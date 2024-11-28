@@ -1,165 +1,147 @@
-import React from 'react';
-// import ProductCard from '../components/ProductCard';
-// import Carousel from '../components/Carousel';
+import React, { useState } from 'react';
+import { FaHome, FaUser, FaShoppingCart, FaHeart, FaSignOutAlt } from 'react-icons/fa';
 
-export default function HomePage() {
-  const categories = [
-    'GAMING MONITORS',
-    'GRAPHICS CARDS',
-    'GAMING MOUSE',
-    'GAMING LAPTOPS',
-    'OTHER CATEGORIES'
-  ];
+const ProductCard = ({ name, price, image }) => (
+  <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg">
+    <img src={image} alt={name} className="w-full h-48 object-cover" />
+    <div className="p-4">
+      <h3 className="text-white text-lg font-semibold">{name}</h3>
+      <p className="text-green-500 font-bold mt-2">${price.toFixed(2)}</p>
+      <button className="mt-4 w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition-colors duration-200">
+        Add to Cart
+      </button>
+    </div>
+  </div>
+);
 
-  const hotDeals = [
-    {
-      id: 1,
-      title: 'Gaming Headset Pro',
-      price: 79.99,
-      image: '/placeholder.svg?height=300&width=300'
-    },
-    {
-      id: 2,
-      title: 'RGB Gaming Mouse',
-      price: 49.99,
-      image: '/placeholder.svg?height=300&width=300'
-    },
-    {
-      id: 3,
-      title: 'Mechanical Keyboard',
-      price: 129.99,
-      image: '/placeholder.svg?height=300&width=300'
-    },
-    {
-      id: 4,
-      title: 'Gaming Chair Deluxe',
-      price: 249.99,
-      image: '/placeholder.svg?height=300&width=300'
-    },
-    {
-      id: 5,
-      title: 'RGB Mousepad XL',
-      price: 39.99,
-      image: '/placeholder.svg?height=300&width=300'
-    }
-  ];
+const UserHomePage = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const popularProducts = [
-    {
-      id: 1,
-      title: 'Blue LED Headset',
-      price: 89.99,
-      image: '/placeholder.svg?height=300&width=300'
-    },
-    {
-      id: 2,
-      title: 'Gaming Mouse RGB',
-      price: 59.99,
-      image: '/placeholder.svg?height=300&width=300'
-    },
-    {
-      id: 3,
-      title: 'Gaming Chair',
-      price: 299.99,
-      image: '/placeholder.svg?height=300&width=300'
-    },
-    {
-      id: 4,
-      title: 'RTX Graphics Card',
-      price: 699.99,
-      image: '/placeholder.svg?height=300&width=300'
-    },
-    {
-      id: 5,
-      title: 'Gaming PC Case',
-      price: 149.99,
-      image: '/placeholder.svg?height=300&width=300'
-    },
-    {
-      id: 6,
-      title: 'Gaming Monitor 144Hz',
-      price: 349.99,
-      image: '/placeholder.svg?height=300&width=300'
-    }
+  const featuredProducts = [
+    { id: 1, name: 'Gaming Mouse', price: 59.99, image: '/placeholder.svg?height=200&width=300&text=Gaming+Mouse' },
+    { id: 2, name: 'Mechanical Keyboard', price: 129.99, image: '/placeholder.svg?height=200&width=300&text=Mechanical+Keyboard' },
+    { id: 3, name: 'Gaming Headset', price: 89.99, image: '/placeholder.svg?height=200&width=300&text=Gaming+Headset' },
+    { id: 4, name: 'Gaming Chair', price: 249.99, image: '/placeholder.svg?height=200&width=300&text=Gaming+Chair' },
   ];
 
   return (
-    <div className="min-h-screen bg-black">
-      <nav className="bg-green-600 p-4">
-        <div className="container mx-auto flex justify-between items-center">
-          <div className="text-white text-2xl font-bold">GeeZee</div>
-          <div className="space-x-6">
-            <a href="#" className="text-white hover:text-gray-200">HOME</a>
-            <a href="#" className="text-white hover:text-gray-200">BEST SELLER</a>
-            <a href="#" className="text-white hover:text-gray-200">SHOP</a>
-            <a href="#" className="text-white hover:text-gray-200">CONTACT</a>
+    <div className="min-h-screen bg-black text-white">
+      {/* Navbar */}
+      <nav className="bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <span className="text-green-500 text-2xl font-bold">GeeZee</span>
+              </div>
+              <div className="hidden md:block">
+                <div className="ml-10 flex items-baseline space-x-4">
+                  <a href="#" className="text-white hover:bg-green-600 px-3 py-2 rounded-md text-sm font-medium">
+                    <FaHome className="inline mr-1" /> Home
+                  </a>
+                  <a href="#" className="text-gray-300 hover:bg-green-600 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                    <FaUser className="inline mr-1" /> Account
+                  </a>
+                  <a href="#" className="text-gray-300 hover:bg-green-600 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                    <FaShoppingCart className="inline mr-1" /> Cart
+                  </a>
+                  <a href="#" className="text-gray-300 hover:bg-green-600 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                    <FaHeart className="inline mr-1" /> Wishlist
+                  </a>
+                  <a href="#" className="text-gray-300 hover:bg-green-600 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                    <FaSignOutAlt className="inline mr-1" /> Logout
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div className="-mr-2 flex md:hidden">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                type="button"
+                className="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+                aria-controls="mobile-menu"
+                aria-expanded="false"
+              >
+                <span className="sr-only">Open main menu</span>
+                {!isMenuOpen ? (
+                  <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                ) : (
+                  <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile menu, show/hide based on menu state */}
+        <div className={`${isMenuOpen ? 'block' : 'hidden'} md:hidden`} id="mobile-menu">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            <a href="#" className="text-white hover:bg-green-600 block px-3 py-2 rounded-md text-base font-medium">
+              <FaHome className="inline mr-1" /> Home
+            </a>
+            <a href="#" className="text-gray-300 hover:bg-green-600 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
+              <FaUser className="inline mr-1" /> Account
+            </a>
+            <a href="#" className="text-gray-300 hover:bg-green-600 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
+              <FaShoppingCart className="inline mr-1" /> Cart
+            </a>
+            <a href="#" className="text-gray-300 hover:bg-green-600 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
+              <FaHeart className="inline mr-1" /> Wishlist
+            </a>
+            <a href="#" className="text-gray-300 hover:bg-green-600 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
+              <FaSignOutAlt className="inline mr-1" /> Logout
+            </a>
           </div>
         </div>
       </nav>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="bg-gray-100 rounded-lg p-4">
-            <h2 className="text-xl font-bold mb-4 bg-green-500 text-white p-2 rounded">
-              CATEGORIES
-            </h2>
-            <ul className="space-y-2">
-              {categories.map((category, index) => (
-                <li key={index}>
-                  <a
-                    href="#"
-                    className="block p-2 hover:bg-green-500 hover:text-white rounded transition-colors duration-300"
-                  >
-                    {category}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+      {/* Main content */}
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        {/* Hero section */}
+        <div className="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
+          <h1 className="text-4xl font-bold text-white mb-4">Welcome to GeeZee Gaming</h1>
+          <p className="text-xl text-gray-300 mb-6">Discover the latest gaming gear and accessories</p>
+          <button className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+            Shop Now
+          </button>
+        </div>
 
-          <div className="md:col-span-3 space-y-8">
-            <div className="bg-gradient-to-r from-purple-900 to-pink-600 rounded-lg p-8 text-white">
-              <h1 className="text-4xl font-bold mb-4">GAMING ACCESSORIES STORE</h1>
-              <p className="text-xl mb-6">One stop shop for all gaming accessories needs</p>
-              <div className="flex space-x-4">
-                <div className="flex items-center">
-                  <span className="bg-white text-black px-3 py-1 rounded">NO COST EMI</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="bg-white text-black px-3 py-1 rounded">EXCHANGE OFFER</span>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h2 className="text-3xl font-bold text-white mb-6 text-center">
-                HOT DEALS
-              </h2>
-              <Carousel slidesToShow={3}>
-                {hotDeals.map((product) => (
-                  <div key={product.id}>
-                    <ProductCard {...product} />
-                  </div>
-                ))}
-              </Carousel>
-            </div>
-
-            <div>
-              <h2 className="text-3xl font-bold text-white mb-6 text-center">
-                Popular Department
-              </h2>
-              <Carousel slidesToShow={4}>
-                {popularProducts.map((product) => (
-                  <div key={product.id}>
-                    <ProductCard {...product} />
-                  </div>
-                ))}
-              </Carousel>
-            </div>
+        {/* Featured Products */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-white mb-4">Featured Products</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {featuredProducts.map((product) => (
+              <ProductCard key={product.id} {...product} />
+            ))}
           </div>
         </div>
-      </div>
+
+        {/* Categories */}
+        <div>
+          <h2 className="text-2xl font-bold text-white mb-4">Shop by Category</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {['PC Gaming', 'Console Gaming', 'VR Gaming', 'Gaming Accessories'].map((category, index) => (
+              <div key={index} className="bg-gray-800 rounded-lg p-4 text-center hover:bg-gray-700 transition-colors duration-200">
+                <h3 className="text-lg font-semibold text-white">{category}</h3>
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 mt-12">
+        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-gray-400">&copy; 2023 GeeZee Gaming. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
   );
-}
+};
+
+export default UserHomePage;
 

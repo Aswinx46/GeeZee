@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import axios from '../../axios/adminAxios'
+import axios from '../../../axios/adminAxios'
+import { useNavigate } from "react-router";
+import {toast} from 'react-toastify'
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
-
+  const navigate=useNavigate()
   const validateForm = () => {
     let formErrors = {};
-    
+ 
    
     if (!email) {
       formErrors.email = 'Email is required';
@@ -34,6 +36,9 @@ export default function AdminLoginPage() {
         
         const response=await axios.post('/login',{email,password})
         console.log(response)
+        toast.success(response.data.message)
+        navigate('/dashboard')
+        
         
       } catch (error) {
         console.log(error.message)

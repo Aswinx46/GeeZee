@@ -1,7 +1,7 @@
 const express=require('express')
 const user_route=express()
 const userController=require('../controllers/userController')
-
+const auth=require('../auth/userAuth')
 user_route.post('/signup',userController.signup)
 user_route.post('/otpVerification',userController.otpVerification)
 user_route.post('/resendOtp',userController.resendOtp)

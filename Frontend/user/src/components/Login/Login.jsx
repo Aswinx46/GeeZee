@@ -4,8 +4,8 @@ import axios from '../../axios/userAxios';
 import { toast } from 'react-toastify';
 import {jwtDecode} from 'jwt-decode'
 import { GoogleLogin } from '@react-oauth/google';
-
-
+import { addToken } from '../../redux/slices/tokenSlice';
+import {useDispatch} from 'react-redux'
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -13,7 +13,7 @@ export default function LoginPage() {
   const [error, setError] = useState({})
   const [user, setUser] = useState({ email: "", password: "" })
   const navigate = useNavigate();
-
+  const dispatch=useDispatch()
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
@@ -30,6 +30,8 @@ export default function LoginPage() {
           password: data.get('password'),
         });
         console.log(response.data);
+      
+        dispatch(addToken(response.data.token))
         toast.success('Login successful!');
         navigate('/home');
       } catch (error) {
@@ -73,6 +75,7 @@ export default function LoginPage() {
             console.log(email)
             const response=await axios.post('/login',{email})
            console.log(response)
+           dispatch(addToken(response.data.token))
            navigate('/home')
   
       
@@ -85,12 +88,6 @@ export default function LoginPage() {
     
     console.log('Google login clicked');
   };
-
-  const handleFacebookLogin = () => {
-    // Implement Facebook login logic here
-    console.log('Facebook login clicked');
-  };
-
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">

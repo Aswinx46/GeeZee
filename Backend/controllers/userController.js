@@ -171,16 +171,22 @@ const login =async(req,res)=>{
         }else{
             if(user.googleId)
             {
-                return res.status(200).json({message:'user logged',user})
+                const token= await jwt.sign({email:email},process.env.ACCESS_TOKEN_SECRET_KEY,{expiresIn:'1h'})
+                const refreshToken=await jwt.sign({email:email},process.env.REFRESH_TOKEN_SECRET_KEY,{expiresIn:'7d'})
+                return res.status(200).json({message:"the user logged",user,token,refreshToken})
+                
             }else{
                 const isPasswordValid=await bcrypt.compare(password,user.password)
                 if(!isPasswordValid)return res.status(400).json({message:"invalid password"})
-                    return res.status(200).json({message:"the user logged",user})
+                    const token= await jwt.sign({email:email},process.env.ACCESS_TOKEN_SECRET_KEY,{expiresIn:'1h'})
+                    const refreshToken=await jwt.sign({email:email},process.env.REFRESH_TOKEN_SECRET_KEY,{expiresIn:'7d'})
+                    return res.status(200).json({message:"the user logged",user,token,refreshToken})
             }
         }
 
     } catch (error) {
-        
+        console.log('login failed',error.message)
+        return res.status(500).json({message:"login failed"})
     }
 }
 
