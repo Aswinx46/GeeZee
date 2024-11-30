@@ -65,7 +65,7 @@ const AdminDashboard = () => {
           <motion.div className="space-y-1">
             {[
               { text: 'Dashboard', href: '#', icon: 'dashboard' },
-              { text: 'Products', href: '#', icon: 'products' },
+              { text: 'Products', href: '/showProduct', icon: 'products' },
               { text: 'Orders', href: '#', icon: 'orders' },
               { text: 'Customers', href: '/users', icon: 'customers' },
               { text: 'Categories', href: '/categoryManagement', icon: 'categories' }

@@ -7,6 +7,8 @@ import {BrowserRouter,Route,Routes} from 'react-router-dom'
 import AdminDashboard from './components/dashboard/AdminDashboard';
 import UserList from './components/dashboard/UserList';
 import CategoryManagement from './components/categoryManagement/categoryManage';
+import AddProduct from './components/productManagement/AddProduct'
+import ShowProduct from './components/productManagement/showProducts'
 function App() {
 
 
@@ -18,6 +20,8 @@ function App() {
     <Route path='/dashboard' element={<AdminDashboard/>}></Route>
     <Route path='/users' element={<UserList/>}></Route>
     <Route path='/categoryManagement' element={<CategoryManagement/>}></Route>
+    <Route path='/addProduct' element={<AddProduct/>}></Route>
+    <Route path='/showProduct' element={<ShowProduct/>}></Route>
     </Routes>
     </BrowserRouter>
     
