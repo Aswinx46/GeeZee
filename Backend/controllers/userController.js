@@ -169,19 +169,31 @@ const login =async(req,res)=>{
         if(!user){
             return res.status(400).json({message:"the user not found"})
         }else{
+            let token,refreshToken
+            if(user.status=='inactive') return res.status(400).json({message:"the user is blocked by admin"})
             if(user.googleId)
             {
-                const token= await jwt.sign({email:email},process.env.ACCESS_TOKEN_SECRET_KEY,{expiresIn:'1h'})
-                const refreshToken=await jwt.sign({email:email},process.env.REFRESH_TOKEN_SECRET_KEY,{expiresIn:'7d'})
-                return res.status(200).json({message:"the user logged",user,token,refreshToken})
+                 token= await jwt.sign({email:email},process.env.ACCESS_TOKEN_SECRET_KEY,{expiresIn:'1h'})
+                 refreshToken=await jwt.sign({email:email},process.env.REFRESH_TOKEN_SECRET_KEY,{expiresIn:'7d'})
+                // return res.status(200).json({message:"the user logged",user,token,refreshToken})
+                console.log(refreshToken)
+
                 
             }else{
                 const isPasswordValid=await bcrypt.compare(password,user.password)
                 if(!isPasswordValid)return res.status(400).json({message:"invalid password"})
-                    const token= await jwt.sign({email:email},process.env.ACCESS_TOKEN_SECRET_KEY,{expiresIn:'1h'})
-                    const refreshToken=await jwt.sign({email:email},process.env.REFRESH_TOKEN_SECRET_KEY,{expiresIn:'7d'})
-                    return res.status(200).json({message:"the user logged",user,token,refreshToken})
+                     token= await jwt.sign({email:email},process.env.ACCESS_TOKEN_SECRET_KEY,{expiresIn:'1h'})
+                     refreshToken=await jwt.sign({email:email},process.env.REFRESH_TOKEN_SECRET_KEY,{expiresIn:'7d'})
+                    // return res.status(200).json({message:"the user logged",user,token,refreshToken})
+                    console.log(refreshToken)
             }
+
+            res.cookie('refreshToken',refreshToken,{
+                httpOnly:true,
+                secure:false,
+                maxAge: 7 * 24 * 60 * 60 * 1000
+            })
+            return res.status(200).json({message:"user logged",user,token})
         }
 
     } catch (error) {
@@ -190,11 +202,30 @@ const login =async(req,res)=>{
     }
 }
 
+const refreshToken=async(req,res)=>{
+    const refreshToken=req.cookies.refreshToken
+
+    if(!refreshToken) return res.status(401).json({message:"no refresh token available"})
+
+        try {
+            const decoded=jwt.verify(refreshToken,process.env.REFRESH_TOKEN_SECRET_KEY)
+            const user=await User.findOne({email:decoded.email})
+            if(!user) return res.status(400).json({message:"user not found"})
+
+                const newAccessToken=jwt.sign({email:user.email},process.env.ACCESS_TOKEN_SECRET_KEY,{expiresIn:'1h'})
+                return res.status(200).json({message:"new token created",accessToken:newAccessToken})
+        } catch (error) {
+            console.log('creting the new access token error',error.message)
+            return res.status(403).json({message:"error in creating the new access token"})
+        }
+}
+
 module.exports={
     signup,
     otpVerification,
     resendOtp,
     googleSave,
-    login
+    login,
+    refreshToken
 
 }

@@ -36,6 +36,7 @@ export default function LoginPage() {
         navigate('/home');
       } catch (error) {
         console.error('Login failed:', error);
+        toast.error(error.response.data.message)
      
       } finally {
         setIsLoading(false);
@@ -70,14 +71,15 @@ export default function LoginPage() {
       {
           try {
             const credential=jwtDecode(credentialResponse.credential)
-            // console.log(credential)
+            console.log(credential)
             const{email}=credential
             console.log(email)
             const response=await axios.post('/login',{email})
            console.log(response)
+           toast.success(response.data.message)
            dispatch(addToken(response.data.token))
            navigate('/home')
-  
+   
       
           } catch (error) {
             console.log('google authenticate failed',error)

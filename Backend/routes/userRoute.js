@@ -7,4 +7,5 @@ user_route.post('/otpVerification',userController.otpVerification)
 user_route.post('/resendOtp',userController.resendOtp)
 user_route.post('/googleAuthenticate',userController.googleSave)
 user_route.post('/login',userController.login)
+user_route.post('/refreshToken',userController.refreshToken)
 module.exports=user_route

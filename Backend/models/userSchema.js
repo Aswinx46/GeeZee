@@ -1,4 +1,5 @@
 const mongoose=require('mongoose')
+const {Schema} =mongoose
 const userSchema= new mongoose.Schema({
     firstName:{
         type:String,
@@ -28,7 +29,7 @@ const userSchema= new mongoose.Schema({
     },
     status:{
         type:String,
-        enum:['active','inactive','blocked'],
+        enum:['active','inactive','blocked','unBlock'],
         default:'active'
     },
     googleId:{
@@ -44,7 +45,11 @@ const userSchema= new mongoose.Schema({
         type:Boolean,
         default:false,
         required:false
-    }
+    },
+    cart:[{
+        type:Schema.Types.ObjectId,
+        ref:"cart"
+    }]
 })
 
 module.exports=mongoose.model('user',userSchema)

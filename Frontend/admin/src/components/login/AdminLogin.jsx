@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import axios from '../../../axios/adminAxios'
 import { useNavigate } from "react-router";
 import {toast} from 'react-toastify'
+import { addToken } from '@/redux/slices/tokenSlice';
+import { useDispatch } from 'react-redux';
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const navigate=useNavigate()
+  const dispatch=useDispatch()
   const validateForm = () => {
     let formErrors = {};
  
@@ -36,12 +39,14 @@ export default function AdminLoginPage() {
         
         const response=await axios.post('/login',{email,password})
         console.log(response)
+        dispatch(addToken(response.data.token))
         toast.success(response.data.message)
+
         navigate('/dashboard')
         
         
       } catch (error) {
-        console.log(error.message)
+        console.log(error)
       }
    
      
