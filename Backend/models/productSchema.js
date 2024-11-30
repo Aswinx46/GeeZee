@@ -4,11 +4,13 @@ const {Schema}=mongoose
 const ProductSchema=new mongoose.Schema({
     title:{
         type:String,
-        required:true
+        required:true,
+        unique:true
     },
     sku:{
         type:String,
-        required:true
+        required:true,
+        unique:true
     },
     price:{
         type:Number,
@@ -23,7 +25,7 @@ const ProductSchema=new mongoose.Schema({
         required:true
     },
     productImg:{
-        type:Array,
+        type:[String],
         required:true
     },
     status:{
@@ -33,11 +35,15 @@ const ProductSchema=new mongoose.Schema({
     },
     categoryId:{
         type:Schema.Types.ObjectId,
-        ref:'category'
+        ref:'category',
+        required:true
     },
     cart:{
         type:Schema.Types.ObjectId,
         ref:"cart"
+    },stock:{
+        type:String,
+        enum:['In Stock','Out of Stock']
     }
 })
 

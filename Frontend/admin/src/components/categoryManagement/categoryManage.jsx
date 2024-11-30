@@ -14,7 +14,6 @@ const StaticCategoryManagement = () => {
     const[editNameCategory,setEditNameCategory]=useState('')
     const[selectedId,setSelectedId]=useState(null)
 
-
     useEffect(()=>{
         const fetchCategory=async () => {
             const category=await axios.get('/category')
@@ -35,10 +34,11 @@ const StaticCategoryManagement = () => {
         try {
             console.log(newCategory)
             const response=await axios.post('/addCategory',{newCategory})
-            setFetch(!fetch)
             console.log(response)
+            setFetch(!fetch)
         } catch (error) {
-            console.log('error in adding the category',error.message)
+            console.log('error in adding the category',error)
+            toast.error(error.response.data.message)
           
         }
       }else{

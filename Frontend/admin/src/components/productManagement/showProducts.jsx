@@ -1,25 +1,39 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaSearch, FaEllipsisH, FaPlus } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-
+import axios from '../../../axios/adminAxios'
+import { toast } from 'react-toastify';
 const ProductList = () => {
   // Sample data for design purposes
-  const products = [
-    { id: 1, name: 'Xpro Keyboard', sku: '47514501', price: '$75.00', stock: 'In Stock', category: 'Keyboard', image: '/placeholder.svg?height=50&width=80' },
-    { id: 2, name: 'Logitech Keyboard', sku: '47514551', price: '$35.00', stock: 'In Stock', category: 'Mouse', image: '/placeholder.svg?height=50&width=80' },
-    { id: 3, name: 'Evolux Mouse', sku: '47514501', price: '$27.00', stock: 'In Stock', category: 'Monitor', image: '/placeholder.svg?height=50&width=80' },
-    { id: 4, name: 'Asus TUF A15', sku: '47514501', price: '$22.00', stock: 'In Stock', category: 'Laptop', image: '/placeholder.svg?height=50&width=80' },
-    { id: 5, name: '4090 Graphics Card', sku: '47514501', price: '$43.00', stock: 'In Stock', category: 'Monitor', image: '/placeholder.svg?height=50&width=80' },
-  ];
+  const [products,setProducts]=useState([])
+//   const products = [
+//     { id: 1, name: 'Xpro Keyboard', sku: '47514501', price: '$75.00', stock: 'In Stock', category: 'Keyboard', image: '/placeholder.svg?height=50&width=80' },
+//     { id: 2, name: 'Logitech Keyboard', sku: '47514551', price: '$35.00', stock: 'In Stock', category: 'Mouse', image: '/placeholder.svg?height=50&width=80' },
+//     { id: 3, name: 'Evolux Mouse', sku: '47514501', price: '$27.00', stock: 'In Stock', category: 'Monitor', image: '/placeholder.svg?height=50&width=80' },
+//     { id: 4, name: 'Asus TUF A15', sku: '47514501', price: '$22.00', stock: 'In Stock', category: 'Laptop', image: '/placeholder.svg?height=50&width=80' },
+//     { id: 5, name: '4090 Graphics Card', sku: '47514501', price: '$43.00', stock: 'In Stock', category: 'Monitor', image: '/placeholder.svg?height=50&width=80' },
+//   ];
 
+    useEffect(()=>{
+        const fetchProducts=async()=>{
+
+            const products= await axios.get('/products')
+            console.log(products)
+            setProducts(products.data.message.products)
+            
+            toast.success(products.data.message)
+        }
+        fetchProducts()
+    },[])
   const [activeDropdown, setActiveDropdown] = useState(null);
+  
+
 
   return (
     <div className="min-h-screen bg-white p-8">
       
       
-
 
       {/* Header */}
       <div className="flex justify-between items-center mb-8">

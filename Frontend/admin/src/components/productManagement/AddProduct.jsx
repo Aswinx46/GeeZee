@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaUpload, FaImage } from 'react-icons/fa';
 import ImageCropper from '../common/ImageCropper';
 import cloudAxios from 'axios'
+import axios from '../../../axios/adminAxios'
 import { MutatingDots } from 'react-loader-spinner'
+import { toast } from 'react-toastify';
 const ProductManagement = () => {
     const[imageUrl,setImageUrl]=useState([])
     const[image,setImage]=useState([])
@@ -11,29 +13,75 @@ const ProductManagement = () => {
     const [currentImage, setCurrentImage] = useState(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(null);
     const [isLoading,setIsLoading]=useState(false)
+    const[categories,setCategories]=useState([])
+    const[success,setSuccess]=useState(false)
+
+    const formRef=useRef()
+
+    useEffect(()=>{
+        const getCategory=async () => {
+            
+            const category= await axios.get('/category')
+            setCategories(category.data.category)
+
+        }
+        getCategory()
+    },[success])
 
     const handleSubmit=async(event)=>{
         event.preventDefault()
+        console.log(categories)
         setIsLoading(true)
         const data=new FormData(event.target)
-        for (let [key, value] of data.entries()) {
-            console.log(`${key}:`, value);
-          }
+        const selectedCategory=categories.find((cat)=>cat.categoryName==data.get('category'))
+        const selectedCategoryId=selectedCategory._id
+        
+        console.log(selectedCategoryId)
           try {
           
-            const uploadPromises= image.map(async(file)=>{
-                const imageUpload=new FormData();
-                imageUpload.append('upload_preset','products')
-                imageUpload.append('cloud_name','dotlezt0x')
-                imageUpload.append('file', file);
-
-                return cloudAxios.post("https://api.cloudinary.com/v1_1/dotlezt0x/image/upload",imageUpload)
+            const uploadPromises= image.map(async(file, index)=>{
+                const formData = new FormData();
+                const croppedImageBlob = await fetch(imageUrl[index]).then(r => r.blob());
+                formData.append('file', croppedImageBlob);
+                formData.append('upload_preset', 'products')
+                formData.append('cloud_name','dotlezt0x')
+                return cloudAxios.post(
+                    'https://api.cloudinary.com/v1_1/dotlezt0x/image/upload',
+                    formData
+                )
             })
             
             const cloudinaryUpload=await Promise.all(uploadPromises) 
             const imageUrls = cloudinaryUpload.map(res=>res.data?.secure_url)
             console.log(imageUrls)
-            // console.log(cloudinaryUpload.data.secure_url)
+           
+            const productDetails={
+                name:data.get('title'),
+                price:data.get('price'),
+                quantity:data.get('quantity'),
+                categoryId:selectedCategoryId,
+                sku:data.get('SKU'),
+                description:data.get('description'),
+                status:data.get('stockStatus'),
+                imageUrl:imageUrls
+            }
+         
+            try {
+                console.log(productDetails)
+                const uploadProduct=await axios.post('/addProduct',productDetails)
+                console.log('jashdfoasdfnalskdjfaksdj')
+                console.log(uploadProduct)
+                toast.success(uploadProduct.data.data.message)
+                setIsLoading(false)
+                setSuccess(!success)
+               if(formRef.current) formRef.current.reset()
+              
+            } catch (error) {
+                console.log('error while adding the product',error)
+                toast.error(error.response.data.message)
+                if(formRef.current) formRef.current.reset()
+            }
+       
            
            
 
@@ -95,7 +143,7 @@ const ProductManagement = () => {
         >
           <h1 className="text-2xl font-bold text-gray-800 mb-8">Add Product</h1>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Title Field */}
               <motion.div
@@ -169,12 +217,14 @@ const ProductManagement = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Category
                 </label>
-                <select name='category' className="w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black">
-                  <option>Select Category</option>
-                  <option>Gaming Peripherals</option>
-                  <option>PC Components</option>
-                  <option>Laptops</option>
-                </select>
+              
+                     <select name='category' className="w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black">
+                     {categories.map((category,i)=>(
+                     <option key={i}>{category.categoryName}</option>
+                    ))}
+                   </select>
+              
+               
               </motion.div>
 
               {/* Image Upload Field */}
@@ -229,7 +279,7 @@ const ProductManagement = () => {
                 transition={{ delay: 0.8 }}
                 className="flex items-center space-x-2"
               >
-                {imageUrl.length>0?(
+                {imageUrl.length > 0 ? (
                     imageUrl.map((url,index)=>(
                         <div key={index} className="relative w-24 h-24 group">
                             <div className="w-full h-full bg-white border border-gray-300 rounded-md overflow-hidden">

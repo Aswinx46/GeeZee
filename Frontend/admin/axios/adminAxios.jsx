@@ -21,7 +21,7 @@ const instance = axios.create({
       
     },
     (error)=>{
-      return promise.reject(error)
+      return Promise.reject(error)
     }
   )
 
@@ -31,7 +31,7 @@ const instance = axios.create({
       const originalRequest=error.config;
 
       if(error.response.status==401 && !originalRequest._retry)
-      {
+      {        
         originalRequest._retry=true;
 
         try{
@@ -46,18 +46,11 @@ const instance = axios.create({
           return Promise.reject(refreshError);
         }
       }
-
+      console.log("response error " + error)
       return Promise.reject(error);
     }
   )
 
-  instance.interceptors.response.use(
-    (response)=>{
-      return response
-    },
-    async(error)=>{
-
-    }
-  )
+ 
 
   export default instance
