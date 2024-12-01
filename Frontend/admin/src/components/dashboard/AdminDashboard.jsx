@@ -39,56 +39,7 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Sidebar */}
-      <motion.div 
-        initial={{ x: -100, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        className={`
-          fixed md:static inset-y-0 left-0 z-30 
-          w-64 md:w-72 lg:w-80 
-          transform transition-transform duration-300 ease-in-out
-          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
-          md:translate-x-0
-          bg-black border-r border-gray-200
-          h-full md:h-screen
-          overflow-y-auto
-        `}
-      >
-        <nav className="px-4 py-6">
-          <motion.h1 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-2xl md:text-3xl font-medium text-white px-4 mb-8 hidden md:block"
-          >
-            GeeZee
-          </motion.h1>
-          <motion.div className="space-y-1">
-            {[
-              { text: 'Dashboard', href: '#', icon: 'dashboard' },
-              { text: 'Products', href: '/showProduct', icon: 'products' },
-              { text: 'Orders', href: '#', icon: 'orders' },
-              { text: 'Customers', href: '/users', icon: 'customers' },
-              { text: 'Categories', href: '/categoryManagement', icon: 'categories' }
-            ].map((item, index) => (
-              <motion.div
-                key={item.text}
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Link 
-                  to={item.href} 
-                  className="flex items-center py-2.5 px-4 rounded-lg text-sm md:text-base text-gray-300 
-                           transition duration-200 hover:bg-white hover:bg-opacity-10 hover:text-white"
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  {item.text}
-                </Link>
-              </motion.div>
-            ))}
-          </motion.div>
-        </nav>
-      </motion.div>
+  
 
       {/* Main Content */}
       <motion.div 

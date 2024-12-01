@@ -15,6 +15,10 @@ const ProductManagement = () => {
     const [isLoading,setIsLoading]=useState(false)
     const[categories,setCategories]=useState([])
     const[success,setSuccess]=useState(false)
+    const [crop, setCrop] = useState({ x: 0, y: 0 });
+    const [zoom, setZoom] = useState(1);
+    const [rotation, setRotation] = useState(0);
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
 
     const formRef=useRef()
 
@@ -108,17 +112,26 @@ const ProductManagement = () => {
         }
     };
 
-    const handleCropSave = (croppedImageUrl) => {
+    const onCropComplete = (croppedArea, croppedAreaPixels) => {
+        setCroppedAreaPixels(croppedAreaPixels);
+    };
+
+    const handleCropSave = () => {
         const newImageUrls = [...imageUrl];
-        newImageUrls[currentImageIndex] = croppedImageUrl;
+        newImageUrls[currentImageIndex] = currentImage;
         setImageUrl(newImageUrls);
         setCropModalOpen(false);
         setCurrentImage(null);
+      
+        setCrop({ x: 0, y: 0 });
+        setZoom(1);
+        setRotation(0);
     };
 
     const handleCropCancel = () => {
         setCropModalOpen(false);
         setCurrentImage(null);
+        setImage(image.slice(0, -1));
     };
 
     const deleteImage =(index)=>{
@@ -340,13 +353,43 @@ const ProductManagement = () => {
 
         </motion.div>
       </div>
-      {cropModalOpen && (
-                <ImageCropper
-                    image={currentImage}
-                    onCropSave={handleCropSave}
-                    onCropCancel={handleCropCancel}
-                />
-            )}
+      {cropModalOpen && currentImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          >
+            <div className="bg-white p-4 rounded-lg w-[90%] max-w-2xl">
+              <h2 className="text-xl font-bold mb-4">Crop Image</h2>
+              <ImageCropper
+                image={currentImage}
+                crop={crop}
+                setCrop={setCrop}
+                zoom={zoom}
+                setZoom={setZoom}
+                rotation={rotation}
+                setRotation={setRotation}
+                onCropComplete={onCropComplete}
+              />
+              <div className="mt-4 flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={handleCropCancel}
+                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCropSave}
+                  className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800"
+                >
+                  Confirm
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
     </div>
   );
 };
