@@ -29,11 +29,12 @@ export default function LoginPage() {
           email: data.get('email'),
           password: data.get('password'),
         });
-        console.log(response.data);
+        console.log(response.data.user._id);
       
         dispatch(addToken(response.data.token))
+        localStorage.setItem('id',response.data.user._id)
         toast.success('Login successful!');
-        navigate('/home');
+        navigate('/home',{replace:true});
       } catch (error) {
         console.error('Login failed:', error);
         toast.error(error.response.data.message)
@@ -75,10 +76,11 @@ export default function LoginPage() {
             const{email}=credential
             console.log(email)
             const response=await axios.post('/login',{email})
-           console.log(response)
+           console.log(response.data.user._id)
+           localStorage.setItem('id',response.data.user._id)
            toast.success(response.data.message)
            dispatch(addToken(response.data.token))
-           navigate('/home')
+           navigate('/home',{replace:true})
    
       
           } catch (error) {

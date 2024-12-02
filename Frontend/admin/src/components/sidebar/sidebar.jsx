@@ -7,7 +7,9 @@ import {
   FaUsers, 
   FaList 
 } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button } from "@/components/ui/button"
+
 
 const Sidebar = () => {
   const menuItems = [
@@ -17,7 +19,12 @@ const Sidebar = () => {
     { icon: FaUsers, text: 'Customers', href: '/users' },
     { icon: FaList, text: 'Categories', href: '/categoryManagement' },
   ];
-
+  const navigate=useNavigate()
+  const handleLogout=()=>{
+    console.log('logout clicked')
+    navigate('/', { replace: false });
+    localStorage.removeItem('id')
+  }
   return (
     <motion.div
       initial={{ x: -280 }}
@@ -67,6 +74,8 @@ const Sidebar = () => {
             </motion.li>
           ))}
         </motion.ul>
+        <Button onClick={handleLogout} variant="outline">LOGOUT</Button>
+
       </nav>
     </motion.div>
   );

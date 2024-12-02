@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { motion } from 'framer-motion';
 
+
+
 // Sample data for the chart
 const salesData = [
   { name: 'Jan', sales: 4000 },
@@ -19,25 +21,7 @@ const AdminDashboard = () => {
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-white">
       {/* Mobile Header with Hamburger */}
-      <div className="md:hidden bg-black border-b border-gray-200 p-4">
-        <div className="flex justify-between items-center">
-          <h1 className="text-xl font-medium text-white">
-            GeeZee
-          </h1>
-          <button 
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="text-white hover:text-gray-300 focus:outline-none focus:text-gray-300"
-          >
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              {sidebarOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
-        </div>
-      </div>
+    
 
   
 

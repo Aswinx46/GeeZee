@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {store} from '../../redux/store'
 import cloudAxios from 'axios'
+import { MutatingDots } from 'react-loader-spinner'
 const EditProduct = () => {
     const [categories, setCategories] = useState([]);
     const [imageUrl, setImageUrl] = useState([]);
@@ -20,7 +21,8 @@ const EditProduct = () => {
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
     const[product,setProduct]=useState({})
     const[oldUrl,setOldUrl]=useState([])
-
+    const[success,setSuccess]=useState(false)
+  
     const navigate=useNavigate()
 
     useEffect(() => {
@@ -35,6 +37,7 @@ const EditProduct = () => {
             setProduct(sendedProduct)
             setOldUrl(sendedProduct.productImg)
             setCategories(cat);
+            setSuccess(false)
             if(sendedProduct.productImg && sendedProduct.productImg.length>0 ) setImageUrl(sendedProduct.productImg)
         };
         fetchCategory();
@@ -141,7 +144,8 @@ const EditProduct = () => {
 
     const handleSubmit=async (e) => {
         e.preventDefault()
-  
+        setSuccess(true)
+        console.log("Before axios.put, product:", product);
         const newImageUrls = imageUrl.filter(url => !url.startsWith('https://res.cloudinary.com'));
        
         const uploadPromises = newImageUrls.map(async(url, index) => {
@@ -161,8 +165,8 @@ const EditProduct = () => {
             
                 return response;
             } catch (error) {
-                
-                throw error;
+                console.log('error while updating the new image to the cloudinary',error)
+               
             }
         })
         
@@ -170,22 +174,24 @@ const EditProduct = () => {
             const cloudinaryResponse = await Promise.all(uploadPromises)
             console.log(cloudinaryResponse)
             const urls=cloudinaryResponse.map((obj)=>obj.data.secure_url)
-            // setOldUrl((i)=>({
-            //     ...i,...urls
-            // }))
+           
            console.log(urls)
             if(urls.length>0)
-            {    console.log(oldUrl)
+                {    console.log('jhfoasjdf;jaso')
                 const response=await axios.put(`/editProduct/${product._id}`,{product,urls:[...oldUrl,...urls]})
-               
+                console.log(product)
             console.log(response)
+            setSuccess(true)
+                navigate('/showProduct')
             }else{
-                const response=await axios.put(`/editProduct/${product._id}`,{product})
+                const response=await axios.put(`/editProduct/${product._id}`,{product,urls:[...oldUrl,...urls]})
+                setSuccess(true)
+                navigate('/showProduct')
             }
-            
-            // console.log(product)
+             
         } catch (error) {
             console.error('Error in Promise.all:', error)
+            setSuccess(false)
         }
        
     }
@@ -405,6 +411,7 @@ const EditProduct = () => {
                         </motion.button>
                     </div>
                 </motion.form>
+                {/* {success && <MutatingDots className='items-center' visible={true} height="100" width="100" color="black" secondaryColor="yellow" radius="12.5" ariaLabel="mutating-dots-loading" wrapperClass="" wrapperStyle={{}}/>} */}
             </div>
 
             {cropModalOpen && currentImage && (

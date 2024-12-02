@@ -10,6 +10,7 @@ import { addProductSlice } from '@/redux/slices/editProductSlice';
 const ProductList = () => {
  
   const [products,setProducts]=useState([])
+  const[search,setSearch]=useState('')
 
   const dispatch=useDispatch()
   const navigate=useNavigate()
@@ -32,7 +33,13 @@ const ProductList = () => {
     navigate('/editProduct')
 
   }
-
+  const filteredProducts = products.filter(
+    (product) =>
+      product.title?.toLowerCase().includes(search.toLowerCase()) ||
+    product.status?.toLowerCase().includes(search.toLowerCase())
+    
+  );
+ console.log(filteredProducts)
 
   return (
     <div className="min-h-screen bg-white p-8">
@@ -49,6 +56,7 @@ const ProductList = () => {
             <input
               type="text"
               placeholder="Search products..."
+              onChange={(e)=>setSearch(e.target.value)}
               className="w-64 bg-white text-gray-900 border border-gray-300 rounded-lg py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-black"
             />
             <FaSearch className="absolute left-3 top-3 text-gray-400" />
@@ -86,7 +94,7 @@ const ProductList = () => {
             </tr>
           </thead>
           <tbody>
-            {products.map((product, index) => (
+            {filteredProducts.map((product, index) => (
               <motion.tr
                 key={product._id}
                 initial={{ opacity: 0 }}

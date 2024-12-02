@@ -1,147 +1,166 @@
 import React, { useState } from 'react';
-import { FaHome, FaUser, FaShoppingCart, FaHeart, FaSignOutAlt } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
-const ProductCard = ({ name, price, image }) => (
-  <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg">
-    <img src={image} alt={name} className="w-full h-48 object-cover" />
-    <div className="p-4">
-      <h3 className="text-white text-lg font-semibold">{name}</h3>
-      <p className="text-green-500 font-bold mt-2">${price.toFixed(2)}</p>
-      <button className="mt-4 w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition-colors duration-200">
-        Add to Cart
-      </button>
-    </div>
-  </div>
-);
+const Home = () => {
+  const [isHovered, setIsHovered] = useState(null);
 
-const UserHomePage = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const featuredProducts = [
-    { id: 1, name: 'Gaming Mouse', price: 59.99, image: '/placeholder.svg?height=200&width=300&text=Gaming+Mouse' },
-    { id: 2, name: 'Mechanical Keyboard', price: 129.99, image: '/placeholder.svg?height=200&width=300&text=Mechanical+Keyboard' },
-    { id: 3, name: 'Gaming Headset', price: 89.99, image: '/placeholder.svg?height=200&width=300&text=Gaming+Headset' },
-    { id: 4, name: 'Gaming Chair', price: 249.99, image: '/placeholder.svg?height=200&width=300&text=Gaming+Chair' },
+  const features = [
+    { title: "Premium Quality", description: "High-end peripherals and accessories from top gaming brands" },
+    { title: "Fast Delivery", description: "Express shipping for your gaming gear worldwide" },
+    { title: "24/7 Support", description: "Expert technical assistance for all your accessories" },
+    { title: "Secure Payment", description: "Safe transactions for your gaming equipment purchases" }
   ];
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Navbar */}
-      <nav className="bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <span className="text-green-500 text-2xl font-bold">GeeZee</span>
-              </div>
-              <div className="hidden md:block">
-                <div className="ml-10 flex items-baseline space-x-4">
-                  <a href="#" className="text-white hover:bg-green-600 px-3 py-2 rounded-md text-sm font-medium">
-                    <FaHome className="inline mr-1" /> Home
-                  </a>
-                  <a href="#" className="text-gray-300 hover:bg-green-600 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                    <FaUser className="inline mr-1" /> Account
-                  </a>
-                  <a href="#" className="text-gray-300 hover:bg-green-600 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                    <FaShoppingCart className="inline mr-1" /> Cart
-                  </a>
-                  <a href="#" className="text-gray-300 hover:bg-green-600 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                    <FaHeart className="inline mr-1" /> Wishlist
-                  </a>
-                  <a href="#" className="text-gray-300 hover:bg-green-600 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                    <FaSignOutAlt className="inline mr-1" /> Logout
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="-mr-2 flex md:hidden">
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                type="button"
-                className="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
-                aria-controls="mobile-menu"
-                aria-expanded="false"
+    <div className="min-h-screen bg-white">
+      {/* Hero Section */}
+      <motion.section 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+        className="h-screen flex items-center justify-center relative overflow-hidden bg-black text-white"
+      >
+        <div className="absolute inset-0 opacity-50">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black" />
+        </div>
+        
+        <div className="container mx-auto px-4 z-10 text-center">
+          <motion.h1 
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.8 }}
+            className="text-6xl md:text-8xl font-bold mb-6"
+          >
+            GeeZee
+          </motion.h1>
+          <motion.p 
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+            className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto"
+          >
+            Elevate your workspace with premium computer accessories and innovative tech solutions
+          </motion.p>
+          <motion.div
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+          >
+            <Link 
+              to="/productPage" 
+              className="bg-white text-black px-8 py-3 rounded-full text-lg font-semibold hover:bg-gray-200 transition-colors"
+            >
+              Shop Now
+            </Link>
+          </motion.div>
+        </div>
+      </motion.section>
+
+      {/* Features Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-4xl font-bold text-center mb-16 text-black"
+          >
+            Why Choose Us
+          </motion.h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.2, duration: 0.6 }}
+                whileHover={{ scale: 1.05 }}
+                className="p-6 bg-black text-white rounded-lg text-center cursor-pointer"
               >
-                <span className="sr-only">Open main menu</span>
-                {!isMenuOpen ? (
-                  <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
-                ) : (
-                  <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                )}
+                <h3 className="text-xl font-semibold mb-4">{feature.title}</h3>
+                <p className="text-gray-300">{feature.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Collection Preview */}
+      <section className="py-20 bg-black">
+        <div className="container mx-auto px-4">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-4xl font-bold text-center mb-16 text-white"
+          >
+            Latest Collection
+          </motion.h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[1, 2, 3].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.2, duration: 0.6 }}
+                onHoverStart={() => setIsHovered(index)}
+                onHoverEnd={() => setIsHovered(null)}
+                className="relative overflow-hidden rounded-lg aspect-[3/4] bg-gray-900"
+              >
+                <motion.div
+                  animate={{
+                    scale: isHovered === index ? 1.1 : 1,
+                  }}
+                  transition={{ duration: 0.4 }}
+                  className="w-full h-full bg-gray-800"
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: isHovered === index ? 1 : 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-black bg-opacity-50 p-4 rounded-lg"
+                  >
+                    <Link to="/products" className="text-white font-semibold">
+                      View Collection
+                    </Link>
+                  </motion.div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Newsletter Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center"
+          >
+            <h2 className="text-4xl font-bold mb-6 text-black">Stay Updated</h2>
+            <p className="text-gray-600 mb-8">Subscribe to our newsletter for exclusive offers and updates</p>
+            <div className="flex flex-col md:flex-row gap-4 justify-center">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="px-6 py-3 rounded-full border border-gray-300 focus:outline-none focus:border-black"
+              />
+              <button className="bg-black text-white px-8 py-3 rounded-full hover:bg-gray-900 transition-colors">
+                Subscribe
               </button>
             </div>
-          </div>
+          </motion.div>
         </div>
-
-        {/* Mobile menu, show/hide based on menu state */}
-        <div className={`${isMenuOpen ? 'block' : 'hidden'} md:hidden`} id="mobile-menu">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <a href="#" className="text-white hover:bg-green-600 block px-3 py-2 rounded-md text-base font-medium">
-              <FaHome className="inline mr-1" /> Home
-            </a>
-            <a href="#" className="text-gray-300 hover:bg-green-600 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
-              <FaUser className="inline mr-1" /> Account
-            </a>
-            <a href="#" className="text-gray-300 hover:bg-green-600 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
-              <FaShoppingCart className="inline mr-1" /> Cart
-            </a>
-            <a href="#" className="text-gray-300 hover:bg-green-600 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
-              <FaHeart className="inline mr-1" /> Wishlist
-            </a>
-            <a href="#" className="text-gray-300 hover:bg-green-600 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
-              <FaSignOutAlt className="inline mr-1" /> Logout
-            </a>
-          </div>
-        </div>
-      </nav>
-
-      {/* Main content */}
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        {/* Hero section */}
-        <div className="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
-          <h1 className="text-4xl font-bold text-white mb-4">Welcome to GeeZee Gaming</h1>
-          <p className="text-xl text-gray-300 mb-6">Discover the latest gaming gear and accessories</p>
-          <button className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-            Shop Now
-          </button>
-        </div>
-
-        {/* Featured Products */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">Featured Products</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} {...product} />
-            ))}
-          </div>
-        </div>
-
-        {/* Categories */}
-        <div>
-          <h2 className="text-2xl font-bold text-white mb-4">Shop by Category</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {['PC Gaming', 'Console Gaming', 'VR Gaming', 'Gaming Accessories'].map((category, index) => (
-              <div key={index} className="bg-gray-800 rounded-lg p-4 text-center hover:bg-gray-700 transition-colors duration-200">
-                <h3 className="text-lg font-semibold text-white">{category}</h3>
-              </div>
-            ))}
-          </div>
-        </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 mt-12">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-gray-400">&copy; 2023 GeeZee Gaming. All rights reserved.</p>
-        </div>
-      </footer>
+      </section>
     </div>
   );
 };
 
-export default UserHomePage;
-
+export default Home;

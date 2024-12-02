@@ -24,7 +24,7 @@ const login=async(req,res)=>{
                         maxAge: 7 * 24 * 60 * 60 * 1000
                     })
            
-                    return res.status(200).json({message:'admin logged',token})
+                    return res.status(200).json({message:'admin logged',token,user})
             }   
     } catch (error) {
         console.log('admin login failed',error)

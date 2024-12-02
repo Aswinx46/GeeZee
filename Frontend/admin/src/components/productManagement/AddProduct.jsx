@@ -6,6 +6,7 @@ import cloudAxios from 'axios'
 import axios from '../../../axios/adminAxios'
 import { MutatingDots } from 'react-loader-spinner'
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 const ProductManagement = () => {
     const[imageUrl,setImageUrl]=useState([])
     const[image,setImage]=useState([])
@@ -19,7 +20,7 @@ const ProductManagement = () => {
     const [zoom, setZoom] = useState(1);
     const [rotation, setRotation] = useState(0);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-
+    const navigate=useNavigate()
     const formRef=useRef()
 
     useEffect(()=>{
@@ -73,12 +74,14 @@ const ProductManagement = () => {
             try {
                 console.log(productDetails)
                 const uploadProduct=await axios.post('/addProduct',productDetails)
-                console.log('jashdfoasdfnalskdjfaksdj')
+              
                 console.log(uploadProduct)
                 toast.success(uploadProduct.data.data.message)
+                navigate('/showProduct')
                 setIsLoading(false)
                 setSuccess(!success)
                if(formRef.current) formRef.current.reset()
+              
               
             } catch (error) {
                 console.log('error while adding the product',error)

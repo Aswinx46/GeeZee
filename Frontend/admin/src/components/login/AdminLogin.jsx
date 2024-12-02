@@ -38,11 +38,12 @@ export default function AdminLoginPage() {
       try {
         
         const response=await axios.post('/login',{email,password})
-        console.log(response)
+        console.log(response.data.user._id)
+        localStorage.setItem('id',response.data.user._id)
         dispatch(addToken(response.data.token))
         toast.success(response.data.message)
 
-        navigate('/dashboard')
+        navigate('/dashboard',{replace:true})
         
         
       } catch (error) {

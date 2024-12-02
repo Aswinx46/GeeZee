@@ -40,34 +40,73 @@ const showProduct=async (req,res) => {
 
 const editProduct=async (req,res) => {
     const{id}=req.params
-    console.log(id)
+   
   
-    const {title,sku,price,availableQuantity,description,status,categoryId,categoryName,stock,urls,category}=req.body
-    console.log(categoryName)
+    const {title,sku,price,availableQuantity,description,status,categoryId,stock,category}=req.body.product
+   
+    const oldCatId=categoryId._id
+    const{urls}=req.body
+  
+    
     try {
         const checkCategory=await Category.findOne({categoryName:category})
-        if(!checkCategory) return res.status(400).json({message:"no category found "})
-            console.log(checkCategory)
-        const editedProduct=await Product.findByIdAndUpdate(id,{
-            title,
-            sku,
-            price,
-            availableQuantity,
-            description,
-            productImg:urls,
-            status,
-            stock,
+        
+        if(!checkCategory)
+        {
             
-        })
+            const editedProduct=await Product.findByIdAndUpdate(id,{
+                title,
+                sku,
+                price,
+                availableQuantity,
+                description,
+                productImg:urls,
+                status,
+                stock,
+                categoryId:oldCatId
+            })
+            await editedProduct.save()
+            return res.status(200).json({message:"product edited"})
+        }else{
+            console.log(checkCategory)
+            const editedProduct=await Product.findByIdAndUpdate(id,{
+                title,
+                sku,
+                price,
+                availableQuantity,
+                description,
+                productImg:urls,
+                status,
+                stock,
+                categoryId:checkCategory._id
+            })
+            await editedProduct.save()
+            return res.status(200).json({message:"product edited"})
+        }
+          
     } catch (error) {
         console.log('error while editing the product',error)
         return res.status(500).json({message:"error while editing the product"})
     }
 }
+
+
+const showProductListed=async (req,res) => {
+    
+    try {
+        const products=await Product.find({status:'active'}).populate('categoryId','categoryName')
+        return res.status(200).json({message:'products fetched',products})
+    } catch (error) {
+        console.log('error while fetching the products')
+        return res.status(500).json({message:"error while fetching the products"})
+    }
+}
+
 module.exports={
     addProduct,
     showProduct,
-    editProduct
+    editProduct,
+    showProductListed
     
 }
 
