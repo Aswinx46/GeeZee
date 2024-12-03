@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import {store} from '../../redux/store'
 import cloudAxios from 'axios'
 import { MutatingDots } from 'react-loader-spinner'
+
 const EditProduct = () => {
     const [categories, setCategories] = useState([]);
     const [imageUrl, setImageUrl] = useState([]);
@@ -280,7 +281,7 @@ const EditProduct = () => {
                             <input
                                 type="number"
                                 id="quantity"
-                                name="quantity"
+                                name="availableQuantity"
                                 value={product.availableQuantity}
                                 onChange={handleInputChange}
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-all duration-200 ease-in-out"

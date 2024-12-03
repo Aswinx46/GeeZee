@@ -13,6 +13,7 @@ import ProductPage from './components/productPage/ProductPage';
 import ProductDetails from './components/productDetails/productDetails';
 import ProtectedRoute from './components/protectedRoute/protectedRoute';
 import Signup from './components/signup/Signup'
+import Prod from './product'
 function App() {
 
 
@@ -23,6 +24,7 @@ function App() {
     <Routes>
        <Route path='/' element={<HomePage/>}></Route>
        <Route path='/signup' element={<Signup/>}></Route>
+       <Route path='/prod' element={<Prod/>}></Route>
        <Route path='/otpVerification' element={ <OtpVerification/>   }></Route>
        <Route path='/login' element={ <LoginPage/>}></Route>
        <Route path='/home' element={<ProtectedRoute> <HomePage/> </ProtectedRoute> }></Route>

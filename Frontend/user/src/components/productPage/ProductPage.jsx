@@ -1,12 +1,9 @@
-
-
-
 import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaShoppingCart, FaGamepad, FaDesktop, FaHeadphones, FaKeyboard, FaMouse, FaChair, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import axios from '../../axios/userAxios'
-
+import Banner from '../../assets/banner.jpg'
 const ProductPage = () => {
     const [hoveredCategory, setHoveredCategory] = useState(null);
     const [products, setProducts] = useState([])
@@ -71,21 +68,21 @@ const ProductPage = () => {
     }, [products]);
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-[#000000]">
             {/* Hero Banner Section */}
-            <div className="relative w-full h-[400px] overflow-hidden">
+            <div className="relative w-full h-[600px] overflow-hidden">
                 <div className="flex w-full h-full">
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         className="w-full h-full relative"
                     >
-                        {/* <img
-                            src="/gaming-banner.jpg"
+                        <img
+                            src={Banner}
                             alt="Gaming Accessories"
                             className="w-full h-full object-cover"
-                        /> */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent">
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent">
                             <div className="container mx-auto px-4 h-full flex items-center">
                                 <div className="max-w-xl">
                                     <motion.h1
@@ -112,24 +109,24 @@ const ProductPage = () => {
             </div>
 
             {/* Hot Deals Section */}
-            <section className="py-12 bg-white">
+            <section className="py-12 bg-[#000000]">
                 <div className="container mx-auto px-4">
                     <motion.h2
                         initial={{ y: 20, opacity: 0 }}
                         whileInView={{ y: 0, opacity: 1 }}
-                        className="text-3xl font-bold mb-8 text-center"
+                        className="text-3xl font-bold mb-8 text-center text-white"
                     >
                         HOT DEALS
                     </motion.h2>
                     <div className="relative overflow-hidden">
                         <div className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10">
-                            <button onClick={prevSlide} className="bg-white p-2 rounded-full shadow-md">
-                                <FaChevronLeft className="text-blue-600" />
+                            <button onClick={prevSlide} className="bg-[#1b1b1b] p-2 rounded-full shadow-md hover:bg-[#2d2d2d]">
+                                <FaChevronLeft className="text-[#8b5cf6]" />
                             </button>
                         </div>
                         <div className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10">
-                            <button onClick={nextSlide} className="bg-white p-2 rounded-full shadow-md">
-                                <FaChevronRight className="text-blue-600" />
+                            <button onClick={nextSlide} className="bg-[#1b1b1b] p-2 rounded-full shadow-md hover:bg-[#2d2d2d]">
+                                <FaChevronRight className="text-[#8b5cf6]" />
                             </button>
                         </div>
                         <div 
@@ -143,7 +140,7 @@ const ProductPage = () => {
                                     className="w-full md:w-[280px] flex-shrink-0 px-2"
                                     style={{ scrollSnapAlign: 'start' }}
                                 >
-                                    <div className="bg-white rounded-md shadow-md overflow-hidden h-full max-w-[280px]">
+                                    <div className="bg-[#1b1b1b] rounded-md shadow-md overflow-hidden h-full max-w-[280px] border border-[#3d3d3d]">
                                         <div className="relative pt-[60%]">
                                             <img
                                                 src={product.productImg[0]}
@@ -152,9 +149,9 @@ const ProductPage = () => {
                                             />
                                         </div>
                                         <div className="p-3">
-                                            <h3 className="text-sm font-semibold mb-2 line-clamp-2">{product.title}</h3>
-                                            <p className="text-lg font-bold text-blue-600 mb-2">₹{product.price}</p>
-                                            <button onClick={() => handleDeal(index)} className="w-full bg-blue-600 text-white px-3 py-1.5 rounded-full hover:bg-blue-700 transition-all text-sm">
+                                            <h3 className="text-sm font-semibold mb-2 line-clamp-2 text-white">{product.title}</h3>
+                                            <p className="text-lg font-bold text-[#8b5cf6] mb-2">₹{product.price}</p>
+                                            <button onClick={() => handleDeal(index)} className="w-full bg-[#8b5cf6] text-white px-3 py-1.5 rounded-full hover:bg-[#7c3aed] transition-all text-sm font-semibold">
                                                 View Deal
                                             </button>
                                         </div>
@@ -167,12 +164,12 @@ const ProductPage = () => {
             </section>
 
             {/* Popular Department Section */}
-            <section className="py-12 bg-gray-50">
+            <section className="py-12 bg-[#1b1b1b]">
                 <div className="container mx-auto px-4">
                     <motion.h2
                         initial={{ y: 20, opacity: 0 }}
                         whileInView={{ y: 0, opacity: 1 }}
-                        className="text-3xl font-bold mb-8 text-center"
+                        className="text-3xl font-bold mb-8 text-center text-white"
                     >
                         Popular Department
                     </motion.h2>
@@ -192,13 +189,13 @@ const ProductPage = () => {
                                 whileHover={{ scale: 1.1 }}
                                 onHoverStart={() => setHoveredCategory(index)}
                                 onHoverEnd={() => setHoveredCategory(null)}
-                                className="bg-white rounded-lg shadow-md p-4 text-center cursor-pointer"
+                                className="bg-[#000000] border border-[#3d3d3d] rounded-lg shadow-md p-4 text-center cursor-pointer hover:border-[#8b5cf6]"
                             >
                                 <category.icon
-                                    className={`text-4xl mx-auto mb-2 transition-colors duration-200 ${hoveredCategory === index ? 'text-blue-600' : 'text-gray-700'
+                                    className={`text-4xl mx-auto mb-2 transition-colors duration-200 ${hoveredCategory === index ? 'text-[#8b5cf6]' : 'text-gray-400'
                                         }`}
                                 />
-                                <h3 className="text-sm font-medium">{category.name}</h3>
+                                <h3 className="text-sm font-medium text-white">{category.name}</h3>
                             </motion.div>
                         ))}
                     </div>
@@ -206,7 +203,7 @@ const ProductPage = () => {
             </section>
 
             {/* Build PC Section */}
-            <section className="py-12 bg-gray-900 text-white">
+            <section className="py-12 bg-[#000000]">
                 <div className="container mx-auto px-4">
                     <div className="grid md:grid-cols-2 gap-8">
                         <motion.div
@@ -236,12 +233,12 @@ const ProductPage = () => {
             </section>
 
             {/* What We Serve Section */}
-            <section className="py-12 bg-white">
+            <section className="py-12 bg-[#000000]">
                 <div className="container mx-auto px-4">
                     <motion.h2
                         initial={{ y: 20, opacity: 0 }}
                         whileInView={{ y: 0, opacity: 1 }}
-                        className="text-3xl font-bold mb-12 text-center"
+                        className="text-3xl font-bold mb-12 text-center text-white"
                     >
                         What We Serve
                     </motion.h2>
@@ -259,11 +256,11 @@ const ProductPage = () => {
                                 transition={{ delay: index * 0.1 }}
                                 className="text-center"
                             >
-                                <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
-                                    <FaShoppingCart className="text-2xl text-blue-600" />
+                                <div className="w-16 h-16 mx-auto mb-4 bg-[#1b1b1b] rounded-full flex items-center justify-center">
+                                    <FaShoppingCart className="text-2xl text-[#8b5cf6]" />
                                 </div>
-                                <h3 className="text-lg font-semibold mb-2">{service.title}</h3>
-                                <p className="text-gray-600">{service.description}</p>
+                                <h3 className="text-lg font-semibold mb-2 text-white">{service.title}</h3>
+                                <p className="text-gray-400">{service.description}</p>
                             </motion.div>
                         ))}
                     </div>
@@ -274,4 +271,3 @@ const ProductPage = () => {
 };
 
 export default ProductPage;
-
