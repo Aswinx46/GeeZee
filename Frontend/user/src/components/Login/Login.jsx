@@ -6,7 +6,8 @@ import {jwtDecode} from 'jwt-decode'
 import { GoogleLogin } from '@react-oauth/google';
 import { addToken } from '../../redux/slices/tokenSlice';
 import {useDispatch} from 'react-redux'
-
+import Header from '../Header/header';
+import { addUser } from '@/redux/slices/userSlice';
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false)
@@ -29,12 +30,16 @@ export default function LoginPage() {
           email: data.get('email'),
           password: data.get('password'),
         });
-        console.log(response.data.user._id);
+        console.log(response.data.user);
+        localStorage.setItem('user',response.data.user)
       
         dispatch(addToken(response.data.token))
         localStorage.setItem('id',response.data.user._id)
+    
+        dispatch(addUser(response.data.user))
         toast.success('Login successful!');
         navigate('/home',{replace:true});
+     
       } catch (error) {
         console.error('Login failed:', error);
         toast.error(error.response.data.message)
@@ -80,8 +85,11 @@ export default function LoginPage() {
            localStorage.setItem('id',response.data.user._id)
            toast.success(response.data.message)
            dispatch(addToken(response.data.token))
+            localStorage.setItem('id',response.data.user._id)
+            localStorage.setItem('user',response.data.user)
+            dispatch((addUser(response.data.user)))
            navigate('/home',{replace:true})
-   
+     
       
           } catch (error) {
             console.log('google authenticate failed',error)
@@ -206,7 +214,7 @@ export default function LoginPage() {
         <p className="mt-2 text-center text-sm text-gray-400">
           Don't have an account?{' '}
 
-          <Link to='/' className='className="font-medium text-green-500 hover:text-green-400"' >  Sign up</Link>
+          <Link to='/signup' className='className="font-medium text-green-500 hover:text-green-400"' >  Sign up</Link>
 
 
         </p>

@@ -11,7 +11,8 @@ import LoginPage from './components/Login/Login';
 import HomePage from './components/home/Home';
 import ProductPage from './components/productPage/ProductPage';
 import ProductDetails from './components/productDetails/productDetails';
-import protectedRoute from './components/protectedRoute/protectedRoute';
+import ProtectedRoute from './components/protectedRoute/protectedRoute';
+import Signup from './components/signup/Signup'
 function App() {
 
 
@@ -21,11 +22,12 @@ function App() {
     <Header/>
     <Routes>
        <Route path='/' element={<HomePage/>}></Route>
-       <Route path='/otpVerification' element={<protectedRoute> <OtpVerification/> </protectedRoute>  }></Route>
-       <Route path='/login' element={<protectedRoute>  <LoginPage/> </protectedRoute>}></Route>
-       <Route path='/home' element={<protectedRoute> <HomePage/> </protectedRoute> }></Route>
-       <Route path='/productPage' element={<protectedRoute>  <ProductPage/> </protectedRoute>}></Route>
-       <Route path='/productDetails' element={ <protectedRoute> <ProductDetails/> </protectedRoute>}></Route>
+       <Route path='/signup' element={<Signup/>}></Route>
+       <Route path='/otpVerification' element={ <OtpVerification/>   }></Route>
+       <Route path='/login' element={ <LoginPage/>}></Route>
+       <Route path='/home' element={<ProtectedRoute> <HomePage/> </ProtectedRoute> }></Route>
+       <Route path='/productPage' element={<ProtectedRoute>  <ProductPage/> </ProtectedRoute>}></Route>
+       <Route path='/productDetails' element={ <ProtectedRoute> <ProductDetails/> </ProtectedRoute>}></Route>
     </Routes>
     </BrowserRouter>
     

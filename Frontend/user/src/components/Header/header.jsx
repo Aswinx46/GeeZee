@@ -1,10 +1,37 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, replace, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaHome, FaShoppingCart, FaSearch, FaUser, FaCrown, FaStore } from 'react-icons/fa';
-
-const Header = () => {
+import {store} from '../../redux/store'
+import BreadCrumps from '../BreadCrump/BreadCrumps';
+import { useSelector, useDispatch } from 'react-redux';
+import { removeUser } from '@/redux/slices/userSlice';
+const Header = (props) => {
   const [isHovered, setIsHovered] = useState(null);
+  const navigate=useNavigate()
+  const[isLogin,setIsLogin]=useState(false)
+  const[checkToken,setCheckToken]=useState(false)
+  const[user,setUser]=useState({})
+
+  const userData = useSelector(state=>state.user.user);
+  const dispatch = useDispatch()
+
+
+
+  const handleLogin = () => {
+    navigate('/login');
+    console.log("Login button clicked");
+  };
+  
+  const handleLogout = () => {
+  
+    localStorage.removeItem('id');
+    setIsLogin(false);
+    dispatch(removeUser())
+    navigate('/', { replace: true });
+    console.log("Logout button clicked");
+  };
+  
 
   return (
     <motion.header 
@@ -29,11 +56,11 @@ const Header = () => {
           <nav className="hidden md:flex items-center space-x-8">
             {[
               { name: 'Home', icon: FaHome, path: '/' },
-              { name: 'Best Sellers', icon: FaCrown, path: '/best-sellers' },
-              { name: 'Shop', icon: FaStore, path: '/shop' },
-              { name: 'Search', icon: FaSearch, path: '/search' },
-              { name: 'Cart', icon: FaShoppingCart, path: '/cart' },
-              { name: 'Account', icon: FaUser, path: '/account' }
+              { name: 'Best Sellers', icon: FaCrown, path: '/productPage' },
+              { name: 'Shop', icon: FaStore, path: '/productPage' },
+              { name: 'Search', icon: FaSearch, path: '#' },
+              { name: 'Cart', icon: FaShoppingCart, path: '#' },
+              { name: 'Account', icon: FaUser, path: '#' }
             ].map((item, index) => (
               <motion.div
                 key={index}
@@ -50,8 +77,36 @@ const Header = () => {
                 </Link>
               </motion.div>
             ))}
-          </nav>
+            
+            {/* Login Button */}
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+            >
 
+              {userData ?      <button
+                onClick={handleLogout}
+                className="flex items-center space-x-1 hover:text-violet-400 transition-colors duration-200"
+              >
+                <FaUser className="text-lg" />
+                <span className="font-medium">Logout</span>
+              </button> :      <button
+                onClick={handleLogin}
+                className="flex items-center space-x-1 hover:text-violet-400 transition-colors duration-200"
+              >
+                <FaUser className="text-lg" />
+                <span className="font-medium">Login</span>
+              </button>}
+              {/* <button
+                onClick={handleLogin}
+                className="flex items-center space-x-1 hover:text-violet-400 transition-colors duration-200"
+              >
+                <FaUser className="text-lg" />
+                <span className="font-medium">Login</span>
+              </button> */}
+         
+            </motion.div>
+          </nav>
+            
           {/* Mobile Menu Button */}
           <motion.button
             whileTap={{ scale: 0.95 }}
@@ -73,6 +128,7 @@ const Header = () => {
           </motion.button>
         </div>
       </div>
+      {/* <BreadCrumps/> */}
     </motion.header>
   );
 };

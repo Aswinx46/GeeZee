@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-
+import image1 from '../../assets/image.png'
+import image2 from '../../assets/image2.jpg'
+import Asus from '../../assets/asus rog 1.jpg'
 const Home = () => {
   const [isHovered, setIsHovered] = useState(null);
 
@@ -11,6 +13,7 @@ const Home = () => {
     { title: "24/7 Support", description: "Expert technical assistance for all your accessories" },
     { title: "Secure Payment", description: "Safe transactions for your gaming equipment purchases" }
   ];
+  const items=['https://www.google.com/url?q=http://www.flipkart.com/evofox-one-universal-wireless-bluetooth-gamepad/p/itmcaaf10284dd0b%3Fpid%3DACCGNCFY2C88ECRR%26lid%3DLSTACCGNCFY2C88ECRRF4QUHN%26marketplace%3DFLIPKART%26cmpid%3Dcontent_gamepad_8965229628_gmc&opi=95576897&sa=U&ved=0ahUKEwjz5qXCzomKAxUxhq8BHfRUKdcQrzwIpgM&usg=AOvVaw1FAO7RR7J-9SAb_P3J4CrC']
 
   return (
     <div className="min-h-screen bg-white">
@@ -100,7 +103,20 @@ const Home = () => {
           </motion.h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[1, 2, 3].map((item, index) => (
+            {[
+              {
+                image: image1,
+                title: "Gaming Peripherals"
+              },
+              {
+                image: image2,
+                title: "Mechanical Keyboards"
+              },
+              {
+                image: Asus,
+                title: "Premium Accessories"
+              }
+            ].map((item, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
@@ -108,15 +124,21 @@ const Home = () => {
                 transition={{ delay: index * 0.2, duration: 0.6 }}
                 onHoverStart={() => setIsHovered(index)}
                 onHoverEnd={() => setIsHovered(null)}
-                className="relative overflow-hidden rounded-lg aspect-[3/4] bg-gray-900"
+                className="relative overflow-hidden rounded-lg aspect-[3/4]"
               >
                 <motion.div
                   animate={{
                     scale: isHovered === index ? 1.1 : 1,
                   }}
                   transition={{ duration: 0.4 }}
-                  className="w-full h-full bg-gray-800"
-                />
+                  className="w-full h-full"
+                >
+                  <img 
+                    src={item.image} 
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                  />
+                </motion.div>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <motion.div
                     initial={{ opacity: 0 }}
@@ -125,7 +147,7 @@ const Home = () => {
                     className="bg-black bg-opacity-50 p-4 rounded-lg"
                   >
                     <Link to="/products" className="text-white font-semibold">
-                      View Collection
+                      View {item.title}
                     </Link>
                   </motion.div>
                 </div>
