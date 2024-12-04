@@ -16,7 +16,7 @@ const instance = axios.create({
       {
         config.headers['Authorization']=`Bearer ${token}`
       }
-      console.log('token interceptor done')
+      console.log('token interceptor done',config)
       return config;
       
     },

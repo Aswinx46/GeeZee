@@ -14,6 +14,8 @@ const Header = (props) => {
   const[user,setUser]=useState({})
 
   const userData = useSelector(state=>state.user.user);
+
+  console.log(userData)
   const dispatch = useDispatch()
 
 
@@ -26,6 +28,7 @@ const Header = (props) => {
   const handleLogout = () => {
   
     localStorage.removeItem('id');
+    localStorage.removeItem('user');
     setIsLogin(false);
     dispatch(removeUser())
     navigate('/', { replace: true });

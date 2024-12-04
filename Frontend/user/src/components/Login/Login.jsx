@@ -31,7 +31,7 @@ export default function LoginPage() {
           password: data.get('password'),
         });
         console.log(response.data.user);
-        localStorage.setItem('user',response.data.user)
+        localStorage.setItem('user', JSON.stringify(response.data.user));
       
         dispatch(addToken(response.data.token))
         localStorage.setItem('id',response.data.user._id)
