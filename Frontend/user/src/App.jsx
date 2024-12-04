@@ -14,12 +14,14 @@ import ProductDetails from './components/productDetails/productDetails';
 import ProtectedRoute from './components/protectedRoute/protectedRoute';
 import Signup from './components/signup/Signup'
 import Prod from './product'
+import ScrollToTop from './extraAddonComponents/ScrollToTop';
 function App() {
 
 
   return (
     <BrowserRouter>
     <ToastContainer/>
+    <ScrollToTop/>
     <Header/>
     <Routes>
        <Route path='/' element={<HomePage/>}></Route>

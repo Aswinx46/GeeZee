@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import image1 from '../../assets/image.png'
 import image2 from '../../assets/image2.jpg'
 import Asus from '../../assets/asus rog 1.jpg'
+
 const Home = () => {
   const [isHovered, setIsHovered] = useState(null);
 
@@ -22,7 +23,8 @@ const Home = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
-        className="h-screen flex items-center justify-center relative overflow-hidden bg-black text-white"
+        className="h-screen flex items-center justify-center relative overflow-hidden bg-[url('/pc.jpg')] text-white"
+        
       >
         <div className="absolute inset-0 opacity-50">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black" />

@@ -1,160 +1,4 @@
-// import React, { useState } from 'react';
-// import { motion } from 'framer-motion';
-
-// const Product = () => {
-//   const [selectedImage, setSelectedImage] = useState(0);
-//   const [isSpecsOpen, setIsSpecsOpen] = useState(false);
-//   const [isBoxOpen, setIsBoxOpen] = useState(false);
-//   const [isSupportOpen, setIsSupportOpen] = useState(false);
-
-//   const product = {
-//     series: 'G SERIES',
-//     name: 'G515 TKL',
-//     subtitle: 'Wired Gaming Keyboard',
-//     description: 'Logitech G515 TKL wired tenkeyless gaming keyboard offers high performance and low-profile aesthetic. Personalize your play with gear that is engineered to hold up to intense moments of play and designed for a finely-tuned gaming experience.',
-//     images: [
-//       '/keyboard-front.jpg',
-//       '/keyboard-angle.jpg',
-//       '/keyboard-side.jpg',
-//       '/keyboard-back.jpg',
-//       '/keyboard-rgb.jpg',
-//       '/keyboard-detail.jpg'
-//     ],
-//     specs: {
-//       'Switch Type': 'Mechanical GX',
-//       'Form Factor': 'Tenkeyless (TKL)',
-//       'Connectivity': 'USB-C to USB-A',
-//       'Backlighting': 'Per-key RGB',
-//       'Battery Life': 'N/A (Wired)',
-//       'Weight': '615g'
-//     }
-//   };
-
-//   return (
-//     <div className="bg-black min-h-screen">
-//       <div className="max-w-7xl mx-auto px-4 py-8 bg-[#000000]">
-//         {/* Breadcrumb */}
-//         <div className="text-gray-400 text-sm mb-8">
-//           <span className="hover:text-white cursor-pointer">Products</span>
-//           <span className="mx-2">/</span>
-//           <span className="hover:text-white cursor-pointer">Gaming Keyboards</span>
-//           <span className="mx-2">/</span>
-//           <span className="text-white">{product.name}</span>
-//         </div>
-
-//         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-//           {/* Left Column - Images */}
-//           <div>
-//             <motion.div
-//               className="bg-[#1b1b1b] rounded-lg p-6 mb-4"
-//               initial={{ opacity: 0 }}
-//               animate={{ opacity: 1 }}
-//             >
-//               <img
-//                 src={product.images[selectedImage]}
-//                 alt={product.name}
-//                 className="w-full h-auto"
-//               />
-//             </motion.div>
-            
-//             {/* Thumbnail Grid */}
-//             <div className="grid grid-cols-6 gap-2">
-//               {product.images.map((img, index) => (
-//                 <motion.div
-//                   key={index}
-//                   className={`cursor-pointer rounded-md overflow-hidden border-2 ${
-//                     selectedImage === index ? 'border-[#8b5cf6]' : 'border-transparent'
-//                   }`}
-//                   whileHover={{ scale: 1.05 }}
-//                   onClick={() => setSelectedImage(index)}
-//                 >
-//                   <img src={img} alt={`${product.name} view ${index + 1}`} className="w-full h-auto" />
-//                 </motion.div>
-//               ))}
-//             </div>
-//           </div>
-
-//           {/* Right Column - Product Details */}
-//           <div>
-//             <div className="bg-[#1b1b1b] rounded-lg p-8">
-//               <span className="text-sm text-[#8b5cf6] font-medium">{product.series}</span>
-//               <h1 className="text-4xl font-bold text-white mt-2 mb-1">{product.name}</h1>
-//               <h2 className="text-xl text-gray-400 mb-6">{product.subtitle}</h2>
-              
-//               <p className="text-gray-300 mb-8">{product.description}</p>
-
-//               {/* Specs & Details Accordion */}
-//               <div className="border-t border-[#3d3d3d] py-4">
-//                 <button
-//                   className="w-full flex justify-between items-center text-white"
-//                   onClick={() => setIsSpecsOpen(!isSpecsOpen)}
-//                 >
-//                   <span className="text-lg font-medium">SPECS & DETAILS</span>
-//                   <span className="text-2xl">{isSpecsOpen ? '-' : '+'}</span>
-//                 </button>
-//                 {isSpecsOpen && (
-//                   <div className="mt-4 space-y-4">
-//                     {Object.entries(product.specs).map(([key, value]) => (
-//                       <div key={key} className="flex justify-between">
-//                         <span className="text-gray-400">{key}</span>
-//                         <span className="text-white">{value}</span>
-//                       </div>
-//                     ))}
-//                   </div>
-//                 )}
-//               </div>
-
-//               {/* In The Box Accordion */}
-//               <div className="border-t border-[#3d3d3d] py-4">
-//                 <button
-//                   className="w-full flex justify-between items-center text-white"
-//                   onClick={() => setIsBoxOpen(!isBoxOpen)}
-//                 >
-//                   <span className="text-lg font-medium">IN THE BOX</span>
-//                   <span className="text-2xl">{isBoxOpen ? '-' : '+'}</span>
-//                 </button>
-//                 {isBoxOpen && (
-//                   <ul className="mt-4 text-gray-300 list-disc list-inside">
-//                     <li>G515 TKL Gaming Keyboard</li>
-//                     <li>USB-C to USB-A Cable</li>
-//                     <li>User Documentation</li>
-//                     <li>2-year Limited Hardware Warranty</li>
-//                   </ul>
-//                 )}
-//               </div>
-
-//               {/* Support Accordion */}
-//               <div className="border-t border-[#3d3d3d] py-4">
-//                 <button
-//                   className="w-full flex justify-between items-center text-white"
-//                   onClick={() => setIsSupportOpen(!isSupportOpen)}
-//                 >
-//                   <span className="text-lg font-medium">SUPPORT</span>
-//                   <span className="text-2xl">{isSupportOpen ? '-' : '+'}</span>
-//                 </button>
-//                 {isSupportOpen && (
-//                   <div className="mt-4 space-y-4 text-gray-300">
-//                     <p>Need help with your G515 TKL?</p>
-//                     <button className="text-[#8b5cf6] hover:underline">
-//                       Download Support Software
-//                     </button>
-//                     <button className="text-[#8b5cf6] hover:underline">
-//                       View Online Manual
-//                     </button>
-//                   </div>
-//                 )}
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Product;
-
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronDown, ChevronRight, Search, User } from 'lucide-react'
 
@@ -175,6 +19,24 @@ const ProductDetails = () => {
     setActiveSection(activeSection === section ? null : section)
   }
 
+  const [selectedImage, setSelectedImage] = useState(0);
+  const productSelected = localStorage.getItem('selectedProduct');
+  const produc = productSelected ? JSON.parse(productSelected) : [];
+  const single = produc[0];
+  const [product, setProduct] = useState(single);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [scale, setScale] = useState(1);
+  const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const[review,setReview]=useState('')
+
+  useEffect(() => {
+    const productSelected = localStorage.getItem('selectedProduct');
+    const produc = productSelected ? JSON.parse(productSelected) : [];
+    const single = produc[0];
+    console.log(single)
+    setProduct(single);
+  }, []);
   return (
     <div className="min-h-screen bg-[#1c1c1c] text-white">
       {/* Navigation */}
@@ -227,7 +89,7 @@ const ProductDetails = () => {
           <div>
             <div className="bg-[#2d2d2d] rounded-lg p-8 mb-4">
               <img
-                src={images[activeImage]}
+                src={product?.productImg[0]}
                 alt="G515 TKL Keyboard"
                 className="w-full h-auto"
               />
@@ -363,4 +225,3 @@ const ProductDetails = () => {
 }
 
 export default ProductDetails
-
