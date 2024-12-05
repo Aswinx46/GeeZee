@@ -1,7 +1,7 @@
 const Product=require('../models/productSchema')
 const Category=require('../models/categorySchema')
 const addProduct=async (req,res) => {
-    const{name,price,quantity,categoryId,sku,description,status,imageUrl}=req.body
+    const{name,price,quantity,subHead,categoryId,subHeadDescription,sku,description,status,imageUrl,specAndDetails}=req.body
     console.log(name,price,quantity,categoryId,sku,description,status,imageUrl)
     try {
         const category=await Category.findById(categoryId)
@@ -17,7 +17,10 @@ const addProduct=async (req,res) => {
                 description,
                 productImg:imageUrl,
                 stock:status,
-                categoryId:categoryId
+                categoryId:categoryId,
+                spec:specAndDetails,
+                subHead,
+                subHeadDescription
         })
         await product.save()
         res.status(201).json({message:"product created"})
@@ -42,7 +45,7 @@ const editProduct=async (req,res) => {
     const{id}=req.params
    
   
-    const {title,sku,price,availableQuantity,description,status,categoryId,stock,category}=req.body.product
+    const {title,sku,price,availableQuantity,subHeadDescription,description,status,categoryId,stock,category,spec,subHead}=req.body.product
    
     const oldCatId=categoryId._id
     const{urls}=req.body
@@ -63,9 +66,13 @@ const editProduct=async (req,res) => {
                 productImg:urls,
                 status,
                 stock,
-                categoryId:oldCatId
+                categoryId:oldCatId,
+                spec,
+                subHead,
+                subHeadDescription
             })
-            await editedProduct.save()
+            console.log("Spec saved " , spec)
+           
             return res.status(200).json({message:"product edited"})
         }else{
             console.log(checkCategory)
@@ -78,9 +85,10 @@ const editProduct=async (req,res) => {
                 productImg:urls,
                 status,
                 stock,
-                categoryId:checkCategory._id
+                categoryId:checkCategory._id,
+                subHead
             })
-            await editedProduct.save()
+           
             return res.status(200).json({message:"product edited"})
         }
           
@@ -102,11 +110,23 @@ const showProductListed=async (req,res) => {
     }
 }
 
+const showRelatedProducts=async (req,res) => {
+    const {id}=req.query
+    console.log(id)
+    try {
+        const relatedProducts=await Product.find({status:'active',categoryId:id})
+        console.log(relatedProducts)
+    } catch (error) {
+        
+    }
+}
+
 module.exports={
     addProduct,
     showProduct,
     editProduct,
-    showProductListed
+    showProductListed,
+    showRelatedProducts
     
 }
 

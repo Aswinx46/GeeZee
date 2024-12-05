@@ -1,249 +1,17 @@
-// import { motion, AnimatePresence } from 'framer-motion';
-// import { useEffect, useState } from 'react';
-
-// const ProductDetails = () => {
-//   const [selectedImage, setSelectedImage] = useState(0);
-//   const [product, setProduct] = useState([]);
-//   const [isModalOpen, setIsModalOpen] = useState(false);
-//   const [scale, setScale] = useState(1);
-//   const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
-//   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-//   const[review,setReview]=useState('')
-
-//   useEffect(() => {
-//     const productSelected = localStorage.getItem('selectedProduct');
-//     const produc = productSelected ? JSON.parse(productSelected) : [];
-//     console.log(produc)
-//     const single = produc[0];
-//     setProduct(single);
-//   }, []);
-
-//   const handleZoomIn = () => {
-//     setScale(prev => Math.min(prev + 0.5, 4));
-//   };
-
-//   const handleZoomOut = () => {
-//     setScale(prev => Math.max(prev - 0.5, 1));
-//   };
-
-//   const handleDoubleClick = () => {
-//     setScale(scale === 1 ? 2.5 : 1);
-//     if (scale === 1) {
-//       setDragPosition({ x: 0, y: 0 });
-//     }
-//   };
-
-//   const handleDragEnd = (event, info) => {
-//     setDragPosition({
-//       x: dragPosition.x + info.offset.x,
-//       y: dragPosition.y + info.offset.y
-//     });
-//   };
-
-//   return (
-//     <motion.div 
-//       initial={{ opacity: 0 }}
-//       animate={{ opacity: 1 }}
-//       transition={{ duration: 0.5 }}
-//       className="min-h-screen bg-black text-white"
-//     >
-//       <motion.div
-//         initial={{ y: 20, opacity: 0 }}
-//         animate={{ y: 0, opacity: 1 }}
-//         transition={{ duration: 0.5 }}
-//         className="container mx-auto px-4 py-8"
-//       >
-//         <div className="grid md:grid-cols-2 gap-12">
-//           {/* Product Images */}
-//           <motion.div
-//             initial={{ x: -20, opacity: 0 }}
-//             animate={{ x: 0, opacity: 1 }}
-//             transition={{ duration: 0.5 }}
-//           >
-//             <div className="rounded-lg p-8 mb-4">
-//               <motion.img
-//                 src={product?.productImg[0]}
-//                 alt="G515 TKL Keyboard"
-//                 className="w-full h-[500px] w-50 object-cover"
-//                 whileHover={{ scale: 1.05 }}
-//                 transition={{ type: "spring", stiffness: 300 }}
-//               />
-//             </div>
-//             <div className="grid grid-cols-6 gap-2">
-//               {product?.productImg?.map((image, index) => (
-//                 <motion.button
-//                   key={index}
-//                   whileHover={{ scale: 1.1 }}
-//                   whileTap={{ scale: 0.95 }}
-//                   transition={{ type: "spring", stiffness: 400 }}
-//                   onClick={() => setSelectedImage(index)}
-//                   className={`border-2 rounded-lg overflow-hidden ${
-//                     selectedImage === index ? 'border-blue-500' : 'border-transparent'
-//                   }`}
-//                 >
-//                   <img
-//                     src={image}
-//                     alt={`Thumbnail ${index + 1}`}
-//                     className="w-full h-auto"
-//                   />
-//                 </motion.button>
-//               ))}
-//             </div>
-//           </motion.div>
-
-//           {/* Product Info */}
-//           <motion.div
-//             initial={{ x: 20, opacity: 0 }}
-//             animate={{ x: 0, opacity: 1 }}
-//             transition={{ duration: 0.5 }}
-//           >
-//             <motion.h1 
-//               initial={{ y: -20, opacity: 0 }}
-//               animate={{ y: 0, opacity: 1 }}
-//               transition={{ delay: 0.2, duration: 0.5 }}
-//               className="text-4xl font-bold mb-4"
-//             >
-//               {product?.title}
-//             </motion.h1>
-//             <h2 className="text-xl text-gray-400 mb-6">{product?.categoryId?.categoryName}</h2>
-//             <p className="text-gray-300 mb-8">
-//               {product?.description}
-//             </p>
-
-//             {/* Add to Cart and Buy Now Buttons */}
-//             <div className="space-y-4 mb-8">
-//               <motion.button
-//                 whileHover={{ scale: 1.02 }}
-//                 whileTap={{ scale: 0.95 }}
-//                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
-//                 className="w-full py-4 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2"
-//               >
-//                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-//                   <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-//                 </svg>
-//                 <span>Add to Cart</span>
-//               </motion.button>
-              
-//               <motion.button
-//                 whileHover={{ scale: 1.02 }}
-//                 whileTap={{ scale: 0.95 }}
-//                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
-//                 className="w-full py-4 bg-[#521166] text-white rounded-lg font-medium hover:bg-[#3d0d4d] transition-colors flex items-center justify-center space-x-2"
-//               >
-//                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-//                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clipRule="evenodd" />
-//                 </svg>
-//                 <span>Buy Now</span>
-//               </motion.button>
-//             </div>
-
-//             {/* Expandable Sections */}
-//             <div className="space-y-4">
-//               <motion.div className="border-t border-gray-800">
-//                 <button
-//                   onClick={() => toggleSection('specs')}
-//                   className="w-full py-4 flex justify-between items-center text-left"
-//                 >
-//                   <span className="font-medium">SPECS & DETAILS</span>
-//                   <ChevronDown
-//                     className={`w-5 h-5 transition-transform ${
-//                       activeSection === 'specs' ? 'rotate-180' : ''
-//                     }`}
-//                   />
-//                 </button>
-//                 {activeSection === 'specs' && (
-//                   <motion.div
-//                     initial={{ height: 0, opacity: 0 }}
-//                     animate={{ height: 'auto', opacity: 1 }}
-//                     exit={{ height: 0, opacity: 0 }}
-//                     className="pb-4 text-gray-400"
-//                   >
-//                     <ul className="space-y-2">
-//                       <li>Tenkeyless Form Factor</li>
-//                       <li>RGB Backlit Keys</li>
-//                       <li>Mechanical Switches</li>
-//                       <li>USB-C Connection</li>
-//                       <li>Anti-Ghosting</li>
-//                     </ul>
-//                   </motion.div>
-//                 )}
-//               </motion.div>
-
-//               <motion.div className="border-t border-gray-800">
-//                 <button
-//                   onClick={() => toggleSection('box')}
-//                   className="w-full py-4 flex justify-between items-center text-left"
-//                 >
-//                   <span className="font-medium">IN THE BOX</span>
-//                   <ChevronDown
-//                     className={`w-5 h-5 transition-transform ${
-//                       activeSection === 'box' ? 'rotate-180' : ''
-//                     }`}
-//                   />
-//                 </button>
-//                 {activeSection === 'box' && (
-//                   <motion.div
-//                     initial={{ height: 0, opacity: 0 }}
-//                     animate={{ height: 'auto', opacity: 1 }}
-//                     exit={{ height: 0, opacity: 0 }}
-//                     className="pb-4 text-gray-400"
-//                   >
-//                     <ul className="space-y-2">
-//                       <li>G515 TKL Gaming Keyboard</li>
-//                       <li>USB-C Cable</li>
-//                       <li>User Documentation</li>
-//                       <li>2-Year Limited Hardware Warranty</li>
-//                     </ul>
-//                   </motion.div>
-//                 )}
-//               </motion.div>
-
-//               <motion.div className="border-t border-gray-800">
-//                 <button
-//                   onClick={() => toggleSection('support')}
-//                   className="w-full py-4 flex justify-between items-center text-left"
-//                 >
-//                   <span className="font-medium">SUPPORT</span>
-//                   <ChevronDown
-//                     className={`w-5 h-5 transition-transform ${
-//                       activeSection === 'support' ? 'rotate-180' : ''
-//                     }`}
-//                   />
-//                 </button>
-//                 {activeSection === 'support' && (
-//                   <motion.div
-//                     initial={{ height: 0, opacity: 0 }}
-//                     animate={{ height: 'auto', opacity: 1 }}
-//                     exit={{ height: 0, opacity: 0 }}
-//                     className="pb-4 text-gray-400"
-//                   >
-//                     <ul className="space-y-2">
-//                       <li>Specifications</li>
-//                       <li>Setup Guide</li>
-//                       <li>Downloads</li>
-//                       <li>Community Forums</li>
-//                       <li>Warranty Information</li>
-//                     </ul>
-//                   </motion.div>
-//                 )}
-//               </motion.div>
-//             </div>
-//           </motion.div>
-//         </div>
-//       </motion.div>
-//     </motion.div>
-//   );
-// };
 
 // export default ProductDetails;
 import React, { useState,useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronDown, ChevronRight, Search, User } from 'lucide-react'
 import axios from '../../axios/userAxios'
+import Corouser from '../../extraAddonComponents/corouser'
+import sample from '../../assets/banner.jpg'
 const ProductDetails = () => {
   const [activeImage, setActiveImage] = useState(0)
   const [activeSection, setActiveSection] = useState(null)
-
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [dragConstraints, setDragConstraints] = useState({ top: 0, left: 0, right: 0, bottom: 0 });
+  const [position, setPosition] = useState({ x: 0, y: 0 });
 
   const features = [
     { title: "chandran", description: "Good Keyboard" },
@@ -271,6 +39,7 @@ const ProductDetails = () => {
   useEffect(() => {
     const productSelected = localStorage.getItem('selectedProduct');
     const produc = productSelected ? JSON.parse(productSelected) : [];
+    console.log(produc)
     const single = produc[0];
     const fetchProduct=async () => {
       
@@ -280,7 +49,26 @@ const ProductDetails = () => {
     fetchProduct()
     console.log(single)
     setProduct(single);
+    
   }, []);
+  console.log(product.spec)
+  const handleDoubleClick = () => {
+    setIsZoomed(!isZoomed);
+    if (!isZoomed) {
+      
+      const imageWidth = 500; 
+      const dragLimit = (imageWidth * (2 - 1)) / 2;
+      setDragConstraints({
+        top: -dragLimit,
+        left: -dragLimit,
+        right: dragLimit,
+        bottom: dragLimit
+      });
+    } else {
+      // Reset position when unzooming
+      setPosition({ x: 0, y: 0 });
+    }
+  };
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -301,14 +89,46 @@ const ProductDetails = () => {
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="rounded-lg p-8 mb-4">
-              <motion.img
-                src={product?.productImg[activeImage]}
-                alt="G515 TKL Keyboard"
-                className="w-full h-[500px] w-50 object-cover"
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: "tween", duration: 0.5 }}
-              />
+            <div className="rounded-lg p-8 mb-4 overflow-hidden relative">
+              <motion.div 
+                className="w-full h-[500px]"
+                style={{ overflow: 'hidden' }}
+              >
+                <motion.img
+                  src={product?.productImg[selectedImage]}
+                  alt="Product Image"
+                  className="w-full h-full object-cover cursor-pointer"
+                  animate={{ 
+                    scale: isZoomed ? 2 : 1,
+                    x: isZoomed ? position.x : 0,
+                    y: isZoomed ? position.y : 0,
+                    transition: { duration: 0.3 }
+                  }}
+                  drag={isZoomed}
+                  dragConstraints={{
+                    top: isZoomed ? -250 : 0,
+                    left: isZoomed ? -250 : 0,
+                    right: isZoomed ? 250 : 0,
+                    bottom: isZoomed ? 250 : 0
+                  }}
+                  dragElastic={0.05}
+                  onDoubleClick={handleDoubleClick}
+                  onDragEnd={(e, info) => {
+                    const newX = position.x + info.offset.x;
+                    const newY = position.y + info.offset.y;
+                    // Ensure the position stays within bounds
+                    setPosition({
+                      x: Math.max(Math.min(newX, 250), -250),
+                      y: Math.max(Math.min(newY, 250), -250)
+                    });
+                  }}
+                  style={{
+                    transformOrigin: 'center',
+                    cursor: isZoomed ? 'grab' : 'pointer'
+                  }}
+                  whileDrag={{ cursor: 'grabbing' }}
+                />
+              </motion.div>
             </div>
             <div className="grid grid-cols-6 gap-2">
               {product?.productImg?.map((image, index) => (
@@ -317,9 +137,9 @@ const ProductDetails = () => {
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                   transition={{ type: "spring", stiffness: 400 }}
-                  onClick={() => setActiveImage(index)}
+                  onClick={() => setSelectedImage(index)}
                   className={`border-2 rounded-lg overflow-hidden ${
-                    activeImage === index ? 'border-blue-500' : 'border-transparent'
+                    selectedImage === index ? 'border-blue-500' : 'border-transparent'
                   }`}
                 >
                   <img
@@ -400,11 +220,11 @@ const ProductDetails = () => {
                     className="pb-4 text-gray-400"
                   >
                     <ul className="space-y-2">
-                      <li>Tenkeyless Form Factor</li>
-                      <li>RGB Backlit Keys</li>
-                      <li>Mechanical Switches</li>
-                      <li>USB-C Connection</li>
-                      <li>Anti-Ghosting</li>
+                      {product.spec.map((item,i)=>
+
+                      <li key={i}>{item}</li>
+                      )}
+                  
                     </ul>
                   </motion.div>
                 )}
@@ -430,8 +250,6 @@ const ProductDetails = () => {
                     className="pb-4 text-gray-400"
                   >
                     <ul className="space-y-2">
-                      <li>G515 TKL Gaming Keyboard</li>
-                      <li>USB-C Cable</li>
                       <li>User Documentation</li>
                       <li>2-Year Limited Hardware Warranty</li>
                     </ul>
@@ -473,6 +291,86 @@ const ProductDetails = () => {
         </div>
       </motion.div>
      
+      <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen bg-black text-white"
+    >
+      {/* Previous navigation and product details sections remain the same... */}
+      
+      {/* Review Section */}
+      <div className="w-full bg-black px-4 py-16">
+        <div className="max-w-8xl mx-auto">
+          {/* Previous review header and rating bars remain the same... */}
+          
+          {/* Feature Sections - Added between reviews and carousel */}
+          <section className="py-16 border-t border-gray-800">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="grid md:grid-cols-2 gap-12 items-center mb-24"
+            >
+              <div className="space-y-6">
+                <h2 className="text-3xl font-bold">FORMATIVE FUNCTION</h2>
+                <p className="text-gray-400 text-lg">
+                  Tenkeyless design and only 23 mm high, this keyboard defies the expectations of structure 
+                  design. Meticulous engineering provides durability and an ultra-thin build for maximized 
+                  comfort and a sleek aesthetic.
+                </p>
+              </div>
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                className="rounded-lg overflow-hidden"
+              >
+                <img
+                  src= {product?.productImg[1]}
+                  alt="Keyboard Design"
+                  className="w-50 h-50 flex " 
+                />
+              </motion.div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="grid md:grid-cols-2 gap-12 items-center"
+            >
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                className="rounded-lg overflow-hidden"
+              >
+                <img
+                  src={product.productImg[2]}
+                  alt="Next-Gen Typing"
+                  className="w-50 h-50"
+                />
+              </motion.div>
+              <div className="space-y-6">
+                <h2 className="text-3xl font-bold">NEXT-GEN TYPING EXPERIENCE</h2>
+                <p className="text-gray-400 text-lg">
+                  Double-shot PBT keycaps and premium brushed aluminum alloy top plate provide smoother feel, 
+                  faster actuation, and precise typing with zero compromises to durability.
+                </p>
+              </div>
+            </motion.div>
+          </section>
+
+          {/* Previous reviews carousel and related products remain the same... */}
+          <div className="overflow-hidden relative w-full">
+            {/* Previous carousel content remains the same... */}
+          </div>
+
+          <Corouser id={product._id}/>
+
+          {/* Previous related products grid remains the same... */}
+        </div>
+      </div>
+    </motion.div>
+
+
     {/* Review Section */}
     <div className="w-full bg-black px-4 py-16">
       <div className="max-w-8xl mx-auto ">
@@ -529,6 +427,7 @@ const ProductDetails = () => {
           ))}
         </div>
 
+          
         {/* Reviews List */}
          <div className="overflow-hidden relative w-full">
       <motion.div
@@ -544,7 +443,7 @@ const ProductDetails = () => {
         {[...features, ...features].map((feature, index) => (
           <motion.div
             key={index}
-            className="min-w-[450px] p-6 bg-[#521166] my-10 text-gray-50 rounded-lg text-left mx-4   hover:shadow-[0_0_20px_1px_rgba(256,256,256,0.3)]"
+            className="min-w-[450px] p-6 bg-darkGrey my-10 text-gray-50 rounded-lg text-left mx-4   hover:shadow-[0_0_20px_1px_rgba(256,256,256,0.3)]"
             whileHover={{ scale: 1.05 }}
           >
             <div className="flex justify-between items-center mb-4">
@@ -600,6 +499,7 @@ const ProductDetails = () => {
             <p className="text-gray-400 mt-1">The clicking sound of this keyboard is perfect, I think its because of its Blue Switches</p>
           </div>
         </div> */}
+        <Corouser id={product._id}/>
          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {[...products].map((product, index) => (
             <motion.div
@@ -632,3 +532,4 @@ const ProductDetails = () => {
 }
 
 export default ProductDetails
+

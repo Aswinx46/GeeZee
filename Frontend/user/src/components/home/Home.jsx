@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import image1 from '../../assets/image.png'
-import image2 from '../../assets/image2.jpg'
-import Asus from '../../assets/asus rog 1.jpg'
+import image1 from '../../assets/https___hybrismediaprod.blob.core.windows.net_sys-master-phoenix-images-container_h93_h9a_9834855137310_241101-viper-v3-pro-sentinels-1500x1000-1.jpg'
+import image2 from '../../assets/pro-tips.jpeg'
+import Asus from '../../assets/https%3A%2F%2Fhybrismediaprod.blob.core.windows.net%2Fsys-master-phoenix-images-container%2Fh48%2Fh42%2F9814447783966%2F240909-blackshark-v2-pro-white-2023-1.png'
 
 const Home = () => {
   const [isHovered, setIsHovered] = useState(null);
@@ -112,7 +112,7 @@ const Home = () => {
               },
               {
                 image: image2,
-                title: "Mechanical Keyboards"
+                title: "Gaming Laptops"
               },
               {
                 image: Asus,

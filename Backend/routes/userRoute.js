@@ -11,8 +11,8 @@ user_route.post('/googleAuthenticate',userController.googleSave)
 user_route.post('/login',userController.login)
 user_route.post('/refreshToken',userController.refreshToken)
 
-user_route.get('/products',auth.authToken,productController.showProductListed)
+user_route.get('/products',productController.showProductListed)
+user_route.get('/relatedProducts',productController.showRelatedProducts)
 
-
-user_route.get('/category',auth.authToken,categoryController.showCategory)
+user_route.get('/category',categoryController.showCategory)
 module.exports=user_route

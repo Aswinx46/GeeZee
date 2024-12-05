@@ -44,6 +44,18 @@ const ProductSchema=new mongoose.Schema({
     },stock:{
         type:String,
         enum:['In Stock','Out of Stock']
+    },
+    spec:{
+        type:[String],
+        required:true
+    },
+    subHead:{
+        type:[String],
+        required:true
+    },
+    subHeadDescription:{
+        type:[String],
+        required:true
     }
 })
 

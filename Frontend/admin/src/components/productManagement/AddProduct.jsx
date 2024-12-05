@@ -22,20 +22,79 @@ const ProductManagement = () => {
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
     const navigate=useNavigate()
     const formRef=useRef()
+    const [errors, setErrors] = useState({});
 
     useEffect(()=>{
         const getCategory=async () => {
-            
             const category= await axios.get('/category')
             setCategories(category.data.category)
-
         }
         getCategory()
     },[success])
 
+    const validateForm = (formData) => {
+        const newErrors = {};
+        
+        // Title validation
+        if (!formData.get('title').trim()) {
+            newErrors.title = 'Title is required';
+        }
+
+        // Price validation
+        const price = formData.get('price');
+        if (!price) {
+            newErrors.price = 'Please enter a valid price';
+        } else if (Number(price) <= 0) {
+            newErrors.price = 'Price must be greater than 0';
+        }
+
+        // Quantity validation
+        const quantity = Number(formData.get('quantity'));
+        if (!formData.get('quantity')) {
+            newErrors.quantity = 'Please enter a valid quantity';
+        } else if (quantity <= 0) {
+            newErrors.quantity = 'Quantity must be greater than 0';
+        }
+
+        // SKU validation
+        if (!formData.get('SKU').trim()) {
+            newErrors.SKU = 'SKU is required';
+        }
+
+        // Description validation
+        if (!formData.get('description').trim()) {
+            newErrors.description = 'Description is required';
+        }
+
+        // Specs validation
+        if (!formData.get('spec').trim()) {
+            newErrors.spec = 'Specifications are required';
+        }
+
+        if (!formData.get('SubHeadings').trim()) {
+          newErrors.SubHeadings = 'SubHeadings are required';
+      }
+
+      if (!formData.get('subHeadingdescription').trim()) {
+        newErrors.subHeadingdescription = 'subHeadingdescription are required';
+    }
+     
+        return newErrors;
+    };
+
     const handleSubmit=async(event)=>{
         event.preventDefault()
-        console.log(categories)
+        const formData = new FormData(event.target);
+        
+        // Validate form
+        const formErrors = validateForm(formData);
+        console.log(formErrors)
+        if (Object.keys(formErrors).length > 0) {
+            setErrors(formErrors);
+            toast.error('Please fill the form');
+            return;
+        }
+        setErrors({});
         setIsLoading(true)
         const data=new FormData(event.target)
         const selectedCategory=categories.find((cat)=>cat.categoryName==data.get('category'))
@@ -59,7 +118,19 @@ const ProductManagement = () => {
             const cloudinaryUpload=await Promise.all(uploadPromises) 
             const imageUrls = cloudinaryUpload.map(res=>res.data?.secure_url)
             console.log(imageUrls)
+            
            
+            const spec=data.get('spec')
+            const specArray=spec.split('>').map((item)=>item.trim()).filter((item)=>item.length>0)
+            // console.log(specArray)
+
+            const subHeading=data.get('SubHeadings')
+            const subHeadArray=subHeading.split('>').map((item)=>item.trim()).filter((item)=>item.length>0)
+            console.log(subHeadArray)
+
+            const subHeadingdescription=data.get('subHeadingdescription')
+            const subHeadingDescriptionArray=subHeadingdescription.split('>').map((item)=>item.trim()).filter((item)=>item.length>0)
+            console.log(subHeadingDescriptionArray)
             const productDetails={
                 name:data.get('title'),
                 price:data.get('price'),
@@ -68,7 +139,10 @@ const ProductManagement = () => {
                 sku:data.get('SKU'),
                 description:data.get('description'),
                 status:data.get('stockStatus'),
-                imageUrl:imageUrls
+                imageUrl:imageUrls,
+                specAndDetails:specArray,
+                subHead:subHeadArray,
+                subHeadDescription:subHeadingDescriptionArray
             }
          
             try {
@@ -76,7 +150,7 @@ const ProductManagement = () => {
                 const uploadProduct=await axios.post('/addProduct',productDetails)
               
                 console.log(uploadProduct)
-                toast.success(uploadProduct.data.data.message)
+                toast.success(uploadProduct.data.message)
                 navigate('/showProduct')
                 setIsLoading(false)
                 setSuccess(!success)
@@ -173,8 +247,9 @@ const ProductManagement = () => {
                 <input
                   type="text"
                   name='title'
-                  className="w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black"
+                  className={`w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black ${errors.title ? 'border-red-500' : ''}`}
                 />
+                {errors.title && <p className="text-red-500 text-sm">{errors.title}</p>}
               </motion.div>
 
               {/* Stock Status Field */}
@@ -204,8 +279,9 @@ const ProductManagement = () => {
                 <input
                   type="number"
                   name='price'
-                  className="w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black"
+                  className={`w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black ${errors.price ? 'border-red-500' : ''}`}
                 />
+                {errors.price && <p className="text-red-500 text-sm">{errors.price}</p>}
               </motion.div>
 
               {/* Available Quantity Field */}
@@ -220,8 +296,9 @@ const ProductManagement = () => {
                 <input
                   type="number"
                   name='quantity'
-                  className="w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black"
+                  className={`w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black ${errors.quantity ? 'border-red-500' : ''}`}
                 />
+                {errors.quantity && <p className="text-red-500 text-sm">{errors.quantity}</p>}
               </motion.div>
 
               {/* Category Field */}
@@ -284,8 +361,9 @@ const ProductManagement = () => {
                 <input
                   type="text"
                   name='SKU'
-                  className="w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black"
+                  className={`w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black ${errors.SKU ? 'border-red-500' : ''}`}
                 />
+                {errors.SKU && <p className="text-red-500 text-sm">{errors.SKU}</p>}
               </motion.div>
 
               {/* Preview Images */}
@@ -317,6 +395,38 @@ const ProductManagement = () => {
               
               </motion.div>
             </div>
+            <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.7 }}
+              >
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Sub Headings
+                </label>
+                <input
+                  type="text"
+                  name='SubHeadings'
+                  className={`w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black ${errors.SKU ? 'border-red-500' : ''}`}
+                />
+               {errors.SubHeadings && <p className="text-red-500 text-sm">{errors.SubHeadings}</p>}
+              </motion.div>
+
+
+              <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9 }}
+            >
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Sub Heading Description
+              </label>
+              <textarea
+                rows="4"
+                name='subHeadingdescription'
+                className={`w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black ${errors.description ? 'border-red-500' : ''}`}
+              ></textarea>
+              {errors.subHeadingdescription && <p className="text-red-500 text-sm">{errors.subHeadingdescription}</p>}
+            </motion.div>
 
             {/* Description Field */}
             <motion.div
@@ -330,8 +440,24 @@ const ProductManagement = () => {
               <textarea
                 rows="4"
                 name='description'
-                className="w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black"
+                className={`w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black ${errors.description ? 'border-red-500' : ''}`}
               ></textarea>
+              {errors.description && <p className="text-red-500 text-sm">{errors.description}</p>}
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9 }}
+            >
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Spec and Details
+              </label>
+              <textarea
+                rows="4"
+                name='spec'
+                className={`w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black ${errors.spec ? 'border-red-500' : ''}`}
+              ></textarea>
+              {errors.spec && <p className="text-red-500 text-sm">{errors.spec}</p>}
             </motion.div>
 
             {/* Submit Button */}

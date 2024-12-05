@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import {store} from '../../redux/store'
 import cloudAxios from 'axios'
 import { MutatingDots } from 'react-loader-spinner'
+import { toast } from 'react-toastify';
 
 const EditProduct = () => {
     const [categories, setCategories] = useState([]);
@@ -20,9 +21,11 @@ const EditProduct = () => {
     const [zoom, setZoom] = useState(1);
     const [rotation, setRotation] = useState(0);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-    const[product,setProduct]=useState({})
+    // const[product,setProduct]=useState({spec:[]})
+    const[product,setProduct]=useState(store.getState().product.product)
     const[oldUrl,setOldUrl]=useState([])
     const[success,setSuccess]=useState(false)
+    const[errors, setErrors] = useState({});
   
     const navigate=useNavigate()
 
@@ -31,14 +34,15 @@ const EditProduct = () => {
             const category = await axios.get('/category');
             const sendedProduct=store.getState().product.product
             console.log("Old urls are ", product.productImg)
-            console.log(sendedProduct)
+            console.log(sendedProduct.spec)
             console.log(category)
             const cat=category.data.category.filter((cat)=>cat.categoryName!=sendedProduct.categoryId.categoryName)
             console.log(cat)
-            setProduct(sendedProduct)
+      
             setOldUrl(sendedProduct.productImg)
             setCategories(cat);
             setSuccess(false)
+            console.log(sendedProduct)
             if(sendedProduct.productImg && sendedProduct.productImg.length>0 ) setImageUrl(sendedProduct.productImg)
         };
         fetchCategory();
@@ -137,14 +141,49 @@ const EditProduct = () => {
 
     const handleInputChange=(e)=>{
         const {name,value}=e.target
-        setProduct((p)=>({
-            ...p,[name]:value
-        }))
+        if(name === 'spec'){
+            const spec = e.target.value.split('>');
+            setProduct((p)=>({...p,spec}))
+        }else{
+
+            setProduct((p)=>({
+                ...p,[name]:value
+            }))
+        }
     }
 
 
     const handleSubmit=async (e) => {
         e.preventDefault()
+        // Validate all fields
+        const newErrors = {};
+        if (!product.title?.trim()) {
+            newErrors.title = 'Title is required';
+        }
+        if (!product.price || Number(product.price) <= 0) {
+            newErrors.price = 'Price must be greater than 0';
+        }
+        if (!product.availableQuantity || Number(product.availableQuantity) <= 0) {
+            newErrors.availableQuantity = 'Quantity must be greater than 0';
+        }
+        if (!product.sku?.trim()) {
+            newErrors.sku = 'SKU is required';
+        }
+        if (!product.description?.trim()) {
+            newErrors.description = 'Description is required';
+        }
+        if (product.spec.length <=0) {
+            newErrors.spec = 'Specifications are required';
+        }
+
+        // If there are errors, show toast and stop submission
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            toast.error('Please fill all required fields correctly');
+            return;
+        }
+
+        setErrors({});
         setSuccess(true)
         console.log("Before axios.put, product:", product);
         const newImageUrls = imageUrl.filter(url => !url.startsWith('https://res.cloudinary.com'));
@@ -231,9 +270,9 @@ const EditProduct = () => {
                                 name="title"
                                 value={product.title}
                                 onChange={handleInputChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-all duration-200 ease-in-out"
-                              
+                                className={`mt-1 block w-full border rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-all duration-200 ease-in-out ${errors.title ? 'border-red-500' : 'border-gray-300'}`}
                             />
+                            {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
                         </motion.div>
 
                         <motion.div whileHover={{ scale: 1.02 }} className="space-y-2">
@@ -267,11 +306,11 @@ const EditProduct = () => {
                                 name="price"
                                 value={product.price}
                                 onChange={handleInputChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-all duration-200 ease-in-out"
-                                
+                                className={`mt-1 block w-full border rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-all duration-200 ease-in-out ${errors.price ? 'border-red-500' : 'border-gray-300'}`}
                                 min="0"
                                 step="0.01"
                             />
+                            {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
                         </motion.div>
 
                         <motion.div whileHover={{ scale: 1.02 }} className="space-y-2">
@@ -284,10 +323,10 @@ const EditProduct = () => {
                                 name="availableQuantity"
                                 value={product.availableQuantity}
                                 onChange={handleInputChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-all duration-200 ease-in-out"
-                                
+                                className={`mt-1 block w-full border rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-all duration-200 ease-in-out ${errors.availableQuantity ? 'border-red-500' : 'border-gray-300'}`}
                                 min="0"
                             />
+                            {errors.availableQuantity && <p className="text-red-500 text-sm mt-1">{errors.availableQuantity}</p>}
                         </motion.div>
 
                         <motion.div whileHover={{ scale: 1.02 }} className="space-y-2">
@@ -300,9 +339,29 @@ const EditProduct = () => {
                                 rows="4"
                                 value={product.description}
                                 onChange={handleInputChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-all duration-200 ease-in-out"
-                                
+                                className={`mt-1 block w-full border rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-all duration-200 ease-in-out ${errors.description ? 'border-red-500' : 'border-gray-300'}`}
                             ></textarea>
+                            {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
+                        </motion.div>
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.9 }}
+                        >
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Spec and Details
+                            </label>
+
+                            <textarea
+                                rows="4"
+                                name='spec'
+                                value={product.spec.join(">")}
+                                onChange={handleInputChange}
+                                className={`w-full bg-white border rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black ${errors.spec ? 'border-red-500' : 'border-gray-300'}`}
+                                >
+                          
+                                </textarea>
+                            {errors.spec && <p className="text-red-500 text-sm mt-1">{errors.spec}</p>}
                         </motion.div>
 
                         <motion.div whileHover={{ scale: 1.02 }} className="space-y-2">
@@ -332,9 +391,9 @@ const EditProduct = () => {
                                 name="sku"
                                 value={product.sku}
                                 onChange={handleInputChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-all duration-200 ease-in-out"
-                                
+                                className={`mt-1 block w-full border rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-all duration-200 ease-in-out ${errors.sku ? 'border-red-500' : 'border-gray-300'}`}
                             />
+                            {errors.sku && <p className="text-red-500 text-sm mt-1">{errors.sku}</p>}
                         </motion.div>
 
                         <motion.div whileHover={{ scale: 1.02 }} className="space-y-2">
