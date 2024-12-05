@@ -6,6 +6,8 @@ import {store} from '../../redux/store'
 import BreadCrumps from '../BreadCrump/BreadCrumps';
 import { useSelector, useDispatch } from 'react-redux';
 import { removeUser } from '@/redux/slices/userSlice';
+import { persistor } from '../../redux/store';
+import { removeToken } from '@/redux/slices/tokenSlice';
 const Header = (props) => {
   const [isHovered, setIsHovered] = useState(null);
   const navigate=useNavigate()
@@ -31,6 +33,9 @@ const Header = (props) => {
     localStorage.removeItem('user');
     setIsLogin(false);
     dispatch(removeUser())
+    dispatch(removeToken())
+    localStorage.clear()
+    persistor.purge();
     navigate('/', { replace: true });
     console.log("Logout button clicked");
   };
