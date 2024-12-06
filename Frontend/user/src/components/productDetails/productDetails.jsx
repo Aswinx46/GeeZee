@@ -313,11 +313,9 @@ const ProductDetails = () => {
               className="grid md:grid-cols-2 gap-12 items-center mb-24"
             >
               <div className="space-y-6">
-                <h2 className="text-3xl font-bold">FORMATIVE FUNCTION</h2>
+                <h2 className="text-3xl font-bold">{product.subHead[0]}</h2>
                 <p className="text-gray-400 text-lg">
-                  Tenkeyless design and only 23 mm high, this keyboard defies the expectations of structure 
-                  design. Meticulous engineering provides durability and an ultra-thin build for maximized 
-                  comfort and a sleek aesthetic.
+                {product.subHeadDescription[0]}
                 </p>
               </div>
               <motion.div
@@ -349,10 +347,9 @@ const ProductDetails = () => {
                 />
               </motion.div>
               <div className="space-y-6">
-                <h2 className="text-3xl font-bold">NEXT-GEN TYPING EXPERIENCE</h2>
+                <h2 className="text-3xl font-bold">{product.subHead[1]}</h2>
                 <p className="text-gray-400 text-lg">
-                  Double-shot PBT keycaps and premium brushed aluminum alloy top plate provide smoother feel, 
-                  faster actuation, and precise typing with zero compromises to durability.
+                {product.subHeadDescription[1]}
                 </p>
               </div>
             </motion.div>
@@ -363,7 +360,7 @@ const ProductDetails = () => {
             {/* Previous carousel content remains the same... */}
           </div>
 
-          <Corouser id={product._id}/>
+        
 
           {/* Previous related products grid remains the same... */}
         </div>
@@ -434,7 +431,7 @@ const ProductDetails = () => {
         className="flex"
         animate={{ x: ["0%", "-100%"] }}
         transition={{
-          duration: features.length * 15, // Adjust the duration based on the number of features
+          duration: features.length * 7, // Adjust the duration based on the number of features
           ease: "linear",
           repeat: Infinity,
         }}
@@ -499,8 +496,8 @@ const ProductDetails = () => {
             <p className="text-gray-400 mt-1">The clicking sound of this keyboard is perfect, I think its because of its Blue Switches</p>
           </div>
         </div> */}
-        <Corouser id={product._id}/>
-         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <Corouser/>
+         {/* <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {[...products].map((product, index) => (
             <motion.div
               key={index}
@@ -524,7 +521,7 @@ const ProductDetails = () => {
               </div>
             </motion.div>
           ))}
-        </div>
+        </div> */}
       </div>
     </div>
     </motion.div>

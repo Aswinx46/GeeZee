@@ -5,7 +5,7 @@ import ImageCropper from '../common/ImageCropper';
 import axios from '../../../axios/adminAxios';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import {store} from '../../redux/store'
+import { store } from '../../redux/store'
 import cloudAxios from 'axios'
 import { MutatingDots } from 'react-loader-spinner'
 import { toast } from 'react-toastify';
@@ -22,28 +22,28 @@ const EditProduct = () => {
     const [rotation, setRotation] = useState(0);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
     // const[product,setProduct]=useState({spec:[]})
-    const[product,setProduct]=useState(store.getState().product.product)
-    const[oldUrl,setOldUrl]=useState([])
-    const[success,setSuccess]=useState(false)
-    const[errors, setErrors] = useState({});
-  
-    const navigate=useNavigate()
+    const [product, setProduct] = useState(store.getState().product.product)
+    const [oldUrl, setOldUrl] = useState([])
+    const [success, setSuccess] = useState(false)
+    const [errors, setErrors] = useState({});
+
+    const navigate = useNavigate()
 
     useEffect(() => {
         const fetchCategory = async () => {
             const category = await axios.get('/category');
-            const sendedProduct=store.getState().product.product
+            const sendedProduct = store.getState().product.product
             console.log("Old urls are ", product.productImg)
             console.log(sendedProduct.spec)
             console.log(category)
-            const cat=category.data.category.filter((cat)=>cat.categoryName!=sendedProduct.categoryId.categoryName)
+            const cat = category.data.category.filter((cat) => cat.categoryName != sendedProduct.categoryId.categoryName)
             console.log(cat)
-      
+
             setOldUrl(sendedProduct.productImg)
             setCategories(cat);
             setSuccess(false)
             console.log(sendedProduct)
-            if(sendedProduct.productImg && sendedProduct.productImg.length>0 ) setImageUrl(sendedProduct.productImg)
+            if (sendedProduct.productImg && sendedProduct.productImg.length > 0) setImageUrl(sendedProduct.productImg)
         };
         fetchCategory();
     }, []);
@@ -59,7 +59,7 @@ const EditProduct = () => {
             };
             reader.readAsDataURL(files[0]);
             setImage([...image, files[0]]);
-           console.log("handle Image chagen",oldUrl)
+            console.log("handle Image chagen", oldUrl)
         }
     };
 
@@ -126,7 +126,7 @@ const EditProduct = () => {
         const newImage = [...image];
         newImage.splice(currentImageIndex, 1);
         setImage(newImage);
-      
+
     };
 
     const deleteImage = (index) => {
@@ -139,21 +139,27 @@ const EditProduct = () => {
 
 
 
-    const handleInputChange=(e)=>{
-        const {name,value}=e.target
-        if(name === 'spec'){
+    const handleInputChange = (e) => {
+        const { name, value } = e.target
+        if (name === 'spec') {
             const spec = e.target.value.split('>');
-            setProduct((p)=>({...p,spec}))
-        }else{
-
-            setProduct((p)=>({
-                ...p,[name]:value
+            setProduct((p) => ({ ...p, spec }))
+        } else if (name === 'subHead') {
+            
+            const subHead = e.target.value.split('>')
+            setProduct((p) => ({ ...p, subHead }))
+        } else if (name === 'subHeadDescription') {
+            const subHeadDescription = e.target.value.split('>')
+            setProduct((p) => ({ ...p, subHeadDescription }))
+        } else {
+            setProduct((p) => ({
+                ...p, [name]: value
             }))
         }
     }
 
 
-    const handleSubmit=async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
         // Validate all fields
         const newErrors = {};
@@ -172,9 +178,15 @@ const EditProduct = () => {
         if (!product.description?.trim()) {
             newErrors.description = 'Description is required';
         }
-        if (product.spec.length <=0) {
+        if (product.spec.length <= 0) {
             newErrors.spec = 'Specifications are required';
         }
+        // if (product.SubHeadings.length<=0) {
+        //     newErrors.SubHeadings = 'SubHeadings are required';
+        // }
+        // if (product.subHeadingdescription.length<=0) {
+        //     newErrors.subHeadingdescription = 'subHeadingdescription are required';
+        // }
 
         // If there are errors, show toast and stop submission
         if (Object.keys(newErrors).length > 0) {
@@ -187,53 +199,53 @@ const EditProduct = () => {
         setSuccess(true)
         console.log("Before axios.put, product:", product);
         const newImageUrls = imageUrl.filter(url => !url.startsWith('https://res.cloudinary.com'));
-       
-        const uploadPromises = newImageUrls.map(async(url, index) => {
+
+        const uploadPromises = newImageUrls.map(async (url, index) => {
             try {
                 console.log('Processing new image:', index)
-                
+
                 const formData = new FormData();
                 const croppedImageBlob = await fetch(url).then(r => r.blob());
                 formData.append('file', croppedImageBlob);
                 formData.append('upload_preset', 'products')
-                formData.append('cloud_name','dotlezt0x')
-                
+                formData.append('cloud_name', 'dotlezt0x')
+
                 const response = await cloudAxios.post(
                     'https://api.cloudinary.com/v1_1/dotlezt0x/image/upload',
                     formData
                 )
-            
+
                 return response;
             } catch (error) {
-                console.log('error while updating the new image to the cloudinary',error)
-               
+                console.log('error while updating the new image to the cloudinary', error)
+
             }
         })
-        
+
         try {
             const cloudinaryResponse = await Promise.all(uploadPromises)
             console.log(cloudinaryResponse)
-            const urls=cloudinaryResponse.map((obj)=>obj.data.secure_url)
-           
-           console.log(urls)
-            if(urls.length>0)
-                {    console.log('jhfoasjdf;jaso')
-                const response=await axios.put(`/editProduct/${product._id}`,{product,urls:[...oldUrl,...urls]})
+            const urls = cloudinaryResponse.map((obj) => obj.data.secure_url)
+
+            console.log(urls)
+            if (urls.length > 0) {
+                console.log('jhfoasjdf;jaso')
+                const response = await axios.put(`/editProduct/${product._id}`, { product, urls: [...oldUrl, ...urls] })
                 console.log(product)
-            console.log(response)
-            setSuccess(true)
+                console.log(response)
+                setSuccess(true)
                 navigate('/showProduct')
-            }else{
-                const response=await axios.put(`/editProduct/${product._id}`,{product,urls:[...oldUrl,...urls]})
+            } else {
+                const response = await axios.put(`/editProduct/${product._id}`, { product, urls: [...oldUrl, ...urls] })
                 setSuccess(true)
                 navigate('/showProduct')
             }
-             
+
         } catch (error) {
             console.error('Error in Promise.all:', error)
             setSuccess(false)
         }
-       
+
     }
 
     return (
@@ -284,15 +296,15 @@ const EditProduct = () => {
                                 name="category"
                                 onChange={handleInputChange}
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-all duration-200 ease-in-out"
-                                
+
                             >
                                 <option value=""> {product.categoryId?.categoryName || "Select a category"}</option>
-                                
-                                {categories.map((category,index)=>(
-                                      <option key={index} value={category.categoryName}>{category.categoryName}</option>
+
+                                {categories.map((category, index) => (
+                                    <option key={index} value={category.categoryName}>{category.categoryName}</option>
                                 ))}
-                              
-                              
+
+
                             </select>
                         </motion.div>
 
@@ -358,9 +370,9 @@ const EditProduct = () => {
                                 value={product.spec.join(">")}
                                 onChange={handleInputChange}
                                 className={`w-full bg-white border rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black ${errors.spec ? 'border-red-500' : 'border-gray-300'}`}
-                                >
-                          
-                                </textarea>
+                            >
+
+                            </textarea>
                             {errors.spec && <p className="text-red-500 text-sm mt-1">{errors.spec}</p>}
                         </motion.div>
 
@@ -374,7 +386,7 @@ const EditProduct = () => {
                                 value={product.status}
                                 onChange={handleInputChange}
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-all duration-200 ease-in-out"
-                                
+
                             >
                                 <option value="active">Active</option>
                                 <option value="inactive">Inactive</option>
@@ -394,6 +406,41 @@ const EditProduct = () => {
                                 className={`mt-1 block w-full border rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-all duration-200 ease-in-out ${errors.sku ? 'border-red-500' : 'border-gray-300'}`}
                             />
                             {errors.sku && <p className="text-red-500 text-sm mt-1">{errors.sku}</p>}
+                        </motion.div>
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.7 }}
+                        >
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Sub Headings
+                            </label>
+                            <input
+                                type="text"
+                                name='subHead'
+                                value={product.subHead.join('>')}
+                                onChange={handleInputChange}
+                                className={`w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black ${errors.subHead ? 'border-red-500' : ''}`}
+                            />
+                            {errors.subHead && <p className="text-red-500 text-sm">{errors.subHead}</p>}
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.9 }}
+                        >
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Sub Heading Description
+                            </label>
+                            <textarea
+                                rows="4"
+                                onChange={handleInputChange}
+                                name='subHeadDescription'
+                                value={product.subHeadDescription.join('>')}
+                                className={`w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black ${errors.subHeadDescription ? 'border-red-500' : ''}`}
+                            ></textarea>
+                            {errors.subHeadDescription && <p className="text-red-500 text-sm">{errors.subHeadDescription}</p>}
                         </motion.div>
 
                         <motion.div whileHover={{ scale: 1.02 }} className="space-y-2">
@@ -419,6 +466,7 @@ const EditProduct = () => {
                                 </label>
                             </div>
                         </motion.div>
+
 
                         {/* Preview Images */}
                         <motion.div
@@ -449,6 +497,7 @@ const EditProduct = () => {
                             )}
                         </motion.div>
                     </div>
+
 
                     <div className="px-6 py-4 bg-gray-50 flex justify-end space-x-4">
                         <motion.button

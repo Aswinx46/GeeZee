@@ -1,5 +1,6 @@
 const Product=require('../models/productSchema')
 const Category=require('../models/categorySchema')
+const product = require('../models/productSchema')
 const addProduct=async (req,res) => {
     const{name,price,quantity,subHead,categoryId,subHeadDescription,sku,description,status,imageUrl,specAndDetails}=req.body
     console.log(name,price,quantity,categoryId,sku,description,status,imageUrl)
@@ -8,6 +9,7 @@ const addProduct=async (req,res) => {
         console.log(category)
         if(!category) return res.status(400).json({message:"the category is not found"})
             const existingProduct=await Product.findOne({title:new RegExp(`^${name}$`, 'i')})
+        console.log(existingProduct)
         if(existingProduct) return res.status(400).json({message:"the product is already created"})
             const product=new Product({
                 title:name,
@@ -111,13 +113,16 @@ const showProductListed=async (req,res) => {
 }
 
 const showRelatedProducts=async (req,res) => {
-    const {id}=req.query
+    const {id}=req.params
     console.log(id)
     try {
-        const relatedProducts=await Product.find({status:'active',categoryId:id})
-        console.log(relatedProducts)
+        const relatedProducts=await Product.find({status:'active',categoryId:id}).limit(4)
+        const notRelatedProducts=await product.find({status:"active"}).limit(4)
+        if(!relatedProducts) return res.status(200).json({message:"related products is empty so random products",notRelatedProducts})
+           return res.status(200).json({message:"related products fetched",relatedProducts})
     } catch (error) {
-        
+        console.log('error while fetching the related products',error)
+        return res.status(400).json({message:"error while retrieving the related products"})
     }
 }
 
