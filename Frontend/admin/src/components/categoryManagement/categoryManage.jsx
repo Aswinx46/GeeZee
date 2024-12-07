@@ -16,10 +16,16 @@ const StaticCategoryManagement = () => {
 
     useEffect(()=>{
         const fetchCategory=async () => {
+          try {
             const category=await axios.get('/category')
             
             setCategories(category.data.category)
             console.log('category added in the state')
+          } catch (error) {
+            console.log(error)
+            toast.error('error in fetching category')
+          }
+            
         }
         fetchCategory()
     },[fetch])
@@ -29,10 +35,20 @@ const StaticCategoryManagement = () => {
 
     const handleAddCategory=async (e) => {
         e.preventDefault()
+        console.log(categories)
         if(newCategory.trim())
       {
+      
+        
         try {
             console.log(newCategory)
+            const duplicate=categories.filter((cat)=>cat.categoryName.toLowerCase()==newCategory.toLowerCase())
+            if(duplicate.length>0) 
+              {
+                toast.error('category already exist')
+                return;
+              }
+            
             const response=await axios.post('/addCategory',{newCategory})
             console.log(response)
             setFetch(!fetch)
@@ -44,7 +60,7 @@ const StaticCategoryManagement = () => {
       }else{
 
         console.log('cant add empty string')
-        toast.success('cant add empty string')
+        toast.error('cant add empty string')
       }
     }
 

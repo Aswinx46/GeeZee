@@ -3,7 +3,7 @@ import { Link, replace, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaHome, FaShoppingCart, FaSearch, FaUser, FaCrown, FaStore } from 'react-icons/fa';
 import {store} from '../../redux/store'
-
+import logo from '../../assets/GeeZee.png'
 import { useSelector, useDispatch } from 'react-redux';
 import { removeUser } from '@/redux/slices/userSlice';
 import { persistor } from '../../redux/store';
@@ -56,8 +56,8 @@ const Header = (props) => {
             whileHover={{ scale: 1.05 }}
             className="flex items-center"
           >
-            <Link to="/" className="text-3xl font-bold bg-gradient-to-r from-blue-500 via-cyan-400 to-green-400 bg-clip-text text-transparent">
-              GeeZee
+            <Link to="/" className="">
+            <img className='h-20 w-30' src={logo}></img>
             </Link>
           </motion.div>
 

@@ -104,8 +104,15 @@ const editProduct=async (req,res) => {
 const showProductListed=async (req,res) => {
     
     try {
-        const products=await Product.find({status:'active'}).populate('categoryId','categoryName')
-        return res.status(200).json({message:'products fetched',products})
+        const products=await Product.find({status:'active',availableQuantity:{$gt:0}}).populate({
+            path:'categoryId',
+            match:{status:'active'},
+            select: '_id categoryName status'
+        })
+        console.log('this is products',products)
+        const activeProducts = products.filter(product => product.categoryId);
+        console.log('this is active products',activeProducts)
+        return res.status(200).json({message:'products fetched',products:activeProducts})
     } catch (error) {
         console.log('error while fetching the products')
         return res.status(500).json({message:"error while fetching the products"})

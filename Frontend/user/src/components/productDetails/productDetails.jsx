@@ -370,7 +370,7 @@ const ProductDetails = () => {
                   transition={{ duration: 0.6 }}
                   src={product?.productImg[1]}
                   alt="Keyboard Design"
-                  className="w-50 h-50 flex"
+                  className="w-full h-[400px] object-cover rounded-lg shadow-lg"
                 />
               </motion.div>
             </motion.div>
@@ -393,7 +393,7 @@ const ProductDetails = () => {
                   transition={{ duration: 0.6 }}
                   src={product.productImg[2]}
                   alt="Next-Gen Typing"
-                  className="w-50 h-50"
+                  className="w-full h-[400px] object-cover rounded-lg shadow-lg"
                 />
               </motion.div>
               <div className="space-y-6">
