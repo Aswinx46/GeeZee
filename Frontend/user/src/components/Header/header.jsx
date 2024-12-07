@@ -3,7 +3,7 @@ import { Link, replace, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaHome, FaShoppingCart, FaSearch, FaUser, FaCrown, FaStore } from 'react-icons/fa';
 import {store} from '../../redux/store'
-import BreadCrumps from '../BreadCrump/BreadCrumps';
+
 import { useSelector, useDispatch } from 'react-redux';
 import { removeUser } from '@/redux/slices/userSlice';
 import { persistor } from '../../redux/store';

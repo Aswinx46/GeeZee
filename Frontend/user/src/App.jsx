@@ -15,7 +15,7 @@ import ProtectedRoute from './components/protectedRoute/protectedRoute';
 import Signup from './components/signup/Signup'
 import Prod from './product'
 import ScrollToTop from './extraAddonComponents/ScrollToTop';
-
+import BreadCrumps from './components/BreadCrump/BreadCrumps';
 import Footer from './components/Footer/Footer';
 function App() {
 
@@ -25,6 +25,7 @@ function App() {
     <ToastContainer/>
     <ScrollToTop/>
     <Header/>
+    <BreadCrumps/>
     <Routes>
        <Route path='/' element={<HomePage/>}></Route>
        <Route path='/signup' element={<Signup/>}></Route>
@@ -33,7 +34,9 @@ function App() {
        <Route path='/login' element={ <LoginPage/>}></Route>
        <Route path='/home' element={ <HomePage/> }></Route>
        <Route path='/productPage' element={  <ProductPage/>}></Route>
-       <Route path='/productDetails' element={  <ProductDetails/>}></Route>
+       {/* <Route path='/productDetails' element={  <ProductDetails/>}></Route> */}
+       <Route path="/productDetails/:id?" element={<ProductDetails />} />
+
      
     </Routes>
     <Footer/>

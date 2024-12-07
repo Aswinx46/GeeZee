@@ -1,4 +1,3 @@
-
 // export default ProductDetails;
 import React, { useState,useEffect } from 'react'
 import { motion } from 'framer-motion'
@@ -6,6 +5,7 @@ import { ChevronDown, ChevronRight, Search, User } from 'lucide-react'
 import axios from '../../axios/userAxios'
 import Corouser from '../../extraAddonComponents/corouser'
 import sample from '../../assets/banner.jpg'
+import { useNavigate, useParams } from 'react-router-dom'
 const ProductDetails = () => {
   const [activeImage, setActiveImage] = useState(0)
   const [activeSection, setActiveSection] = useState(null)
@@ -35,23 +35,34 @@ const ProductDetails = () => {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const[review,setReview]=useState('')
   const[products,setProducts]=useState([])
-
+  const {id}=useParams()
+  const navigate=useNavigate()
   useEffect(() => {
-    const productSelected = localStorage.getItem('selectedProduct');
-    const produc = productSelected ? JSON.parse(productSelected) : [];
-    console.log(produc)
-    const single = produc[0];
     const fetchProduct=async () => {
-      
-      const productsResponse = await axios.get('/products')
-      setProducts(productsResponse.data.products)
-    }
-    fetchProduct()
-    console.log(single)
-    setProduct(single);
+      console.log(id)
+    if(!id)
+    {
+      console.log('this is the if case')
+      const productSelected = localStorage.getItem('selectedProduct');
+      const produc = productSelected ? JSON.parse(productSelected) : [];
+      console.log(produc)
+      const single = produc[0];
+      setProduct(single);
     
-  }, []);
-  console.log(product.spec)
+      console.log(single)
+    }else{
+        console.log('this is the else case')
+        const productsResponse = await axios.get('/products')
+        setProducts(productsResponse.data.products)
+      const allProducts=productsResponse.data.products
+      const selectedProduct=allProducts.find((item)=>item._id==id)
+      console.log(selectedProduct)
+      setProduct(selectedProduct)
+    }
+  }
+  fetchProduct()
+  }, [id]);
+  console.log(product)
   const handleDoubleClick = () => {
     setIsZoomed(!isZoomed);
     if (!isZoomed) {
@@ -77,8 +88,9 @@ const ProductDetails = () => {
       className="min-h-screen bg-black text-white"
     >
       <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
+        key={product?._id || 'loading'} 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="container mx-auto px-4 py-8"
       >
@@ -87,7 +99,7 @@ const ProductDetails = () => {
           <motion.div
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
           >
             <div className="rounded-lg p-8 mb-4 overflow-hidden relative">
               <motion.div 
@@ -156,7 +168,7 @@ const ProductDetails = () => {
           <motion.div
             initial={{ x: 20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
           >
             <motion.h1 
               initial={{ y: -20, opacity: 0 }}
@@ -166,10 +178,24 @@ const ProductDetails = () => {
             >
               {product?.title}
             </motion.h1>
-            <h2 className="text-xl text-gray-400 mb-6">{product?.categoryId?.categoryName}</h2>
-            <p className="text-gray-300 mb-8">
+            <motion.h2 
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: false }}
+              transition={{ duration: 0.6 }}
+              className="text-xl text-gray-400 mb-6"
+            >
+              {product?.categoryId?.categoryName}
+            </motion.h2>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false }}
+              transition={{ duration: 0.6 }}
+              className="text-gray-300 mb-8"
+            >
               {product?.description}
-            </p>
+            </motion.p>
 
             {/* Add to Cart and Buy Now Buttons */}
             <div className="space-y-4 mb-8">
@@ -313,19 +339,38 @@ const ProductDetails = () => {
               className="grid md:grid-cols-2 gap-12 items-center mb-24"
             >
               <div className="space-y-6">
-                <h2 className="text-3xl font-bold">{product.subHead[0]}</h2>
-                <p className="text-gray-400 text-lg">
-                {product.subHeadDescription[0]}
-                </p>
+                <motion.h2 
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: false }}
+                  transition={{ duration: 0.6 }}
+                  className="text-3xl font-bold"
+                >
+                  {product.subHead[0]}
+                </motion.h2>
+                <motion.p 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: false }}
+                  transition={{ duration: 0.6 }}
+                  className="text-gray-400 text-lg"
+                >
+                  {product.subHeadDescription[0]}
+                </motion.p>
               </div>
               <motion.div
                 whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 className="rounded-lg overflow-hidden"
               >
-                <img
-                  src= {product?.productImg[1]}
+                <motion.img
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: false }}
+                  transition={{ duration: 0.6 }}
+                  src={product?.productImg[1]}
                   alt="Keyboard Design"
-                  className="w-50 h-50 flex " 
+                  className="w-50 h-50 flex"
                 />
               </motion.div>
             </motion.div>
@@ -338,19 +383,38 @@ const ProductDetails = () => {
             >
               <motion.div
                 whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 className="rounded-lg overflow-hidden"
               >
-                <img
+                <motion.img
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: false }}
+                  transition={{ duration: 0.6 }}
                   src={product.productImg[2]}
                   alt="Next-Gen Typing"
                   className="w-50 h-50"
                 />
               </motion.div>
               <div className="space-y-6">
-                <h2 className="text-3xl font-bold">{product.subHead[1]}</h2>
-                <p className="text-gray-400 text-lg">
-                {product.subHeadDescription[1]}
-                </p>
+                <motion.h2 
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: false }}
+                  transition={{ duration: 0.6 }}
+                  className="text-3xl font-bold"
+                >
+                  {product.subHead[1]}
+                </motion.h2>
+                <motion.p 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: false }}
+                  transition={{ duration: 0.6 }}
+                  className="text-gray-400 text-lg"
+                >
+                  {product.subHeadDescription[1]}
+                </motion.p>
               </div>
             </motion.div>
           </section>
@@ -458,70 +522,9 @@ const ProductDetails = () => {
         ))}
       </motion.div>
     </div>
-        {/* <div className="space-y-6">
-          <div className="border-t border-gray-700 pt-6">
-            <div className="flex justify-between mb-2">
-              <div className="flex items-center">
-                <span className="font-semibold text-white mr-2">Arjun</span>
-                <span className="px-2 py-1 text-xs bg-gray-800 text-white rounded">Verified</span>
-              </div>
-              <span className="text-sm text-gray-400">10/24/2024</span>
-            </div>
-            <div className="flex mb-2">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <svg key={star} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-              ))}
-            </div>
-            <p className="text-white">Nice Keyboard</p>
-          </div>
-
-          <div className="border-t border-gray-700 pt-6">
-            <div className="flex justify-between mb-2">
-              <div className="flex items-center">
-                <span className="font-semibold text-white mr-2">Chandran</span>
-                <span className="px-2 py-1 text-xs bg-gray-800 text-white rounded">Verified</span>
-              </div>
-              <span className="text-sm text-gray-400">10/03/2024</span>
-            </div>
-            <div className="flex mb-2">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <svg key={star} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-              ))}
-            </div>
-            <p className="text-white">Perfect</p>
-            <p className="text-gray-400 mt-1">The clicking sound of this keyboard is perfect, I think its because of its Blue Switches</p>
-          </div>
-        </div> */}
-        <Corouser/>
-         {/* <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {[...products].map((product, index) => (
-            <motion.div
-              key={index}
-              className="w-full"
-            >
-              <div className="bg-black rounded-md shadow-md overflow-hidden h-full border border-[#white]">
-                <div className="relative pt-[60%]">
-                  <img
-                    src={product.productImg[0]}
-                    alt={product.title}
-                    className="absolute top-0 left-0 w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-3">
-                  <h3 className="text-sm font-semibold mb-2 line-clamp-2 text-white">{product.title}</h3>
-                  <p className="text-lg font-bold text-[#8b5cf6] mb-2">₹{product.price}</p>
-                  <button onClick={() => handleDeal(index)} className="w-full bg-[#8b5cf6] text-white px-3 py-1.5 rounded-full hover:bg-[#7c3aed] transition-all text-sm font-semibold">
-                    View Deal
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div> */}
+    
+        <Corouser setProduct={setProduct}/>
+      
       </div>
     </div>
     </motion.div>
@@ -529,4 +532,3 @@ const ProductDetails = () => {
 }
 
 export default ProductDetails
-
