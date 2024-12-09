@@ -23,34 +23,50 @@ const Home = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
-        className="h-screen flex items-center justify-center relative overflow-hidden bg-[url('/pc.jpg')] text-white"
+        className="h-screen flex items-end justify-center relative overflow-hidden text-white pb-40"
         
       >
+          <video
+          className="absolute inset-0 w-full h-full object-cover"
+          src="/CORSAIR_Header_2024_WQHD_2.webm" // Replace with your video file path
+          autoPlay
+          loop
+          muted
+        ></video>
+
         <div className="absolute inset-0 opacity-50">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black" />
         </div>
         
         <div className="container mx-auto px-4 z-10 text-center">
-          <motion.h1 
+          {/* <motion.h1 
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.8 }}
-            className="text-6xl md:text-8xl font-bold mb-6"
+            className="text-6xl md:text-9xl  font-bold mb-32 text-transparent hover:text-white transition duration-700"
           >
             GeeZee
-          </motion.h1>
+          </motion.h1> */}
           <motion.p 
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.8 }}
-            className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto"
+            className="text-2xl md:text-3xl mb-4 max-w-2xl  mx-auto"
           >
-            Elevate your workspace with premium computer accessories and innovative tech solutions
+            EVERYTHING YOU NEED
+          </motion.p>
+          <motion.p 
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+            className="text-5xl md:text-7xl mb-8 max-w-4xl mx-auto font-bold"
+          >
+            TO PERFORM YOUR BEST
           </motion.p>
           <motion.div
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.6, duration: 0.8 }}
+            transition={{ delay: 0.8, duration: 0.8 }}
           >
             <Link 
               to="/productPage" 

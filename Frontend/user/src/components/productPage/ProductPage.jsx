@@ -77,11 +77,18 @@ const ProductPage = () => {
                         animate={{ opacity: 1 }}
                         className="w-full h-full relative"
                     >
-                        <img
+                        {/* <img
                             src={Banner}
                             alt="Gaming Accessories"
                             className="w-full h-full object-cover"
-                        />
+                        /> */}
+                        <video
+                            className="absolute inset-0 w-full h-full object-cover"
+                            src="/keyboard video.mp4" // Replace with your video file path
+                            autoPlay
+                            loop
+                            muted
+                        ></video>
                         <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent">
                             <div className="container mx-auto px-4 h-full flex items-center">
                                 <div className="max-w-xl">
