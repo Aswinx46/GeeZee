@@ -84,7 +84,14 @@ const StaticCategoryManagement = () => {
       try {
         console.log(selectedId)
         console.log(editNameCategory)
+
+        const clone=categories.find((item)=>item.categoryName.toLowerCase()==editNameCategory.toLowerCase())
         setIsEditOpen(false)
+        if(clone)
+        {
+          toast.error('this category is already exist')
+          return
+        }
         const editName=await axios.patch(`/editCategoryName/${selectedId}`,{editNameCategory})
         console.log(editName.data.changeName)
        setFetch(!fetch)
