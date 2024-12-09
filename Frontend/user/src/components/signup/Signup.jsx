@@ -100,6 +100,7 @@ export default function SignupPage() {
           const response=await axios.post('/googleAuthenticate',{email:email,email_verified,firstName:given_name,lastName:family_name,id:sub})
           console.log(response)
           toast.success(response.data.message)
+          navigate('/login')
         
         } catch (error) {
           console.log('google authenticate failed',error)

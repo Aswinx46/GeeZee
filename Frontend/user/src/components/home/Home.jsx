@@ -148,7 +148,7 @@ const Home = () => {
                     transition={{ duration: 0.3 }}
                     className="bg-black bg-opacity-50 p-4 rounded-lg"
                   >
-                    <Link to="/products" className="text-white font-semibold">
+                    <Link to="/productPage" className="text-white font-semibold">
                       View {item.title}
                     </Link>
                   </motion.div>

@@ -187,6 +187,42 @@ const ProductDetails = () => {
             >
               {product?.categoryId?.categoryName}
             </motion.h2>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false }}
+              transition={{ duration: 0.6 }}
+              className={`mb-8 ${product?.availableQuantity > 0 && product?.availableQuantity < 5
+                  ? "text-red-500"
+                  : product?.availableQuantity >= 5 && product?.availableQuantity < 10
+                    ? "text-orange-500"
+                    : product?.availableQuantity >= 10
+                      ? "text-green-500"
+                      : "text-gray-500"
+                }`}
+            >
+              {product?.availableQuantity==0?"Out of Stock !!":
+              product?.availableQuantity > 0 && product?.availableQuantity < 5
+                ?`Hurry Up: ${product?.availableQuantity}`
+                : product?.availableQuantity >= 5 && product?.availableQuantity <= 10
+                  ? `Available Stock: ${product?.availableQuantity}`
+                  : product?.availableQuantity > 10
+                    ? `Available Stock: ${product?.availableQuantity}`
+                    : ""}
+            </motion.p>
+
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false }}
+              transition={{ duration: 0.6 }}
+              className="text-gray-300 mb-8"
+            >
+              { <span className='font-bold text-white text-2xl' >  PRICE {product?.price}  </span> } <del className='font-bold text-red-500 text-2xl' >10000</del>
+            </motion.p>
+        
+
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -196,6 +232,7 @@ const ProductDetails = () => {
             >
               {product?.description}
             </motion.p>
+        
 
             {/* Add to Cart and Buy Now Buttons */}
             <div className="space-y-4 mb-8">
