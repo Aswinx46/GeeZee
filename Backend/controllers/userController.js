@@ -78,7 +78,7 @@ const signup=async(req,res)=>{
         }
     }
 
-const otpVerification=async(req,res)=>{
+const  otpVerification=async(req,res)=>{
     const {otp}=req.body
     
     // console.log(req.session)
@@ -135,7 +135,8 @@ const resendOtp=async(req,res)=>{
 }
 
 const googleSave = async(req,res)=>{
-    const {email,email_verified,firstName,lastName,id}=req.body
+    const {email,email_verified,firstName,id}=req.body
+    console.log(email,email_verified,firstName,id)
     try {
         const exisitingUSer=await User.findOne({email})
         if(exisitingUSer)
@@ -144,7 +145,6 @@ const googleSave = async(req,res)=>{
         }
         const newUser=new User({
             firstName,
-            lastName,
             email,
             status:'active',
             googleId:id,

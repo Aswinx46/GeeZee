@@ -97,10 +97,10 @@ export default function SignupPage() {
         try {
           const credential=jwtDecode(credentialResponse.credential)
           console.log(credential)
-          const{email,email_verified,family_name,given_name,sub}=credential
+          const{email,email_verified,name,sub}=credential
          
 
-          const response=await axios.post('/googleAuthenticate',{email:email,email_verified,firstName:given_name,lastName:family_name,id:sub})
+          const response=await axios.post('/googleAuthenticate',{email:email,email_verified,firstName:name,id:sub})
           console.log(response)
           toast.success(response.data.message)
           navigate('/login')
