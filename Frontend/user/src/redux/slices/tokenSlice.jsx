@@ -14,7 +14,8 @@ export const tokenSlice=createSlice({
         },
         removeToken:(state,action)=>{
             state.token=null
-        }
+        },
+        
     }
 })
 

@@ -4,16 +4,18 @@ import userSlice from './slices/userSlice'
 import { persistStore,persistReducer } from 'redux-persist'
 import { combineReducers } from '@reduxjs/toolkit'
 import storage from 'redux-persist/lib/storage'
-
+import OtpSlice from './slices/OtpCheck'
 const persistConfig={
     key:'root',
     storage,
-    blacklist: ['token'],  
+    blacklist: ['token','otpCheck'],  
 }
 
 const rootReducer=combineReducers({
     token:tokenSlice,
-    user:userSlice
+    user:userSlice,
+    otpCheck:OtpSlice
+
 })
 
 const persistedReducer =persistReducer(persistConfig,rootReducer)

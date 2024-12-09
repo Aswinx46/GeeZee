@@ -3,14 +3,29 @@ import Gezee from '../../assets/GeeZee.png'
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from '../../axios/userAxios'
+import { useSelector } from 'react-redux';
 const otpVerification = () => {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(300); 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const[error,setError]=useState(false)
+  const[check,setCheck]=useState(null)
 
     const navigate=useNavigate()
+    const otpCheck=useSelector((state)=>state.otpCheck.otp)
+
+   
+  useEffect(() => {
+    if (!otpCheck) {
+      toast.error('OTP session expired. Redirecting to signup.');
+      navigate('/signup');
+    }
+  }, [otpCheck, navigate]); 
+
+
     useEffect(()=>{
+      console.log(otpCheck)
+      setCheck(otpCheck)
         const interval = setInterval(() => {
             setTimer((prevTimer) => (prevTimer > 0 ? prevTimer - 1 : 0));
           }, 1000);
@@ -21,7 +36,9 @@ const otpVerification = () => {
   
     const handleSubmit=async(e)=>{
         e.preventDefault()
-        if(timer>0)
+      
+      
+          if(timer>0)
             {
                 const OTP=otp.join('')
                 console.log(OTP)
@@ -53,6 +70,8 @@ const otpVerification = () => {
                setError(true)
 
             }
+      
+        
     }
 
     const handleChange=(element,index)=>{

@@ -7,9 +7,11 @@ import { FcGoogle } from 'react-icons/fc'; // For Google icon
 import { FaFacebook } from 'react-icons/fa'; // For Facebook icon
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
+import { useDispatch } from 'react-redux';
+import { addValidation } from '@/redux/slices/OtpCheck';
 export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
-
+  const dispatch=useDispatch()
   const [user, setUser] = useState({
     firstname: '',
     lastname: '',
@@ -36,6 +38,7 @@ export default function SignupPage() {
         const response = await axios.post('/signup', user);
         console.log(response.data.message)
         toast.success('DATA SUBMITTED');
+        dispatch(addValidation('otp validation done'))
         navigate('/otpVerification');
       }
     } catch (error) {
