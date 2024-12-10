@@ -7,6 +7,8 @@ import axios from '../../../axios/adminAxios'
 import { MutatingDots } from 'react-loader-spinner'
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import ProductForm from './Variant';
+
 const ProductManagement = () => {
     const[imageUrl,setImageUrl]=useState([])
     const[image,setImage]=useState([])
@@ -20,6 +22,7 @@ const ProductManagement = () => {
     const [zoom, setZoom] = useState(1);
     const [rotation, setRotation] = useState(0);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+    const [isVariantModalOpen, setIsVariantModalOpen] = useState(false);
     const navigate=useNavigate()
     const formRef=useRef()
     const [errors, setErrors] = useState({});
@@ -75,6 +78,8 @@ const ProductManagement = () => {
           newErrors.SubHeadings = 'SubHeadings are required';
       }
 
+      
+
       if (!formData.get('subHeadingdescription').trim()) {
         newErrors.subHeadingdescription = 'subHeadingdescription are required';
     }
@@ -85,7 +90,7 @@ const ProductManagement = () => {
     const handleSubmit=async(event)=>{
         event.preventDefault()
         const formData = new FormData(event.target);
-        
+        console.log(formData.get('variant'))
         // Validate form
         const formErrors = validateForm(formData);
         console.log(formErrors)
@@ -131,6 +136,11 @@ const ProductManagement = () => {
             const subHeadingdescription=data.get('subHeadingdescription')
             const subHeadingDescriptionArray=subHeadingdescription.split('>').map((item)=>item.trim()).filter((item)=>item.length>0)
             console.log(subHeadingDescriptionArray)
+
+            const variantsData=data.get('SubHeadings')
+            const variantsArray=variantsData.split('>').map((item)=>item.trim()).filter((item)=>item.length>0)
+            console.log(variantsArray)
+          
             const productDetails={
                 name:data.get('title'),
                 price:data.get('price'),
@@ -142,7 +152,8 @@ const ProductManagement = () => {
                 imageUrl:imageUrls,
                 specAndDetails:specArray,
                 subHead:subHeadArray,
-                subHeadDescription:subHeadingDescriptionArray
+                subHeadDescription:subHeadingDescriptionArray,
+                variant:variantsArray
             }
          
             try {
@@ -366,6 +377,8 @@ const ProductManagement = () => {
                 {errors.SKU && <p className="text-red-500 text-sm">{errors.SKU}</p>}
               </motion.div>
 
+            
+
               {/* Preview Images */}
               <motion.div
                 initial={{ opacity: 0 }}
@@ -395,6 +408,20 @@ const ProductManagement = () => {
               
               </motion.div>
             </div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1 }}
+              className="flex justify-start"
+            >
+              <button
+                type="button"
+                onClick={() => setIsVariantModalOpen(true)}
+                className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-gray-900"
+              >
+                Add Varient
+              </button>
+            </motion.div>
             <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -482,11 +509,42 @@ const ProductManagement = () => {
 
         </motion.div>
       </div>
+      {isLoading&&
+            <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50'>
+                <MutatingDots
+                    height="100"
+                    width="100"
+                    color="#ee3a24"
+                    secondaryColor= '#ee3a24'
+                    radius='12.5'
+                    ariaLabel="mutating-dots-loading"
+                    wrapperStyle={{}}
+                    wrapperClass=""
+                    visible={true}
+                />
+            </div>}
+      {/* Variant Modal */}
+      {isVariantModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg w-11/12 max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Add Variant</h2>
+              <button
+                onClick={() => setIsVariantModalOpen(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ×
+              </button>
+            </div>
+            <ProductForm />
+          </div>
+        </div>
+      )}
       {cropModalOpen && currentImage && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
           >
             <div className="bg-white p-4 rounded-lg w-[90%] max-w-2xl">
               <h2 className="text-xl font-bold mb-4">Crop Image</h2>

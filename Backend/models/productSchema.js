@@ -38,17 +38,14 @@ const ProductSchema=new mongoose.Schema({
         ref:'category',
         required:true
     },
-    cart:{
-        type:Schema.Types.ObjectId,
-        ref:"cart"
-    },stock:{
+    stock:{
         type:String,
         enum:['In Stock','Out of Stock']
     },
-    spec:{
-        type:[String],
-        required:true
-    },
+    variant:[{
+        type:Schema.Types.ObjectId,
+        ref:'variant'
+    }],
     subHead:{
         type:[String],
         required:true

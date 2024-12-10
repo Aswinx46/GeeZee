@@ -2,7 +2,7 @@ const Product=require('../models/productSchema')
 const Category=require('../models/categorySchema')
 const product = require('../models/productSchema')
 const addProduct=async (req,res) => {
-    const{name,price,quantity,subHead,categoryId,subHeadDescription,sku,description,status,imageUrl,specAndDetails}=req.body
+    const{name,price,quantity,subHead,categoryId,subHeadDescription,variant,sku,description,status,imageUrl,specAndDetails}=req.body
     console.log(name,price,quantity,categoryId,sku,description,status,imageUrl)
     try {
         const category=await Category.findById(categoryId)
@@ -22,7 +22,8 @@ const addProduct=async (req,res) => {
                 categoryId:categoryId,
                 spec:specAndDetails,
                 subHead,
-                subHeadDescription
+                subHeadDescription,
+                variant
         })
         await product.save()
         res.status(201).json({message:"product created"})
@@ -116,6 +117,14 @@ const showProductListed=async (req,res) => {
     } catch (error) {
         console.log('error while fetching the products')
         return res.status(500).json({message:"error while fetching the products"})
+    }
+}
+
+const showProductVariants=async(req,res)=>{
+    try {
+       
+    } catch (error) {
+        
     }
 }
 
