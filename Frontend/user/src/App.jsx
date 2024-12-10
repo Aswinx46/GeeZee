@@ -18,7 +18,7 @@ import ScrollToTop from './extraAddonComponents/ScrollToTop';
 import BreadCrumps from './components/BreadCrump/BreadCrumps';
 import Footer from './components/Footer/Footer';
 import Cart from './components/cart/Cart';
-
+import ProductVariants from './components/productDetails/ProductVariant';
 function App() {
 
 
@@ -39,6 +39,7 @@ function App() {
        {/* <Route path='/productDetails' element={  <ProductDetails/>}></Route> */}
        <Route path="/productDetails/:id?" element={<ProductDetails />} />
         <Route path="/cart" element={<Cart/>}></Route>
+        <Route path="/ProductVariants" element={<ProductVariants/>}></Route>
      
     </Routes>
     <Footer/>

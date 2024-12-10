@@ -4,6 +4,7 @@ import ProductSlice from '../redux/slices/editProductSlice'
 import { persistStore,persistReducer } from 'redux-persist'
 import { combineReducers } from '@reduxjs/toolkit'
 import storage from 'redux-persist/lib/storage'
+import variantSlice from './slices/variantSlice'
 // export const store=configureStore({
 //     reducer:{
 //         token:tokenSlice,
@@ -21,7 +22,8 @@ import storage from 'redux-persist/lib/storage'
 
     const rootReducer=combineReducers({
         token:tokenSlice,
-        product:ProductSlice
+        product:ProductSlice,
+        variant:variantSlice
     })
 
     const persistanceReducer=persistReducer(persistConfig,rootReducer)

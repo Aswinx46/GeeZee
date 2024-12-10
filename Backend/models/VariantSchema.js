@@ -11,11 +11,11 @@ const variantSchema= new mongoose.Schema({
         type:Number,
         required:true
     },
-    attributes:{
+    attributes:[{
         type: Map,
         of: String, // Dynamic key-value pairs like RAM: "8GB", Storage: "256GB"
         required: true
-    },
+    }],
     stock:{
         type:Number,
         required:true

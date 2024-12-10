@@ -6,6 +6,7 @@ import axios from '../../axios/userAxios'
 import Corouser from '../../extraAddonComponents/corouser'
 import sample from '../../assets/banner.jpg'
 import { useNavigate, useParams } from 'react-router-dom'
+import GraphicsSelector from '../productDetails/ProductVariant'
 const ProductDetails = () => {
   const [activeImage, setActiveImage] = useState(0)
   const [activeSection, setActiveSection] = useState(null)
@@ -163,7 +164,7 @@ const ProductDetails = () => {
               ))}
             </div>
           </motion.div>
-
+       
           {/* Product Info */}
           <motion.div
             initial={{ x: 20, opacity: 0 }}
@@ -211,7 +212,7 @@ const ProductDetails = () => {
                     ? `Available Stock: ${product?.availableQuantity}`
                     : ""}
             </motion.p>
-
+            <GraphicsSelector/>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}

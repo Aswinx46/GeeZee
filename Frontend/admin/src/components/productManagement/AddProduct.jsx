@@ -8,6 +8,7 @@ import { MutatingDots } from 'react-loader-spinner'
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import ProductForm from './Variant';
+import { useSelector } from 'react-redux';
 
 const ProductManagement = () => {
     const[imageUrl,setImageUrl]=useState([])
@@ -26,6 +27,13 @@ const ProductManagement = () => {
     const navigate=useNavigate()
     const formRef=useRef()
     const [errors, setErrors] = useState({});
+    const[varients,setVarients]=useState([])
+
+  const varientCallback=(varients)=>{
+    console.log('varients in parent'+varients)
+    console.log(Object.values(varients))
+    setVarients(varients)
+  }
 
     useEffect(()=>{
         const getCategory=async () => {
@@ -89,6 +97,7 @@ const ProductManagement = () => {
 
     const handleSubmit=async(event)=>{
         event.preventDefault()
+        // const varients=useSelector((state)=>state.variant.variant)
         const formData = new FormData(event.target);
         console.log(formData.get('variant'))
         // Validate form
@@ -127,7 +136,7 @@ const ProductManagement = () => {
            
             const spec=data.get('spec')
             const specArray=spec.split('>').map((item)=>item.trim()).filter((item)=>item.length>0)
-            // console.log(specArray)
+            console.log(specArray)
 
             const subHeading=data.get('SubHeadings')
             const subHeadArray=subHeading.split('>').map((item)=>item.trim()).filter((item)=>item.length>0)
@@ -137,10 +146,12 @@ const ProductManagement = () => {
             const subHeadingDescriptionArray=subHeadingdescription.split('>').map((item)=>item.trim()).filter((item)=>item.length>0)
             console.log(subHeadingDescriptionArray)
 
-            const variantsData=data.get('SubHeadings')
-            const variantsArray=variantsData.split('>').map((item)=>item.trim()).filter((item)=>item.length>0)
-            console.log(variantsArray)
+            // const variantsData=data.get('SubHeadings')
+            // const variantsArray=variantsData.split('>').map((item)=>item.trim()).filter((item)=>item.length>0)
+            // console.log(variantsArray)
           
+            console.log(varients)
+
             const productDetails={
                 name:data.get('title'),
                 price:data.get('price'),
@@ -153,7 +164,7 @@ const ProductManagement = () => {
                 specAndDetails:specArray,
                 subHead:subHeadArray,
                 subHeadDescription:subHeadingDescriptionArray,
-                variant:variantsArray
+                variant:varients
             }
          
             try {
@@ -311,6 +322,8 @@ const ProductManagement = () => {
                 />
                 {errors.quantity && <p className="text-red-500 text-sm">{errors.quantity}</p>}
               </motion.div>
+
+          
 
               {/* Category Field */}
               <motion.div
@@ -536,7 +549,7 @@ const ProductManagement = () => {
                 ×
               </button>
             </div>
-            <ProductForm />
+            <ProductForm varientCallback={varientCallback}/>
           </div>
         </div>
       )}

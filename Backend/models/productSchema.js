@@ -42,15 +42,21 @@ const ProductSchema=new mongoose.Schema({
         type:String,
         enum:['In Stock','Out of Stock']
     },
-    variant:[{
-        type:Schema.Types.ObjectId,
-        ref:'variant'
-    }],
+    variants: [
+        {
+          price: { type: Number, required: true },
+          stock: { type: Number, required: true },
+          selectedAttributes: { type: Object, required: true },
+        },
+      ],
     subHead:{
         type:[String],
         required:true
     },
     subHeadDescription:{
+        type:[String],
+        required:true
+    },spec:{
         type:[String],
         required:true
     }
