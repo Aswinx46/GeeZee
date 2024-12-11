@@ -4,6 +4,9 @@ const adminController=require('../controllers/adminController')
 const auth=require('../auth/adminAuth')
 const categoryController=require('../controllers/categoryController')
 const productController=require('../controllers/productController')
+
+const brandController=require('../controllers/BrandController')
+
 admin_route.post('/login',adminController.login)
 admin_route.get('/usersList',adminController.fetchUser)
 admin_route.patch('/userEdit/:id',auth.adminAuth,adminController.editUser)
@@ -19,4 +22,8 @@ admin_route.patch('/editCategoryName/:id',auth.adminAuth,categoryController.edit
 admin_route.post('/addProduct',auth.adminAuth,productController.addProduct)
 admin_route.get('/products',auth.adminAuth,productController.showProduct)
 admin_route.put('/editProduct/:id',auth.adminAuth,productController.editProduct)
+
+admin_route.get('/brands',auth.adminAuth,brandController.showBrand)
+admin_route.post('/addBrand',auth.adminAuth,brandController.addBrand)
+admin_route.patch('/editBrand/:id',auth.adminAuth,brandController.changeStatus)
 module.exports=admin_route

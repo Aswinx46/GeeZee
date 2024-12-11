@@ -28,7 +28,7 @@ const ProductManagement = () => {
     const formRef=useRef()
     const [errors, setErrors] = useState({});
     const[varients,setVarients]=useState([])
-
+    const[brands,setBrands]=useState([])
   const varientCallback=(varients)=>{
     console.log('varients in parent'+varients)
     console.log(Object.values(varients))
@@ -39,6 +39,10 @@ const ProductManagement = () => {
         const getCategory=async () => {
             const category= await axios.get('/category')
             setCategories(category.data.category)
+
+            const response = await axios.get('/brands');
+            setBrands(response.data.brands);
+            console.log(response.data.brands)
         }
         getCategory()
     },[success])
@@ -113,7 +117,9 @@ const ProductManagement = () => {
         const data=new FormData(event.target)
         const selectedCategory=categories.find((cat)=>cat.categoryName==data.get('category'))
         const selectedCategoryId=selectedCategory._id
-        
+        const selectedBrand=categories.find((brand)=>brand.name==data.get('brand'))
+        console.log(selectedBrand)
+        const selectedBrandId=selectedBrand._id
         console.log(selectedCategoryId)
           try {
           
@@ -164,7 +170,8 @@ const ProductManagement = () => {
                 specAndDetails:specArray,
                 subHead:subHeadArray,
                 subHeadDescription:subHeadingDescriptionArray,
-                variant:varients
+                variant:varients,
+                brand:selectedBrandId
             }
          
             try {
@@ -343,6 +350,25 @@ const ProductManagement = () => {
               
                
               </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Brands
+                </label>
+              
+                     <select name='brand' className="w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black">
+                     {brands.map((brand,i)=>(
+                     <option key={i}>{brand.name}</option>
+                    ))}
+                   </select>
+              
+               
+              </motion.div>
+
 
               {/* Image Upload Field */}
               <motion.div
@@ -549,7 +575,7 @@ const ProductManagement = () => {
                 ×
               </button>
             </div>
-            <ProductForm varientCallback={varientCallback}/>
+            <ProductForm varientCallback={varientCallback} setIsVariantModalOpen={setIsVariantModalOpen} />
           </div>
         </div>
       )}

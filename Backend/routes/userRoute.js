@@ -13,6 +13,8 @@ user_route.post('/refreshToken',userController.refreshToken)
 
 user_route.get('/products',productController.showProductListed)
 user_route.get('/relatedProducts/:id',productController.showRelatedProducts)
+user_route.get('/showProductVariantQuantity/:id',productController.showProductVariantQuantity)
+
 
 user_route.get('/category',categoryController.showCategory)
 module.exports=user_route

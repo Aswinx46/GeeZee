@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { addVariant } from '@/redux/slices/variantSlice';
 import { useDispatch } from 'react-redux';
-const ProductForm = ({varientCallback}) => {
+const ProductForm = ({varientCallback,setIsVariantModalOpen}) => {
     const [attributes, setAttributes] = useState([]); 
     const [variants, setVariants] = useState([]); 
     const [newAttribute, setNewAttribute] = useState({ name: '', values: '' }); 
@@ -74,10 +74,12 @@ const ProductForm = ({varientCallback}) => {
         setNewVariant({ price: '', stock: '', selectedAttributes: {} });
     };
 
-    const handleSaveVariant = () => {
+    const handleSaveVariant = (e) => {
+        e.preventDefault()
         console.log(variants);
         // dispatch(addVariant(variants))
         varientCallback(variants)
+        setIsVariantModalOpen(false)
     };
 
     return (
@@ -256,7 +258,7 @@ const ProductForm = ({varientCallback}) => {
             <div className="flex justify-end">
                 <button
                     type="submit"
-                    onClick={handleSaveVariant}
+                    onClick={(e)=>handleSaveVariant(e)}
                     className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors duration-200"
                 >
                     Save Variant

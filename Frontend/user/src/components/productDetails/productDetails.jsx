@@ -6,7 +6,7 @@ import axios from '../../axios/userAxios'
 import Corouser from '../../extraAddonComponents/corouser'
 import sample from '../../assets/banner.jpg'
 import { useNavigate, useParams } from 'react-router-dom'
-import GraphicsSelector from '../productDetails/ProductVariant'
+import VariantSelector from '../productDetails/ProductVariant'
 const ProductDetails = () => {
   const [activeImage, setActiveImage] = useState(0)
   const [activeSection, setActiveSection] = useState(null)
@@ -36,6 +36,7 @@ const ProductDetails = () => {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const[review,setReview]=useState('')
   const[products,setProducts]=useState([])
+  const[index,setIndex]=useState(0)
   const {id}=useParams()
   const navigate=useNavigate()
   useEffect(() => {
@@ -49,12 +50,13 @@ const ProductDetails = () => {
       console.log(produc)
       const single = produc[0];
       setProduct(single);
-    
-      console.log(single)
+      console.log("re fetching")
+      console.log(single.variants)
     }else{
         console.log('this is the else case')
         const productsResponse = await axios.get('/products')
-        setProducts(productsResponse.data.products)
+      console.log("re fetching")
+      setProducts(productsResponse.data.products)
       const allProducts=productsResponse.data.products
       const selectedProduct=allProducts.find((item)=>item._id==id)
       console.log(selectedProduct)
@@ -63,7 +65,10 @@ const ProductDetails = () => {
   }
   fetchProduct()
   }, [id]);
-  console.log(product)
+
+
+  console.log("products" ,product)
+
   const handleDoubleClick = () => {
     setIsZoomed(!isZoomed);
     if (!isZoomed) {
@@ -81,6 +86,11 @@ const ProductDetails = () => {
       setPosition({ x: 0, y: 0 });
     }
   };
+
+  const receiveIndex=(index)=>{
+    console.log(index)
+    setIndex(index)
+  }
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -194,25 +204,29 @@ const ProductDetails = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: false }}
               transition={{ duration: 0.6 }}
-              className={`mb-8 ${product?.availableQuantity > 0 && product?.availableQuantity < 5
+              className={`mb-8 ${product?.variants[index].stock > 0 && product?.variants[index].stock < 5
                   ? "text-red-500"
-                  : product?.availableQuantity >= 5 && product?.availableQuantity < 10
+                  : product?.variants[index].stock >= 5 && product?.variants[index].stock < 10
                     ? "text-orange-500"
-                    : product?.availableQuantity >= 10
+                    : product?.variants[index].stock >= 10
                       ? "text-green-500"
                       : "text-gray-500"
                 }`}
             >
-              {product?.availableQuantity==0?"Out of Stock !!":
-              product?.availableQuantity > 0 && product?.availableQuantity < 5
-                ?`Hurry Up: ${product?.availableQuantity}`
-                : product?.availableQuantity >= 5 && product?.availableQuantity <= 10
-                  ? `Available Stock: ${product?.availableQuantity}`
-                  : product?.availableQuantity > 10
-                    ? `Available Stock: ${product?.availableQuantity}`
+              {product?.variants[index].stock==0?"Out of Stock !!":
+              product?.variants[index].stock > 0 && product?.variants[index].stock < 5
+                ?`Hurry Up: ${product?.variants[index].stock}`
+                : product?.variants[index].stock >= 5 && product?.variants[index].stock <= 10
+                  ? `Available Stock: ${product?.variants[index].stock}`
+                  : product?.variants[index].stock > 10
+                    ? `Available Stock: ${product?.variants[index].stock}`
                     : ""}
             </motion.p>
-            <GraphicsSelector/>
+
+
+            <VariantSelector sendVariant={product.variants} receiveIndex={receiveIndex} id={product._id} setProducts={setProduct}/>
+
+
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -220,7 +234,7 @@ const ProductDetails = () => {
               transition={{ duration: 0.6 }}
               className="text-gray-300 mb-8"
             >
-              { <span className='font-bold text-white text-2xl' >  PRICE {product?.price}  </span> } <del className='font-bold text-red-500 text-2xl' >10000</del>
+              { <span className='font-bold text-white text-2xl' >  PRICE {product?.variants[index]?.price}  </span> } <del className='font-bold text-red-500 text-2xl' >10000</del>
             </motion.p>
         
 

@@ -59,6 +59,10 @@ const ProductSchema=new mongoose.Schema({
     },spec:{
         type:[String],
         required:true
+    },
+    brand:{
+        type:Schema.Types.ObjectId,
+        ref:'Brand'
     }
 })
 

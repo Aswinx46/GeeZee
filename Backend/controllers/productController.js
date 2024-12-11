@@ -1,15 +1,16 @@
 const Product=require('../models/productSchema')
 const Category=require('../models/categorySchema')
 const product = require('../models/productSchema')
+// const product = require('../models/productSchema')
 const addProduct=async (req,res) => {
-    const{name,price,quantity,subHead,categoryId,subHeadDescription,variant,sku,description,status,imageUrl,specAndDetails}=req.body
-    console.log( 'this is spec', specAndDetails)
+    const{name,price,quantity,subHead,categoryId,subHeadDescription,variant,brand,sku,description,status,imageUrl,specAndDetails}=req.body
+    // console.log( 'this is spec', specAndDetails)
     try {
         const category=await Category.findById(categoryId)
-        console.log(category)
+        // console.log(category)
         if(!category) return res.status(400).json({message:"the category is not found"})
             const existingProduct=await Product.findOne({title:new RegExp(`^${name}$`, 'i')})
-        console.log(existingProduct)
+        // console.log(existingProduct)
 
         if(existingProduct) return res.status(400).json({message:"the product is already created"})
 
@@ -25,10 +26,11 @@ const addProduct=async (req,res) => {
                 spec:specAndDetails,
                 subHead,
                 subHeadDescription,
-                variants:variant
+                variants:variant,
+                brand
                 
         })
-        console.log(product)
+        // console.log(product)
         await product.save()
         res.status(201).json({message:"product created"})
     } catch (error) {
@@ -78,11 +80,11 @@ const editProduct=async (req,res) => {
                 subHead,
                 subHeadDescription
             })
-            console.log("Spec saved " , spec)
+            // console.log("Spec saved " , spec)
            
             return res.status(200).json({message:"product edited"})
         }else{
-            console.log(checkCategory)
+            // console.log(checkCategory)
             const editedProduct=await Product.findByIdAndUpdate(id,{
                 title,
                 sku,
@@ -114,9 +116,9 @@ const showProductListed=async (req,res) => {
             match:{status:'active'},
             select: '_id categoryName status'
         })
-        console.log('this is products',products)
+        // console.log('this is products',products)
         const activeProducts = products.filter(product => product.categoryId);
-        console.log('this is active products',activeProducts)
+        // console.log('this is active products',activeProducts)
         return res.status(200).json({message:'products fetched',products:activeProducts})
     } catch (error) {
         console.log('error while fetching the products')
@@ -124,20 +126,29 @@ const showProductListed=async (req,res) => {
     }
 }
 
-const showProductVariants=async(req,res)=>{
+const showProductVariantQuantity=async(req,res)=>{
+    const {id}=req.params
+    const { variantId } = req.query;
     try {
-       
+       console.log(id)
+       const selectedProduct=await product.findById(id)
+       console.log("selected " , selectedProduct.variants)
+    //    console.log(Array.isArray(selectedProduct));
+      const selectedVariant= selectedProduct.variants.find((variant)=>variant._id==variantId)
+       console.log(selectedVariant)
+       res.status(200).json(selectedVariant.stock)
     } catch (error) {
-        
+        console.log(error)
     }
 }
 
 const showRelatedProducts=async (req,res) => {
     const {id}=req.params
-    console.log(id)
+   
+    // console.log(id)
     try {
         const relatedProducts=await Product.find({status:'active',categoryId:id}).limit(4)
-        const notRelatedProducts=await product.find({status:"active"}).limit(4)
+        const notRelatedProducts=await Product.find({status:"active"}).limit(4)
         if(!relatedProducts) return res.status(200).json({message:"related products is empty so random products",notRelatedProducts})
            return res.status(200).json({message:"related products fetched",relatedProducts})
     } catch (error) {
@@ -151,7 +162,8 @@ module.exports={
     showProduct,
     editProduct,
     showProductListed,
-    showRelatedProducts
+    showRelatedProducts,
+    showProductVariantQuantity
     
 }
 
