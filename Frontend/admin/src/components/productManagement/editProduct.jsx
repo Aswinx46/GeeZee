@@ -26,18 +26,34 @@ const EditProduct = () => {
     const [oldUrl, setOldUrl] = useState([])
     const [success, setSuccess] = useState(false)
     const [errors, setErrors] = useState({});
-
+    const [brands,setBrands]=useState([])
+    const[selectedBrand,setSelectedBrand]=useState({})
+    const[modalOpen,setModalOpen]=useState(false)
     const navigate = useNavigate()
+
 
     useEffect(() => {
         const fetchCategory = async () => {
             const category = await axios.get('/category');
             const sendedProduct = store.getState().product.product
+            
+            const response = await axios.get('/brands');
+            console.log( 'this is the brands from the backend', response.data.brands)
+            const selectedBrand=response.data.brands.filter((brand)=>brand._id==sendedProduct.brand)
+            console.log('this is the selected brand name', selectedBrand)
+            // const selectedBrandName=selectedBrand.name
+            setSelectedBrand(selectedBrand)
+            const brand=response.data.brands.filter((bran)=>bran.name!==selectedBrand.name)
+            console.log('this is the brands without selected one',brand)
+            setBrands(brand);
+
             console.log("Old urls are ", product.productImg)
             console.log(sendedProduct.spec)
             console.log(category)
             const cat = category.data.category.filter((cat) => cat.categoryName != sendedProduct.categoryId.categoryName)
             console.log(cat)
+
+           
 
             setOldUrl(sendedProduct.productImg)
             setCategories(cat);
@@ -157,6 +173,14 @@ const EditProduct = () => {
             }))
         }
     }
+
+    const handleVariantEdit=(e)=>{
+        e.preventDefault()
+        setModalOpen(true)
+    }
+
+    
+
 
 
     const handleSubmit = async (e) => {
@@ -302,6 +326,28 @@ const EditProduct = () => {
 
                                 {categories.map((category, index) => (
                                     <option key={index} value={category.categoryName}>{category.categoryName}</option>
+                                ))}
+
+
+                            </select>
+                        </motion.div>
+
+
+                        <motion.div whileHover={{ scale: 1.02 }} className="space-y-2">
+                            <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+                                Brands
+                            </label>
+                            <select
+                                id="brand"
+                                name="brand"
+                                onChange={handleInputChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-all duration-200 ease-in-out"
+
+                            >
+                                <option value=""> {selectedBrand[0]?.name || "Select a brand"}</option>
+
+                                {brands.map((brand, index) => (
+                                    <option key={index} value={brand.name}>{brand.name}</option>
                                 ))}
 
 
@@ -500,6 +546,20 @@ const EditProduct = () => {
 
 
                     <div className="px-6 py-4 bg-gray-50 flex justify-end space-x-4">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 1 }}
+                            className="flex justify-start"
+                        >
+                            <button
+                                type="button"
+                                onClick={(e) => handleVariantEdit(e)}
+                                className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-gray-900"
+                            >
+                                Edit Varient
+                            </button>
+                        </motion.div>
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
@@ -518,10 +578,18 @@ const EditProduct = () => {
                             <FaSave className="mr-2" />
                             Save Changes
                         </motion.button>
+                        
                     </div>
+                    
                 </motion.form>
                 {/* {success && <MutatingDots className='items-center' visible={true} height="100" width="100" color="black" secondaryColor="yellow" radius="12.5" ariaLabel="mutating-dots-loading" wrapperClass="" wrapperStyle={{}}/>} */}
+          
+                            
+
             </div>
+            
+
+
 
             {cropModalOpen && currentImage && (
                 <motion.div

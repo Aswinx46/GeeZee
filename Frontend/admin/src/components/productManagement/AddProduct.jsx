@@ -42,7 +42,7 @@ const ProductManagement = () => {
 
             const response = await axios.get('/brands');
             setBrands(response.data.brands);
-            console.log(response.data.brands)
+            // console.log(response.data.brands)
         }
         getCategory()
     },[success])
@@ -101,6 +101,7 @@ const ProductManagement = () => {
 
     const handleSubmit=async(event)=>{
         event.preventDefault()
+       
         // const varients=useSelector((state)=>state.variant.variant)
         const formData = new FormData(event.target);
         console.log(formData.get('variant'))
@@ -117,8 +118,9 @@ const ProductManagement = () => {
         const data=new FormData(event.target)
         const selectedCategory=categories.find((cat)=>cat.categoryName==data.get('category'))
         const selectedCategoryId=selectedCategory._id
-        const selectedBrand=categories.find((brand)=>brand.name==data.get('brand'))
-        console.log(selectedBrand)
+        // console.log( 'this is the brand name =', data.get('brand'))
+        const selectedBrand=brands.find((brand)=>brand.name==data.get('brand'))
+        // console.log( 'this is the selected brand name', selectedBrand)
         const selectedBrandId=selectedBrand._id
         console.log(selectedCategoryId)
           try {
