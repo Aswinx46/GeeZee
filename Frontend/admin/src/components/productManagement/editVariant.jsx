@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const AttributeModal = ({ isOpen, onClose, onSave, Varient, setVarient,setIsOpen }) => {
+const AttributeModal = ({ isOpen, onClose, onSave, Varient, index,setVarient,setIsOpen }) => {
     const [attributeName, setAttributeName] = useState('');
     const [attributeValue, setAttributeValue] = useState('');
     const [price, setPrice] = useState('');
@@ -10,13 +10,14 @@ const AttributeModal = ({ isOpen, onClose, onSave, Varient, setVarient,setIsOpen
     const [entries, setEntries] = useState([])
 
     useEffect(() => {
+        console.log(Varient)
         setVarients(Varient)
         // console.log(varients[0].selectedAttributes)
-        const keys = Object.entries(Varient[0].selectedAttributes)
+        const keys = Object.entries(Varient[index].selectedAttributes)
         console.log('this is the values', keys)
         setEntries(keys)
-        setPrice(Varient[0]?.price)
-        setStock(Varient[0]?.stock)
+        setPrice(Varient[index]?.price)
+        setStock(Varient[index]?.stock)
        
 
     }, [])
@@ -42,10 +43,14 @@ const AttributeModal = ({ isOpen, onClose, onSave, Varient, setVarient,setIsOpen
     const handleSave = () => {
         // onSave({ attributeName, attributeValue, price, stock });
         
-        console.log(entries)
+        console.log("this is entries",entries)
         console.log(price)
         console.log(stock)
-        setVarient((prev)=>({...prev,price,stock,selectedAttributes:entries}))
+        const result = entries.reduce((obj, [key, value]) => {
+            obj[key] = value;
+            return obj;
+          }, {});
+        setVarient((prev)=>([...prev.map((item, i)=>i===index?({...item,price,stock,selectedAttributes:{...result}}):item)]))
         setIsOpen(false);
     };
 
@@ -67,7 +72,7 @@ const AttributeModal = ({ isOpen, onClose, onSave, Varient, setVarient,setIsOpen
                     >
                         <h2 className="text-2xl font-bold mb-4">Add Attribute</h2>
                         <div className="space-y-4">
-                            <div>
+                            {/* <div>
                                 <label htmlFor="attributeName" className="block text-sm font-medium text-gray-700 mb-1">
                                     Attribute Name
                                 </label>
@@ -82,7 +87,7 @@ const AttributeModal = ({ isOpen, onClose, onSave, Varient, setVarient,setIsOpen
                                     />
                                 ))}
 
-                            </div>
+                            </div> */}
                             <div>
                                 <label htmlFor="attributeValue" className="block text-sm font-medium text-gray-700 mb-1">
                                     Attribute Value
@@ -129,7 +134,7 @@ const AttributeModal = ({ isOpen, onClose, onSave, Varient, setVarient,setIsOpen
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                onClick={onClose}
+                                onClick={()=>setIsOpen(false)}
                                 className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
                             >
                                 Cancel

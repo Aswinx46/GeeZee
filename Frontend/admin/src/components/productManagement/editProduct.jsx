@@ -9,7 +9,7 @@ import { store } from '../../redux/store'
 import cloudAxios from 'axios'
 import { MutatingDots } from 'react-loader-spinner'
 import { toast } from 'react-toastify';
-
+import EditVariant from './editVariant'
 const EditProduct = () => {
     const [categories, setCategories] = useState([]);
     const [imageUrl, setImageUrl] = useState([]);
@@ -34,7 +34,7 @@ const EditProduct = () => {
     const[attributes,setAttributes]=useState([])
     const[editingVariant,setEditingVariant]=useState()
     const navigate = useNavigate()
-
+    const[index,setIndex]=useState()
 
     useEffect(() => {
         const fetchCategory = async () => {
@@ -178,9 +178,9 @@ const EditProduct = () => {
         }
     }
 
-    const handleVariantEdit=(e)=>{
-        e.preventDefault()
-        setModalOpen(true)
+    const handleEditVariant=(index)=>{
+        setIndex(index)
+        setIsOpen(true)
     }
 
     
@@ -623,7 +623,7 @@ const EditProduct = () => {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{variant.stock}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         <button
-                                            onClick={() => handleEditVariant(idx)}
+                                            onClick={() => handleEditVariant(setIsOpen)}
                                             className="text-blue-600 hover:text-blue-800 font-medium"
                                         >
                                             Edit
@@ -641,7 +641,7 @@ const EditProduct = () => {
                     </table>
                 </div>
             )}
-            {isOpen && <EditVariant isOpen={isOpen} onClose={onClose} Varient={varients} setVarient={setVarients} setIsOpen={setIsOpen}/>}
+            {isOpen && <EditVariant isOpen={isOpen} Varient={varients} index={index} setVarient={setVarients} setIsOpen={setIsOpen}/>}
 
 
 

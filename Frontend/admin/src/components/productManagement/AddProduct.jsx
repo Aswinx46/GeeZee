@@ -33,17 +33,18 @@ const ProductManagement = () => {
     const[editingVariant,setEditingVariant]=useState()
     const[isOpen,setIsOpen]=useState(false)
     const[onClose,setOnClose]=useState(false)
+    const[index,setIndex]=useState()
 
   const varientCallback=(varients,attributes)=>{
     console.log('varients in parent'+varients)
     console.log(Object.values(varients))
-    if(varients.length>0)
-    {
-      setVarients(varients)
-    }else{
+    // if(varients.length>0)
+    // {
+    //   setVarients(varients)
+    // }else{
 
       setVarients((prev)=>([...prev,...varients]))
-    }
+    // }
     // setVarients(varients)
     console.log('this is attributes',attributes)
     setAttributes(attributes)
@@ -267,6 +268,7 @@ const ProductManagement = () => {
 
     const handleEditVariant=(index)=>{
       setIsOpen(true)
+      setIndex(index)
       console.log('this is the editing attribute index',index)
     }
 
@@ -625,9 +627,9 @@ const ProductManagement = () => {
                         <tbody className="bg-white divide-y divide-gray-200">
                             {varients.map((variant, idx) => (
                                 <tr key={idx} className={editingVariant === idx ? 'bg-yellow-50' : ''}>
-                                    {attributes.map((attr, attrIdx) => (
+                                    {Object.keys(variant.selectedAttributes).map((attr, attrIdx) => (
                                         <td key={attrIdx} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {variant.selectedAttributes[Object.keys(attr)[0]]}
+                                            {variant.selectedAttributes[attr]}
                                         </td>
                                     ))}
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{variant.price}</td>
@@ -652,7 +654,7 @@ const ProductManagement = () => {
                     </table>
                 </div>
             )}
-            {isOpen && <EditVariant isOpen={isOpen} onClose={onClose} Varient={varients} setVarient={setVarients} setIsOpen={setIsOpen}/>}
+            {isOpen && <EditVariant isOpen={isOpen} onClose={onClose} Varient={varients} index={index} setVarient={setVarients} setIsOpen={setIsOpen}/>}
       {cropModalOpen && currentImage && (
           <motion.div
             initial={{ opacity: 0 }}

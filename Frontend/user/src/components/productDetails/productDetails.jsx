@@ -7,12 +7,19 @@ import Corouser from '../../extraAddonComponents/corouser'
 import sample from '../../assets/banner.jpg'
 import { useNavigate, useParams } from 'react-router-dom'
 import VariantSelector from '../productDetails/ProductVariant'
+import { useSelector } from 'react-redux'
+import { toast } from 'react-toastify'
+import QuantitySelector from '../quantitySelector/QuantitySelector'
 const ProductDetails = () => {
   const [activeImage, setActiveImage] = useState(0)
   const [activeSection, setActiveSection] = useState(null)
   const [isZoomed, setIsZoomed] = useState(false);
   const [dragConstraints, setDragConstraints] = useState({ top: 0, left: 0, right: 0, bottom: 0 });
   const [position, setPosition] = useState({ x: 0, y: 0 });
+
+
+  const userData=useSelector((state)=>state.user.user)
+  const token=useSelector((state)=>state.token.token)
 
   const features = [
     { title: "chandran", description: "Good Keyboard" },
@@ -37,6 +44,7 @@ const ProductDetails = () => {
   const[review,setReview]=useState('')
   const[products,setProducts]=useState([])
   const[index,setIndex]=useState(0)
+  const[quantity,setQuantity]=useState()
   const {id}=useParams()
   const navigate=useNavigate()
   useEffect(() => {
@@ -91,6 +99,35 @@ const ProductDetails = () => {
     console.log(index)
     setIndex(index)
   }
+
+  const handleCart =async()=>{
+    console.log(token)
+    console.log(quantity)
+    if(!token){
+      toast.warning('Please login to add product to the cart')
+    }
+    const userId=userData._id
+    const selectedProductId=product._id
+    const selectedVariant=product.variants.find((_,i)=>i==index)
+    const selectedVariantId=selectedVariant._id
+    console.log(selectedVariant._id)
+    console.log(product._id)
+    console.log(index)
+    const uploadToCart=await axios.post('/cart',{userId:userId,productId:selectedProductId,selectedVariantId:selectedVariantId,quantity})
+    console.log(uploadToCart.data)
+    // navigate('/productDetails/cart')
+  }
+
+  const receiveQuantity=(quantity)=>{
+    setQuantity(quantity)
+  }
+
+  const handleQuantityChange = (newQuantity) => {
+    console.log(`Quantity changed to: ${newQuantity}`);
+    // Here you can update your cart state or perform any other actions
+  };
+
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -223,10 +260,6 @@ const ProductDetails = () => {
                     : ""}
             </motion.p>
 
-
-            <VariantSelector sendVariant={product.variants} receiveIndex={receiveIndex} id={product._id} setProducts={setProduct}/>
-
-
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -236,6 +269,11 @@ const ProductDetails = () => {
             >
               { <span className='font-bold text-white text-2xl' >  PRICE {product?.variants[index]?.price}  </span> } <del className='font-bold text-red-500 text-2xl' >10000</del>
             </motion.p>
+
+            <VariantSelector sendVariant={product.variants} receiveIndex={receiveIndex} id={product._id} setProducts={setProduct}/>
+
+
+          
         
 
             <motion.p 
@@ -248,12 +286,18 @@ const ProductDetails = () => {
               {product?.description}
             </motion.p>
         
+                <div className='flex gap-4 justify-center items-center'>
+
+            <span>QUANTITY</span>    
+            <QuantitySelector initialQuantity={1} onQuantityChange={handleQuantityChange} receiveQuantity={receiveQuantity} />
+                </div>
 
             {/* Add to Cart and Buy Now Buttons */}
             <div className="space-y-4 mb-8">
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={handleCart}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 className="w-full py-4 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2"
               >
