@@ -78,7 +78,7 @@ const ProductForm = ({varientCallback,setIsVariantModalOpen}) => {
         e.preventDefault()
         console.log(variants);
         // dispatch(addVariant(variants))
-        varientCallback(variants)
+        varientCallback(variants,attributes)
         setIsVariantModalOpen(false)
     };
 

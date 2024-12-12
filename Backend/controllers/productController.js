@@ -1,6 +1,7 @@
 const Product=require('../models/productSchema')
 const Category=require('../models/categorySchema')
 const product = require('../models/productSchema')
+const Brand=require('../models/brandSchema')
 // const product = require('../models/productSchema')
 const addProduct=async (req,res) => {
     const{name,price,quantity,subHead,categoryId,subHeadDescription,variant,brand,sku,description,status,imageUrl,specAndDetails}=req.body
@@ -54,14 +55,17 @@ const editProduct=async (req,res) => {
     const{id}=req.params
    
   
-    const {title,sku,price,availableQuantity,subHeadDescription,description,status,categoryId,stock,category,spec,subHead}=req.body.product
+    const {title,sku,price,availableQuantity,brand,subHeadDescription,description,status,categoryId,stock,category,spec,subHead}=req.body.product
    
     const oldCatId=categoryId._id
     const{urls}=req.body
-  
+  console.log('this is the name of the editing brand',brand)
     
     try {
+
         const checkCategory=await Category.findOne({categoryName:category})
+        const checkBrand=await Brand.findOne({name:brand})
+
         
         if(!checkCategory)
         {
@@ -78,7 +82,8 @@ const editProduct=async (req,res) => {
                 categoryId:oldCatId,
                 spec,
                 subHead,
-                subHeadDescription
+                subHeadDescription,
+                brand:checkBrand._id
             })
             // console.log("Spec saved " , spec)
            
@@ -95,7 +100,8 @@ const editProduct=async (req,res) => {
                 status,
                 stock,
                 categoryId:checkCategory._id,
-                subHead
+                subHead,
+                brand:checkBrand._id
             })
            
             return res.status(200).json({message:"product edited"})

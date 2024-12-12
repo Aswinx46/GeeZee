@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import ProductForm from './Variant';
 import { useSelector } from 'react-redux';
-
+import EditVariant from './editVariant'
 const ProductManagement = () => {
     const[imageUrl,setImageUrl]=useState([])
     const[image,setImage]=useState([])
@@ -29,10 +29,24 @@ const ProductManagement = () => {
     const [errors, setErrors] = useState({});
     const[varients,setVarients]=useState([])
     const[brands,setBrands]=useState([])
-  const varientCallback=(varients)=>{
+    const[attributes,setAttributes]=useState([])
+    const[editingVariant,setEditingVariant]=useState()
+    const[isOpen,setIsOpen]=useState(false)
+    const[onClose,setOnClose]=useState(false)
+
+  const varientCallback=(varients,attributes)=>{
     console.log('varients in parent'+varients)
     console.log(Object.values(varients))
-    setVarients(varients)
+    if(varients.length>0)
+    {
+      setVarients(varients)
+    }else{
+
+      setVarients((prev)=>([...prev,...varients]))
+    }
+    // setVarients(varients)
+    console.log('this is attributes',attributes)
+    setAttributes(attributes)
   }
 
     useEffect(()=>{
@@ -103,6 +117,7 @@ const ProductManagement = () => {
         event.preventDefault()
        
         // const varients=useSelector((state)=>state.variant.variant)
+        console.log(varients)
         const formData = new FormData(event.target);
         console.log(formData.get('variant'))
         // Validate form
@@ -250,6 +265,16 @@ const ProductManagement = () => {
         console.log(updatedImageUrl)
     }
 
+    const handleEditVariant=(index)=>{
+      setIsOpen(true)
+      console.log('this is the editing attribute index',index)
+    }
+
+    const handleDeleteVariant=(index)=>{
+      console.log('this is the deleting attribute index',index)
+      const afterDelete=varients.filter((_,i)=>i!==index)
+      setVarients(afterDelete)
+    }
   return (
     <div className="min-h-screen bg-white">
    
@@ -581,6 +606,53 @@ const ProductManagement = () => {
           </div>
         </div>
       )}
+         {varients.length > 0 && (
+                <div className="space-y-4">
+                    <h4 className="text-md font-medium text-gray-700">Current Variants:</h4>
+                    <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                            <tr>
+                                {attributes.map((attr, idx) => (
+                                    <th key={idx} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {Object.keys(attr)[0]}
+                                    </th>
+                                ))}
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                            {varients.map((variant, idx) => (
+                                <tr key={idx} className={editingVariant === idx ? 'bg-yellow-50' : ''}>
+                                    {attributes.map((attr, attrIdx) => (
+                                        <td key={attrIdx} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {variant.selectedAttributes[Object.keys(attr)[0]]}
+                                        </td>
+                                    ))}
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{variant.price}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{variant.stock}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <button
+                                            onClick={() => handleEditVariant(idx)}
+                                            className="text-blue-600 hover:text-blue-800 font-medium"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => handleDeleteVariant(idx)}
+                                            className="text-red-600 hover:text-red-800 font-medium ml-2"
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+            {isOpen && <EditVariant isOpen={isOpen} onClose={onClose} Varient={varients} setVarient={setVarients} setIsOpen={setIsOpen}/>}
       {cropModalOpen && currentImage && (
           <motion.div
             initial={{ opacity: 0 }}

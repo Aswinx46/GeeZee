@@ -29,6 +29,10 @@ const EditProduct = () => {
     const [brands,setBrands]=useState([])
     const[selectedBrand,setSelectedBrand]=useState({})
     const[modalOpen,setModalOpen]=useState(false)
+    const[varients,setVarients]=useState([])
+    const[isOpen,setIsOpen]=useState(false)
+    const[attributes,setAttributes]=useState([])
+    const[editingVariant,setEditingVariant]=useState()
     const navigate = useNavigate()
 
 
@@ -36,7 +40,7 @@ const EditProduct = () => {
         const fetchCategory = async () => {
             const category = await axios.get('/category');
             const sendedProduct = store.getState().product.product
-            
+            setVarients(sendedProduct.variants)
             const response = await axios.get('/brands');
             console.log( 'this is the brands from the backend', response.data.brands)
             const selectedBrand=response.data.brands.filter((brand)=>brand._id==sendedProduct.brand)
@@ -186,6 +190,7 @@ const EditProduct = () => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         // Validate all fields
+   
         const newErrors = {};
         if (!product.title?.trim()) {
             newErrors.title = 'Title is required';
@@ -213,11 +218,14 @@ const EditProduct = () => {
         // }
 
         // If there are errors, show toast and stop submission
+
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
             toast.error('Please fill all required fields correctly');
             return;
         }
+
+        console.log('this is the product after edit',product)
 
         setErrors({});
         setSuccess(true)
@@ -251,7 +259,7 @@ const EditProduct = () => {
             console.log(cloudinaryResponse)
             const urls = cloudinaryResponse.map((obj) => obj.data.secure_url)
 
-            console.log(urls)
+            console.log(product)
             if (urls.length > 0) {
                 console.log('jhfoasjdf;jaso')
                 const response = await axios.put(`/editProduct/${product._id}`, { product, urls: [...oldUrl, ...urls] })
@@ -587,7 +595,53 @@ const EditProduct = () => {
                             
 
             </div>
-            
+            {varients.length > 0 && (
+                <div className="space-y-4">
+                    <h4 className="text-md font-medium text-gray-700">Current Variants:</h4>
+                    <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                            <tr>
+                                {attributes.map((attr, idx) => (
+                                    <th key={idx} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {Object.keys(attr)[0]}
+                                    </th>
+                                ))}
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                            {varients.map((variant, idx) => (
+                                <tr key={idx} className={editingVariant === idx ? 'bg-yellow-50' : ''}>
+                                    {attributes.map((attr, attrIdx) => (
+                                        <td key={attrIdx} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {variant.selectedAttributes[Object.keys(attr)[0]]}
+                                        </td>
+                                    ))}
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{variant.price}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{variant.stock}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <button
+                                            onClick={() => handleEditVariant(idx)}
+                                            className="text-blue-600 hover:text-blue-800 font-medium"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => handleDeleteVariant(idx)}
+                                            className="text-red-600 hover:text-red-800 font-medium ml-2"
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+            {isOpen && <EditVariant isOpen={isOpen} onClose={onClose} Varient={varients} setVarient={setVarients} setIsOpen={setIsOpen}/>}
 
 
 
