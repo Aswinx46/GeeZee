@@ -1,33 +1,56 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trash2, Plus, Minus, Shield } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import axios from '../../axios/userAxios'
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: "Razer Basilisk V3 Pro - Black",
-      price: 159.99,
-      image: "/placeholder.svg?height=80&width=80",
-      quantity: 1,
-      protection: false,
-      protectionPrice: 29.99
-    },
-    {
-      id: 2,
-      name: "Razer Wolverine V3 Pro",
-      price: 199.99,
-      image: "/placeholder.svg?height=80&width=80",
-      quantity: 1,
-      protection: false,
-      protectionPrice: 29.99
-    }
-  ]);
+  const[quantity,setQuantity]=useState(0)
+  const [cartItems, setCartItems]=useState([])
+  const[newQuantity,setNewQuantity]=useState()
+  const user=useSelector(state=>state.user.user)
+  console.log(user._id)
+  const userId=user._id
+  
+useEffect(()=>{
+
+  const fetchCartItems=async () => {
+    const cartItems=await axios.get(`/cartItems/${userId}`)
+    const items=cartItems.data.result
+    console.log(items)
+    // console.log(cartItems.data.result)
+    setCartItems(items)
+  }
+  fetchCartItems()
+},[])
+
+  // const [cartItems, setCartItems] = useState([
+  //   {
+  //     id: 1,
+  //     name: "Razer Basilisk V3 Pro - Black",
+  //     price: 159.99,
+  //     image: "/placeholder.svg?height=80&width=80",
+  //     quantity: 1,
+  //     protection: false,
+  //     protectionPrice: 29.99
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Razer Wolverine V3 Pro",
+  //     price: 199.99,
+  //     image: "/placeholder.svg?height=80&width=80",
+  //     quantity: 1,
+  //     protection: false,
+  //     protectionPrice: 29.99
+  //   }
+  // ]);
 
   const updateQuantity = (id, change) => {
     setCartItems(items =>
@@ -55,15 +78,46 @@ const Cart = () => {
 
   const calculateSubtotal = () => {
     return cartItems.reduce((total, item) => {
-      const itemTotal = item.price * item.quantity;
-      const protectionTotal = item.protection ? item.protectionPrice : 0;
-      return total + itemTotal + protectionTotal;
+      const itemTotal = item.variants[0].price * item.quantity;
+   
+      // console.log('this is the item in the calculate sub total',itemTotal)
+      return total + itemTotal ;
     }, 0);
   };
 
-  const shipping = 0; // Free shipping
-  const tax = calculateSubtotal() * 0.1; // 10% tax
-  const total = calculateSubtotal() + shipping + tax;
+
+  const total = calculateSubtotal()
+
+  const handleQuantity=async(i,count)=>{
+
+    const itemToBeChanged=cartItems.find((_,index)=>index==i)
+    console.log(itemToBeChanged)
+    // setCartItems((prevItems)=>prevItems.map((item,index)=>{
+    //   if(index == i)
+    //   {
+    //     const newQuantity=item.quantity + count
+
+    //     if(newQuantity > item.variants[0].stock)
+    //     {
+    //       toast.error('no stock left')
+    //       return item
+    //     }else if(newQuantity < 1)
+    //     {
+    //       toast.error('quantity cant be less than 1')
+    //       return item
+    //     }
+
+    //     return {...item,quantity:newQuantity}
+    //   }
+    //   return item
+    // }))
+    const itemId=itemToBeChanged.variants[0]._id
+    const cartId=itemToBeChanged.cartId
+    console.log('this is the cartId',cartId)
+    console.log('this is the item id',itemId)
+    
+  // const updateQuantity=await axios.patch(`/changeQuantity/${itemId}/${cartId}`,{quantity})
+  }
 
   return (
     <div className="min-h-screen bg-black text-white p-6">
@@ -80,9 +134,9 @@ const Cart = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <AnimatePresence>
-              {cartItems.map((item) => (
+              {cartItems.map((item,i) => (
                 <motion.div
-                  key={item.id}
+                  key={i}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 20 }}
@@ -92,30 +146,31 @@ const Cart = () => {
                     <CardContent className="p-6">
                       <div className="flex items-start gap-4">
                         <motion.img
-                          src={item.image}
-                          alt={item.name}
+                          src={item.productImg[0]}
+                          alt='item image'
                           className="w-20 h-20 object-cover rounded-lg"
                           whileHover={{ scale: 1.05 }}
                           transition={{ duration: 0.2 }}
                         />
                         <div className="flex-1">
-                          <h3 className="text-lg font-semibold mb-2 text-white">{item.name}</h3> {/* Ensure item name text is white */}
+                          <h3 className="text-lg font-semibold mb-2 text-white">{item.title}</h3> {/* Ensure item name text is white */}
+                          <p className="text-sm font-semibold mb-2 text-white">{item.description}</p>
                           <div className="flex items-center gap-4">
                             <div className="flex items-center space-x-2">
                               <motion.button
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.95 }}
                                 className="h-8 w-8 rounded-md border border-zinc-700 flex items-center justify-center text-white"
-                                onClick={() => updateQuantity(item.id, -1)}
+                                onClick={() => handleQuantity(i, -1)}
                               >
                                 <Minus className="h-4 w-4" />
                               </motion.button>
-                              <span className="w-8 text-center text-white">{item.quantity}</span>
+                              <span onClick={()=>handleQuantity(i)} className="w-8 text-center text-white">{item.quantity}</span>
                               <motion.button
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.95 }}
                                 className="h-8 w-8 rounded-md border border-zinc-700 flex items-center justify-center text-white"
-                                onClick={() => updateQuantity(item.id, 1)}
+                                onClick={() => handleQuantity(i, 1)}
                               >
                                 <Plus className="h-4 w-4" />
                               </motion.button>
@@ -132,7 +187,7 @@ const Cart = () => {
                         </div>
                         <div className="text-right text-white">
                           <p className="text-lg font-bold">
-                            US${(item.price * item.quantity).toFixed(2)}
+                            US${item.variants[0].price}
                           </p>
                         </div>
                       </div>
@@ -143,23 +198,12 @@ const Cart = () => {
                         onClick={() => toggleProtection(item.id)}
                       >
                         <div className="flex items-center gap-4">
-                          <Shield className={`h-6 w-6 ${item.protection ? 'text-green-500' : 'text-gray-400'}`} />
+                          {/* <Shield className={`h-6 w-6 ${item.protection ? 'text-green-500' : 'text-gray-400'}`} /> */}
                           <div className="flex-1">
-                            <h4 className="font-semibold text-white">Add RazerCare for {item.name}</h4>
-                            <p className="text-sm text-gray-400">Protect your new device for up to 3 years</p>
+                            <h4 className="font-semibold text-green-500">Available Stock :  {item.variants[0].stock}</h4>
+                            {/* <p className="text-sm text-gray-400">Protect your new device for up to 3 years</p> */}
                           </div>
-                          <div className="text-right">
-                            <p className="font-semibold text-white">US${item.protectionPrice}</p>
-                            {item.protection && (
-                              <motion.span
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="text-sm text-green-500"
-                              >
-                                Added
-                              </motion.span>
-                            )}
-                          </div>
+                         
                         </div>
                       </motion.div>
                     </CardContent>
@@ -182,10 +226,10 @@ const Cart = () => {
                     <span>Shipping</span>
                     <span className="text-green-500">Free</span>
                   </div>
-                  <div className="flex justify-between text-white">
+                  {/* <div className="flex justify-between text-white">
                     <span>Tax</span>
                     <span>US${tax.toFixed(2)}</span>
-                  </div>
+                  </div> */}
                   <Separator className="bg-zinc-800" />
                   <div className="flex justify-between text-lg font-bold text-white">
                     <span>Total</span>

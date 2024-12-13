@@ -8,6 +8,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { removeUser } from '@/redux/slices/userSlice';
 import { persistor } from '../../redux/store';
 import { removeToken } from '@/redux/slices/tokenSlice';
+
+import Badge from '@mui/material/Badge';
 const Header = (props) => {
   const [isHovered, setIsHovered] = useState(null);
   const navigate=useNavigate()
@@ -16,7 +18,7 @@ const Header = (props) => {
   const[user,setUser]=useState({})
 
   const userData = useSelector(state=>state.user.user);
-
+  const CartCount=useSelector(state=>state.cartCounter.count)
   console.log(userData)
   const dispatch = useDispatch()
 
@@ -27,6 +29,8 @@ const Header = (props) => {
     console.log("Login button clicked");
   };
   
+
+
   const handleLogout = () => {
   
     localStorage.removeItem('id');
@@ -39,7 +43,7 @@ const Header = (props) => {
     navigate('/', { replace: true });
     console.log("Logout button clicked");
   };
-  
+
 
   return (
     <motion.header 
@@ -81,7 +85,23 @@ const Header = (props) => {
                   to={item.path}
                   className="flex items-center space-x-1 hover:text-violet-400 transition-colors duration-200"
                 >
-                  <item.icon className={`text-lg ${isHovered === index ? 'text-violet-400' : ''}`} />
+                  {item.name === 'Cart' ? (
+                    <Badge
+                      badgeContent={CartCount} // Replace with dynamic cart count
+                      color="secondary"
+                      overlap="circular"
+                      anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                      }}
+                    >
+                      <item.icon className={`text-lg ${isHovered === index ? 'text-violet-400' : ''}`} />
+                    </Badge>
+                  ) : (
+                    <item.icon className={`text-lg ${isHovered === index ? 'text-violet-400' : ''}`} />
+                  )}
+
+                  {/* <item.icon className={`text-lg ${isHovered === index ? 'text-violet-400' : ''}`} /> */}
                   <span className="font-medium">{item.name}</span>
                 </Link>
               </motion.div>

@@ -15,14 +15,14 @@ const cartSchema=new mongoose.Schema({
             default:1,
             
         },
-        price:{
-            type:Number,
-            required:true
-        },
-        totalPrice:{
-            type:Number,
-            required:false
-        },
+        // price:{
+        //     type:Number,
+        //     required:true
+        // },
+        // totalPrice:{
+        //     type:Number,
+        //     required:false
+        // },
         orderStatus:{
             type:String,
             enum:'placed',

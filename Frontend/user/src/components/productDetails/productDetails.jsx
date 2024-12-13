@@ -7,9 +7,10 @@ import Corouser from '../../extraAddonComponents/corouser'
 import sample from '../../assets/banner.jpg'
 import { useNavigate, useParams } from 'react-router-dom'
 import VariantSelector from '../productDetails/ProductVariant'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import QuantitySelector from '../quantitySelector/QuantitySelector'
+import { incrementCounter } from '@/redux/slices/CartCounter'
 const ProductDetails = () => {
   const [activeImage, setActiveImage] = useState(0)
   const [activeSection, setActiveSection] = useState(null)
@@ -47,6 +48,7 @@ const ProductDetails = () => {
   const[quantity,setQuantity]=useState()
   const {id}=useParams()
   const navigate=useNavigate()
+  const dispatch=useDispatch()
   useEffect(() => {
     const fetchProduct=async () => {
       console.log(id)
@@ -104,18 +106,30 @@ const ProductDetails = () => {
     console.log(token)
     console.log(quantity)
     if(!token){
-      toast.warning('Please login to add product to the cart')
+      toast.warning('Please login to add product to the cart') }
+    try {
+      console.log('this is inside the try catcvh')
+      const userId=userData._id
+      const selectedProductId=product._id
+      const selectedVariant=product.variants.find((_,i)=>i==index)
+      const selectedVariantId=selectedVariant._id
+      console.log(selectedVariant._id)
+      console.log(product._id)
+      console.log(index)
+      const uploadToCart=await axios.post('/cart',{userId:userId,productId:selectedProductId,selectedVariantId:selectedVariantId,quantity})
+      console.log(uploadToCart.data)
+      toast.success(uploadToCart.data.message)
+      dispatch(incrementCounter())
+      // navigate('/productDetails/cart')
+    } catch (error) {
+      console.log(error)
+      console.log('error in adding to the cart')
+   
+        toast.error(error.response.data.message)
     }
-    const userId=userData._id
-    const selectedProductId=product._id
-    const selectedVariant=product.variants.find((_,i)=>i==index)
-    const selectedVariantId=selectedVariant._id
-    console.log(selectedVariant._id)
-    console.log(product._id)
-    console.log(index)
-    const uploadToCart=await axios.post('/cart',{userId:userId,productId:selectedProductId,selectedVariantId:selectedVariantId,quantity})
-    console.log(uploadToCart.data)
-    // navigate('/productDetails/cart')
+
+    
+
   }
 
   const receiveQuantity=(quantity)=>{

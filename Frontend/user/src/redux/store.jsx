@@ -5,6 +5,8 @@ import { persistStore,persistReducer } from 'redux-persist'
 import { combineReducers } from '@reduxjs/toolkit'
 import storage from 'redux-persist/lib/storage'
 import OtpSlice from './slices/OtpCheck'
+
+import cartCounterSlice from './slices/CartCounter'
 const persistConfig={
     key:'root',
     storage,
@@ -14,7 +16,8 @@ const persistConfig={
 const rootReducer=combineReducers({
     token:tokenSlice,
     user:userSlice,
-    otpCheck:OtpSlice
+    otpCheck:OtpSlice,
+    cartCounter:cartCounterSlice
 
 })
 
