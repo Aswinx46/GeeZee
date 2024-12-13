@@ -19,6 +19,6 @@ user_route.get('/showProductVariantQuantity/:id',productController.showProductVa
 
 user_route.post('/cart',auth.authToken,cartController.addToCart)
 user_route.get('/cartItems/:id',auth.authToken,cartController.showCartItems)
-// user_route.patch('/changeQuantity/:id',auth.authToken,cartController.changeQuantity)
+user_route.patch('/changeQuantity/:itemId/:cartId/:productId',auth.authToken,cartController.changeQuantity)
 user_route.get('/category',categoryController.showCategory)
 module.exports=user_route

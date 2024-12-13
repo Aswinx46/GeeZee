@@ -110,18 +110,39 @@ const showCartItems = async (req, res) => {
     }
 }
 
-// const changeQuantity=async (req,res) => {
-//     const {id}=req.params
-//     console.log( 'this is the id of the variant', id)
-//     try {
-//         const variantToBeChanged=await Cart.findOne({items.variant : id})
-//     } catch (error) {
+const changeQuantity=async (req,res) => {
+    const {itemId,cartId,productId}=req.params
+    console.log( 'this is the id of the variant', itemId)
+    console.log('this is the cart id',cartId)
+    console.log('this is the product id',productId)
+    const {count}=req.body
+    console.log('this is the count',count)
+    try {
+        const cart=await Cart.findById(cartId)
+        if(!cart) return res.status(400).json({message:"cart is not created yet"})
+            // console.log('this is the list of cart',cart)
+        const product=await Product.findById(productId)
+        console.log('this is the product',product)
+        const varienInCart=cart.items.find((item)=>item.varientId == itemId)
+        const varientToBeEdited=product.variants.find((item)=>item._id == itemId)
+        console.log('this is the varient which is to be edited',varientToBeEdited)
+        console.log('varient in the cart',varienInCart)
+        // if(varienInCart.quantity>varientToBeEdited.stock)
+        // {
+        //     return res.status(400).json({message:'no stock available'})
+        // }
+        varienInCart.quantity+=count
+        await cart.save();
+        return res.status(200).json({message:"count updated",cart})
         
-//     }
-// }
+    } catch (error) {
+        console.log('error while updating the quantity',error)
+        return res.status(500).json({message:"error while updating the quantity"})
+    }
+}
 
 module.exports = {
     addToCart,
     showCartItems,
-    // changeQuantity
+    changeQuantity
 }

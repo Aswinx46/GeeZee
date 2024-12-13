@@ -18,7 +18,7 @@ const Cart = () => {
   const user=useSelector(state=>state.user.user)
   console.log(user._id)
   const userId=user._id
-  
+  const[update,setUpdate]=useState(false)
 useEffect(()=>{
 
   const fetchCartItems=async () => {
@@ -29,7 +29,7 @@ useEffect(()=>{
     setCartItems(items)
   }
   fetchCartItems()
-},[])
+},[update])
 
   // const [cartItems, setCartItems] = useState([
   //   {
@@ -111,12 +111,15 @@ useEffect(()=>{
     //   }
     //   return item
     // }))
+    const productId=itemToBeChanged.id
     const itemId=itemToBeChanged.variants[0]._id
     const cartId=itemToBeChanged.cartId
     console.log('this is the cartId',cartId)
     console.log('this is the item id',itemId)
+    console.log('this isthe product id',productId)
     
-  // const updateQuantity=await axios.patch(`/changeQuantity/${itemId}/${cartId}`,{quantity})
+  const updateQuantity=await axios.patch(`/changeQuantity/${itemId}/${cartId}/${productId}`,{count})
+  setUpdate(!update)
   }
 
   return (
