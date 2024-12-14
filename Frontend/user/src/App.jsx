@@ -19,6 +19,13 @@ import BreadCrumps from './components/BreadCrump/BreadCrumps';
 import Footer from './components/Footer/Footer';
 import Cart from './components/cart/Cart';
 import ProductVariants from './components/productDetails/ProductVariant';
+import Sidebar from './components/accountDetails/SideBar';
+import AddressForm from './components/accountDetails/Address';
+import Wishlist from './components/accountDetails/Wishlist';
+import ChangePassword from './components/accountDetails/ChangePassword';
+import AccountDetails from './components/accountDetails/AccountDetails';
+import Wallet from './components/accountDetails/Wallet';
+import OrderDetails from './components/accountDetails/OrderDetails';
 function App() {
 
 
@@ -41,6 +48,14 @@ function App() {
         <Route path="/cart" element={<Cart/>}></Route>
         <Route path="/productDetails/cart" element={<Cart/>}></Route>
         <Route path="/ProductVariants" element={<ProductVariants/>}></Route>
+        <Route path="/sidebar" element={<Sidebar/>}></Route>
+        <Route path="/address" element={<AddressForm/>}></Route>
+        <Route path="/home/wishlist" element={<Wishlist/>}></Route>
+        <Route path="/changePassword" element={<ChangePassword/>}></Route>
+        <Route path="/accountDetails" element={<AccountDetails/>}></Route>
+        <Route path="/wallet" element={<Wallet/>}></Route>
+        <Route path="/order" element={<OrderDetails/>}></Route>
+        
      
     </Routes>
     <Footer/>

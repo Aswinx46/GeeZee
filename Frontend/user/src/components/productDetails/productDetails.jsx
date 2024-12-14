@@ -119,7 +119,7 @@ const ProductDetails = () => {
       const uploadToCart=await axios.post('/cart',{userId:userId,productId:selectedProductId,selectedVariantId:selectedVariantId,quantity})
       console.log(uploadToCart.data)
       toast.success(uploadToCart.data.message)
-      dispatch(incrementCounter())
+      // dispatch(incrementCounter())
       // navigate('/productDetails/cart')
     } catch (error) {
       console.log(error)

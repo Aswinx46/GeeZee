@@ -43,12 +43,15 @@ const EditProduct = () => {
             setVarients(sendedProduct.variants)
             const response = await axios.get('/brands');
             console.log( 'this is the brands from the backend', response.data.brands)
-            const selectedBrand=response.data.brands.filter((brand)=>brand._id==sendedProduct.brand)
+            const selectedBrand=response.data.brands.find((brand)=>brand._id==sendedProduct.brand)
             console.log('this is the selected brand name', selectedBrand)
-            // const selectedBrandName=selectedBrand.name
-            setSelectedBrand(selectedBrand)
+            setSelectedBrand([selectedBrand])
+            setProduct(prev => ({...prev, brand: selectedBrand.name}))  
             const brand=response.data.brands.filter((bran)=>bran.name!==selectedBrand.name)
+            console.log('this is after brand filter',brand)
+            console.log(selectedBrand)
             console.log('this is the brands without selected one',brand)
+
             setBrands(brand);
 
             console.log("Old urls are ", product.productImg)
@@ -179,7 +182,9 @@ const EditProduct = () => {
     }
 
     const handleEditVariant=(index)=>{
+        console.log('modal opened')
         setIndex(index)
+        console.log(isOpen)
         setIsOpen(true)
     }
 
@@ -190,7 +195,7 @@ const EditProduct = () => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         // Validate all fields
-   
+        console.log('this is the product',product)
         const newErrors = {};
         if (!product.title?.trim()) {
             newErrors.title = 'Title is required';
@@ -330,7 +335,7 @@ const EditProduct = () => {
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-all duration-200 ease-in-out"
 
                             >
-                                <option value=""> {product.categoryId?.categoryName || "Select a category"}</option>
+                                <option value={product.categoryId?.categoryName }> {product.categoryId?.categoryName || "Select a category"}</option>
 
                                 {categories.map((category, index) => (
                                     <option key={index} value={category.categoryName}>{category.categoryName}</option>
@@ -352,13 +357,10 @@ const EditProduct = () => {
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-all duration-200 ease-in-out"
 
                             >
-                                <option value=""> {selectedBrand[0]?.name || "Select a brand"}</option>
-
+                                <option value={selectedBrand[0]?.name}>{selectedBrand[0]?.name || "Select a brand"}</option>
                                 {brands.map((brand, index) => (
                                     <option key={index} value={brand.name}>{brand.name}</option>
                                 ))}
-
-
                             </select>
                         </motion.div>
 
@@ -623,7 +625,7 @@ const EditProduct = () => {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{variant.stock}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         <button
-                                            onClick={() => handleEditVariant(setIsOpen)}
+                                            onClick={() => handleEditVariant(idx)}
                                             className="text-blue-600 hover:text-blue-800 font-medium"
                                         >
                                             Edit

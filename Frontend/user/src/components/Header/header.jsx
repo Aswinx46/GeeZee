@@ -8,7 +8,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { removeUser } from '@/redux/slices/userSlice';
 import { persistor } from '../../redux/store';
 import { removeToken } from '@/redux/slices/tokenSlice';
-
+import { resetCounter } from '@/redux/slices/CartCounter';
 import Badge from '@mui/material/Badge';
 const Header = (props) => {
   const [isHovered, setIsHovered] = useState(null);
@@ -22,7 +22,14 @@ const Header = (props) => {
   console.log(userData)
   const dispatch = useDispatch()
 
-
+  const handleCartClick = (e) => {
+    if (!userData) {
+      e.preventDefault();
+      navigate('/login');
+      return;
+    }
+    navigate('/cart');
+  };
 
   const handleLogin = () => {
     navigate('/login');
@@ -31,7 +38,7 @@ const Header = (props) => {
   
 
 
-  const handleLogout = () => {
+  const handleLogout = async() => {
   
     localStorage.removeItem('id');
     localStorage.removeItem('user');
@@ -39,7 +46,8 @@ const Header = (props) => {
     dispatch(removeUser())
     dispatch(removeToken())
     localStorage.clear()
-    persistor.purge();
+    dispatch(resetCounter())
+   await persistor.purge();
     navigate('/', { replace: true });
     console.log("Logout button clicked");
   };
@@ -73,9 +81,10 @@ const Header = (props) => {
               { name: 'Shop', icon: FaStore, path: '/productPage' },
               { name: 'Search', icon: FaSearch, path: '#' },
               { name: 'Cart', icon: FaShoppingCart, path: '/cart' },
-              { name: 'Account', icon: FaUser, path: '#' }
+              { name: 'Account', icon: FaUser, path: '/sidebar' }
             ].map((item, index) => (
               <motion.div
+               
                 key={index}
                 whileHover={{ scale: 1.1 }}
                 onHoverStart={() => setIsHovered(index)}
@@ -86,6 +95,8 @@ const Header = (props) => {
                   className="flex items-center space-x-1 hover:text-violet-400 transition-colors duration-200"
                 >
                   {item.name === 'Cart' ? (
+                    <div  onClick={handleCartClick}> 
+                      
                     <Badge
                       badgeContent={CartCount} // Replace with dynamic cart count
                       color="secondary"
@@ -94,9 +105,10 @@ const Header = (props) => {
                         vertical: 'top',
                         horizontal: 'right',
                       }}
-                    >
+                      >
                       <item.icon className={`text-lg ${isHovered === index ? 'text-violet-400' : ''}`} />
                     </Badge>
+                      </div>
                   ) : (
                     <item.icon className={`text-lg ${isHovered === index ? 'text-violet-400' : ''}`} />
                   )}

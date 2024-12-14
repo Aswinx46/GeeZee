@@ -56,7 +56,8 @@ const editProduct=async (req,res) => {
    
   
     const {title,sku,price,availableQuantity,brand,subHeadDescription,description,status,categoryId,stock,category,spec,subHead}=req.body.product
-   
+//    console.log('this is the category id',categoryId)
+    console.log('this is the brand name',brand)
     const oldCatId=categoryId._id
     const{urls}=req.body
   console.log('this is the name of the editing brand',brand)
@@ -64,8 +65,9 @@ const editProduct=async (req,res) => {
     try {
 
         const checkCategory=await Category.findOne({categoryName:category})
-        const checkBrand=await Brand.findOne({name:brand})
 
+        const checkBrand=await Brand.findOne({name:brand})
+        console.log('this is the checkbrand',checkBrand)
         
         if(!checkCategory)
         {

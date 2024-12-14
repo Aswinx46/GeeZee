@@ -7,29 +7,37 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import axios from '../../axios/userAxios'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-
-
+import { incrementCounter } from '@/redux/slices/CartCounter';
+import EmptyCart from '@/extraAddonComponents/emptyCart';
 const Cart = () => {
+  
   const[quantity,setQuantity]=useState(0)
   const [cartItems, setCartItems]=useState([])
   const[newQuantity,setNewQuantity]=useState()
+  const[count,setCount]=useState(0)
   const user=useSelector(state=>state.user.user)
-  console.log(user._id)
-  const userId=user._id
+ 
+  const userId=user?._id
   const[update,setUpdate]=useState(false)
 useEffect(()=>{
+  if (!userId) return; // Don't fetch cart items if there's no user
 
   const fetchCartItems=async () => {
     const cartItems=await axios.get(`/cartItems/${userId}`)
     const items=cartItems.data.result
-    console.log(items)
+    console.log('this is items',items.length)
+    const count=items.length
+    setCount(count)
     // console.log(cartItems.data.result)
     setCartItems(items)
+    dispatch(incrementCounter(count))
   }
   fetchCartItems()
-},[update])
+},[update,userId])
+
+const dispatch=useDispatch()
 
   // const [cartItems, setCartItems] = useState([
   //   {
@@ -72,8 +80,12 @@ useEffect(()=>{
     );
   };
 
-  const removeItem = (id) => {
-    setCartItems(items => items.filter(item => item.id !== id));
+  const removeItem = async(item) => {
+    const itemId=item.variants[0]._id
+    const cartId=item.cartId
+    setCartItems(items => items.filter(item => item.variants[0]._id !== itemId));
+    const deleteItem =await axios.delete(`/deleteItem/${itemId}/${cartId}`)
+    console.log('this is the item to be delted',item.cartId)
   };
 
   const calculateSubtotal = () => {
@@ -92,37 +104,38 @@ useEffect(()=>{
 
     const itemToBeChanged=cartItems.find((_,index)=>index==i)
     console.log(itemToBeChanged)
-    // setCartItems((prevItems)=>prevItems.map((item,index)=>{
-    //   if(index == i)
-    //   {
-    //     const newQuantity=item.quantity + count
-
-    //     if(newQuantity > item.variants[0].stock)
-    //     {
-    //       toast.error('no stock left')
-    //       return item
-    //     }else if(newQuantity < 1)
-    //     {
-    //       toast.error('quantity cant be less than 1')
-    //       return item
-    //     }
-
-    //     return {...item,quantity:newQuantity}
-    //   }
-    //   return item
-    // }))
     const productId=itemToBeChanged.id
     const itemId=itemToBeChanged.variants[0]._id
     const cartId=itemToBeChanged.cartId
     console.log('this is the cartId',cartId)
     console.log('this is the item id',itemId)
     console.log('this isthe product id',productId)
-    
-  const updateQuantity=await axios.patch(`/changeQuantity/${itemId}/${cartId}/${productId}`,{count})
-  setUpdate(!update)
+    console.log('this is the item',itemToBeChanged)
+    const stock = itemToBeChanged.variants[0].stock;
+    const currentQuantity = itemToBeChanged.quantity;
+    const newQuantity = currentQuantity + count;
+
+    if(count > 0)
+    {
+      if(currentQuantity >=stock)
+      {
+        toast.error('max stock exeeded')
+        return 
+      }
+      if(newQuantity > 5)
+      {
+        toast.error('max quantity exeeded')
+        return 
+      }
+    }
+    const updateQuantity=await axios.patch(`/changeQuantity/${itemId}/${cartId}/${productId}`,{count})
+    setUpdate(!update)
+
   }
 
   return (
+    <>
+    {count == 0 ? <EmptyCart/> : 
     <div className="min-h-screen bg-black text-white p-6">
       <div className="max-w-6xl mx-auto">
         <motion.h1 
@@ -139,11 +152,17 @@ useEffect(()=>{
             <AnimatePresence>
               {cartItems.map((item,i) => (
                 <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  transition={{ duration: 0.3 }}
+                key={i}
+                initial={{ x: 0 }}
+                animate={{ x: 0 }}
+                exit={{ 
+                  x: "100vw",
+                  transition: {
+                    duration: 0.3,
+                    ease: "easeInOut"
+                  }
+                }}
+                style={{ position: 'relative' }}
                 >
                   <Card className="bg-zinc-900 border-zinc-800 mb-4 text-white"> {/* Ensure card text is white */}
                     <CardContent className="p-6">
@@ -178,14 +197,18 @@ useEffect(()=>{
                                 <Plus className="h-4 w-4" />
                               </motion.button>
                             </div>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-red-500 hover:text-red-600"
-                              onClick={() => removeItem(item.id)}
+                            <motion.button
+                              onClick={() => removeItem(item)}
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              className="text-red-500 hover:text-red-600"
+                              initial={{ x: 0 }}
+                              animate={{ x: 0 }}
+                              exit={{ x: 1000, opacity: 0 }}
+                              transition={{ duration: 0.5, ease: "easeOut" }}
                             >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                              <Trash2 className="h-5 w-5" />
+                            </motion.button>
                           </div>
                         </div>
                         <div className="text-right text-white">
@@ -199,7 +222,7 @@ useEffect(()=>{
                         className="mt-4 p-4 bg-zinc-800 rounded-lg cursor-pointer text-white" // Ensure protection section text is white
                         whileHover={{ scale: 1.02 }}
                         onClick={() => toggleProtection(item.id)}
-                      >
+                        >
                         <div className="flex items-center gap-4">
                           {/* <Shield className={`h-6 w-6 ${item.protection ? 'text-green-500' : 'text-gray-400'}`} /> */}
                           <div className="flex-1">
@@ -232,7 +255,7 @@ useEffect(()=>{
                   {/* <div className="flex justify-between text-white">
                     <span>Tax</span>
                     <span>US${tax.toFixed(2)}</span>
-                  </div> */}
+                    </div> */}
                   <Separator className="bg-zinc-800" />
                   <div className="flex justify-between text-lg font-bold text-white">
                     <span>Total</span>
@@ -258,6 +281,8 @@ useEffect(()=>{
         </div>
       </div>
     </div>
+                  }
+                    </>
 
   );
 };

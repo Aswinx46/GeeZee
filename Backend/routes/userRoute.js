@@ -5,6 +5,9 @@ const auth=require('../auth/userAuth')
 const productController=require('../controllers/productController')
 const categoryController=require('../controllers/categoryController')
 const cartController=require('../controllers/cartController')
+const addressController=require('../controllers/AddressController')
+
+
 
 user_route.post('/signup',userController.signup)
 user_route.post('/otpVerification',userController.otpVerification)
@@ -20,5 +23,14 @@ user_route.get('/showProductVariantQuantity/:id',productController.showProductVa
 user_route.post('/cart',auth.authToken,cartController.addToCart)
 user_route.get('/cartItems/:id',auth.authToken,cartController.showCartItems)
 user_route.patch('/changeQuantity/:itemId/:cartId/:productId',auth.authToken,cartController.changeQuantity)
+user_route.delete('/deleteItem/:varientId/:cartId',auth.authToken,cartController.deleteItem)
+
+
+user_route.post('/address',auth.authToken,addressController.addAddress)
+user_route.get('/showAddress/:userId',auth.authToken,addressController.showAddress)
+user_route.delete('/deleteAddress/:addressId',auth.authToken,addressController.deleteAddress)
+user_route.patch('/changeDefaultAddress/:addressId/:userId',auth.authToken,addressController.setDefaultAddress)
+user_route.put('/editAddress',auth.authToken,addressController.editAddress)
+
 user_route.get('/category',categoryController.showCategory)
 module.exports=user_route

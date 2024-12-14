@@ -127,22 +127,50 @@ const changeQuantity=async (req,res) => {
         const varientToBeEdited=product.variants.find((item)=>item._id == itemId)
         console.log('this is the varient which is to be edited',varientToBeEdited)
         console.log('varient in the cart',varienInCart)
-        // if(varienInCart.quantity>varientToBeEdited.stock)
+        // if(varienInCart.quantity>=varientToBeEdited.stock)
         // {
-        //     return res.status(400).json({message:'no stock available'})
+ 
         // }
-        varienInCart.quantity+=count
-        await cart.save();
-        return res.status(200).json({message:"count updated",cart})
-        
+       
+        const newQuantity=varienInCart.quantity+count
+        if(newQuantity>=1 && newQuantity<=5 && newQuantity<=varientToBeEdited.stock)
+        {
+             varienInCart.quantity+=count
+             await cart.save();
+             return res.status(200).json({message:"count updated",cart})
+        }
+                   return res.status(400).json({message:'no stock available'})
     } catch (error) {
         console.log('error while updating the quantity',error)
         return res.status(500).json({message:"error while updating the quantity"})
     }
 }
 
+const deleteItem=async(req,res)=>{
+    const{varientId,cartId}=req.params
+    console.log('this is the id of the item to be deleted',varientId)
+    console.log('this iss the id of the cart',cartId)
+    try {
+        const cart=await Cart.findOneAndUpdate(
+            {'_id' : cartId},
+            {$pull : { items: {varientId}}},
+            {new:true})
+            console.log('cart after updating',cart)
+        // const cart=await Cart.findById(cartId)
+        // console.log('this is the cart to be modified',cart)
+        // cart.items.filter((item)=>item.varientId.toString()!== variantId.toString())
+        // console.log('cart after deleting the item ',cart)
+        // await cart.save()
+        // return res.status(200).json({message:"cart updated",cart})
+    } catch (error) {
+        console.log('error while deleting item from the cart',error)
+        return res.status(500).json({message:"error while deleting item from cart"})
+    }
+}
+
 module.exports = {
     addToCart,
     showCartItems,
-    changeQuantity
+    changeQuantity,
+    deleteItem
 }

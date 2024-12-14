@@ -10,7 +10,7 @@ import cartCounterSlice from './slices/CartCounter'
 const persistConfig={
     key:'root',
     storage,
-    blacklist: ['token','otpCheck'],  
+    blacklist: ['token','otpCheck','cartCounter'],  
 }
 
 const rootReducer=combineReducers({
