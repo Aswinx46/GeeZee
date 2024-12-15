@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { incrementCounter } from '@/redux/slices/CartCounter';
 import EmptyCart from '@/extraAddonComponents/emptyCart';
+import { useNavigate } from 'react-router-dom';
 const Cart = () => {
   
   const[quantity,setQuantity]=useState(0)
@@ -60,6 +61,7 @@ const dispatch=useDispatch()
   //   }
   // ]);
 
+  const navigate=useNavigate()
   const updateQuantity = (id, change) => {
     setCartItems(items =>
       items.map(item =>
@@ -80,6 +82,8 @@ const dispatch=useDispatch()
     );
   };
 
+ 
+
   const removeItem = async(item) => {
     const itemId=item.variants[0]._id
     const cartId=item.cartId
@@ -99,6 +103,11 @@ const dispatch=useDispatch()
 
 
   const total = calculateSubtotal()
+
+
+  const handleCheckOut=()=>{
+    navigate('/checkoutPage')
+  }
 
   const handleQuantity=async(i,count)=>{
 
@@ -262,7 +271,9 @@ const dispatch=useDispatch()
                     <span>US${total.toFixed(2)}</span>
                   </div>
                   <Button 
+                  onClick={handleCheckOut}
                     className="w-full bg-green-600 hover:bg-green-700 text-white"
+                    
                     size="lg"
                   >
                     CHECKOUT

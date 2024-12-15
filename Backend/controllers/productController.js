@@ -123,9 +123,14 @@ const showProductListed=async (req,res) => {
             path:'categoryId',
             match:{status:'active'},
             select: '_id categoryName status'
+        }).populate({
+            path:'brand',
+            match:{status:'active'},
+            select:'_id name status'
         })
-        // console.log('this is products',products)
-        const activeProducts = products.filter(product => product.categoryId);
+        console.log('this is products',products)
+        console.log(products)
+        const activeProducts = products.filter(product => product.categoryId && product.brand?.status == 'active');
         // console.log('this is active products',activeProducts)
         return res.status(200).json({message:'products fetched',products:activeProducts})
     } catch (error) {

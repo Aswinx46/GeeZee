@@ -6,7 +6,7 @@ const productController=require('../controllers/productController')
 const categoryController=require('../controllers/categoryController')
 const cartController=require('../controllers/cartController')
 const addressController=require('../controllers/AddressController')
-
+const orderController=require('../controllers/OrderController')
 
 
 user_route.post('/signup',userController.signup)
@@ -31,6 +31,8 @@ user_route.get('/showAddress/:userId',auth.authToken,addressController.showAddre
 user_route.delete('/deleteAddress/:addressId',auth.authToken,addressController.deleteAddress)
 user_route.patch('/changeDefaultAddress/:addressId/:userId',auth.authToken,addressController.setDefaultAddress)
 user_route.put('/editAddress',auth.authToken,addressController.editAddress)
+
+user_route.post('/createOrder/:userId',auth.authToken,orderController.createOrder)
 
 user_route.get('/category',categoryController.showCategory)
 module.exports=user_route

@@ -1,8 +1,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ShoppingCart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-const EmptyCart = ({ onStartShopping }) => {
+const EmptyCart = () => {
+
+  const navigate=useNavigate()
+  const handleEmptyCart=()=>{
+    navigate('/productPage')
+  }
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -42,7 +48,7 @@ const EmptyCart = ({ onStartShopping }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 0.5 }}
-        onClick={onStartShopping}
+        onClick={handleEmptyCart}
         className="bg-white text-black font-bold py-3 px-6 rounded-full hover:bg-gray-200 transition-colors duration-300"
       >
         Start Shopping

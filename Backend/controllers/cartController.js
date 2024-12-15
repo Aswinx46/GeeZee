@@ -73,8 +73,18 @@ const showCartItems = async (req, res) => {
  
         console.log('ajsdhfakjs')
  
-        const cartItems = await Cart.findOne({ userId: id })
-            .populate('items.productId', ' _id title description variants productImg') // Populate specific fields
+        // const cartItems = await Cart.findOne({ userId: id })
+        //     .populate('items.productId', ' _id title description variants productImg status') // Populate specific fields
+
+        const cartItems=await Cart.findOne({userId : id})
+        .populate({
+            path:'items.productId',
+            select:' _id title description variants productImg status brand categoryId',
+            populate:[
+                {path:'brand' , select:'_id name status'},
+                {path:'categoryId' , select:'_id categoryName status'}
+            ]
+        })
 
         if (!cartItems) {
             return res.status(404).json({ message: 'No items found in the cart' });
@@ -88,7 +98,7 @@ const showCartItems = async (req, res) => {
             const selectedVariant = product.variants.find(
                 (variant) => variant._id.toString() === item.varientId
             );
-            console.log('this is the item',item)
+            console.log('this is the status',product)
             return {
                 title: product.title,
                 description: product.description,
@@ -96,8 +106,12 @@ const showCartItems = async (req, res) => {
                 productImg:product.productImg,
                 quantity:item.quantity,
                 id:product._id,
-                cartId: cartItems._id
-           
+                cartId: cartItems._id,
+                productStatus:product.status,
+                brandStatus:product.brand.status,
+                categoryStatus:product.categoryId.status,
+                categoryId:product.categoryId._id,
+                brandId:product.brand._id
                 // quantity:selectedVariant.quantity // Include the matching variant or an empty array
             };
         });

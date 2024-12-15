@@ -26,6 +26,8 @@ import ChangePassword from './components/accountDetails/ChangePassword';
 import AccountDetails from './components/accountDetails/AccountDetails';
 import Wallet from './components/accountDetails/Wallet';
 import OrderDetails from './components/accountDetails/OrderDetails';
+import CheckoutPage from './components/checkoutPage/checkOutPage';
+import CheckOutSuccess from './components/checkoutPage/CheckOutSuccess'
 function App() {
 
 
@@ -55,6 +57,8 @@ function App() {
         <Route path="/accountDetails" element={<AccountDetails/>}></Route>
         <Route path="/wallet" element={<Wallet/>}></Route>
         <Route path="/order" element={<OrderDetails/>}></Route>
+        <Route path="/checkoutPage" element={<CheckoutPage/>}></Route>
+        <Route path="/checkoutSuccess" element={<CheckOutSuccess/>}></Route>
         
      
     </Routes>
