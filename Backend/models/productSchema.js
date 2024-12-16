@@ -63,6 +63,10 @@ const ProductSchema=new mongoose.Schema({
     brand:{
         type:Schema.Types.ObjectId,
         ref:'Brand'
+    },
+    createdAt:{
+        type:Date,
+        default:Date.now
     }
 })
 

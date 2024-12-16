@@ -32,7 +32,9 @@ user_route.delete('/deleteAddress/:addressId',auth.authToken,addressController.d
 user_route.patch('/changeDefaultAddress/:addressId/:userId',auth.authToken,addressController.setDefaultAddress)
 user_route.put('/editAddress',auth.authToken,addressController.editAddress)
 
-user_route.post('/createOrder/:userId',auth.authToken,orderController.createOrder)
+user_route.post('/createOrder/:userId/:variantId',auth.authToken,orderController.createOrder)
+user_route.get('/orderDetails/:userId',auth.authToken,orderController.showOrders)
+user_route.patch('/cancelOrder/:orderId',auth.authToken,orderController.cancelOrder)
 
 user_route.get('/category',categoryController.showCategory)
 module.exports=user_route

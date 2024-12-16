@@ -28,6 +28,7 @@ import Wallet from './components/accountDetails/Wallet';
 import OrderDetails from './components/accountDetails/OrderDetails';
 import CheckoutPage from './components/checkoutPage/checkOutPage';
 import CheckOutSuccess from './components/checkoutPage/CheckOutSuccess'
+import OrderDetailsTable from './components/orderDetails/orderTable';
 function App() {
 
 
@@ -59,6 +60,7 @@ function App() {
         <Route path="/order" element={<OrderDetails/>}></Route>
         <Route path="/checkoutPage" element={<CheckoutPage/>}></Route>
         <Route path="/checkoutSuccess" element={<CheckOutSuccess/>}></Route>
+        <Route path="/orderDetailsTable" element={<OrderDetailsTable/>}></Route>
         
      
     </Routes>

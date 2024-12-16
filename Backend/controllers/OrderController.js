@@ -1,69 +1,153 @@
-const Order=require('../models/OrderSchema')
-const Product=require('../models/productSchema')
-const Brand=require('../models/brandSchema')
-const Category=require('../models/categorySchema')
+const Order = require('../models/OrderSchema')
+const Product = require('../models/productSchema')
+const Brand = require('../models/brandSchema')
+const Category = require('../models/categorySchema')
 const product = require('../models/productSchema')
-const Cart=require('../models/CartSchema')
-const productBlockCheckingFunction=async(productId,brandId,categoryId)=>{
+const Cart = require('../models/CartSchema')
+const mongoose = require('mongoose')
+const productBlockCheckingFunction = async (productId, brandId, categoryId) => {
     // console.log('this is the brandid',brandId)
     // console.log('this is category id',categoryId)
     // console.log('this isthe product id',productId)
 
-    const statusOfProduct=await Product.findById(productId,{ status: 1, _id: 0 })
-    const statusOfBrand=await Brand.findById(brandId,{ status: 1, _id: 0 })
-    const statusOfCategory=await Category.findById(categoryId,{ status: 1, _id: 0 })
-    return [statusOfProduct,statusOfBrand,statusOfCategory]
+    const statusOfProduct = await Product.findById(productId, { status: 1, _id: 0 })
+    const statusOfBrand = await Brand.findById(brandId, { status: 1, _id: 0 })
+    const statusOfCategory = await Category.findById(categoryId, { status: 1, _id: 0 })
+    return [statusOfProduct, statusOfBrand, statusOfCategory]
 }
 
-const createOrder=async (req,res) => {
-    const{userId}=req.params
-    const{mainAddress,cartItems,paymentMethod,total,shippingCharge}=req.body
+const createOrder = async (req, res) => {
+    const { userId, variantId } = req.params
+
+    const { mainAddress, cartItems, paymentMethod, total, shippingCharge } = req.body
     console.log(paymentMethod)
-    console.log('this isthe userid',userId)
+    console.log('this isthe cartItems', cartItems)
+    console.log('this isthe variants', cartItems.variants)
     try {
-        const brandId=cartItems[0].brandId
-        const categoryId=cartItems[0].categoryId
-        const productId=cartItems[0].id
-        
+        const brandId = cartItems[0].brandId
+        const categoryId = cartItems[0].categoryId
+        const productId = cartItems[0].id
+
         // console.log('this is the cart item',cartItems.quantity)
-      const status =await productBlockCheckingFunction(productId,brandId,categoryId)
-      console.log('this is the status',status)
-      const isBlock=status.some((item)=>item.status == 'inactive')
-      if(isBlock) return res.status(400).json({message:"Product blocked by admin remove the product to continue"})
-        console.log('this is the cart items',cartItems[0].variants)
-        const order=new Order({
+        const status = await productBlockCheckingFunction(productId, brandId, categoryId)
+        console.log('this is the status', status)
+        const isBlock = status.some((item) => item.status == 'inactive')
+        if (isBlock) return res.status(400).json({ message: "Product blocked by admin remove the product to continue" })
+
+
+
+        for (item of cartItems) {
+            console.log("--------------------------------------------------------------")
+            console.log('this is the items', item)
+
+            const allVariants = await Product.findById(item.id, 'variants')
+            const changeVariant = allVariants.variants.find(
+                (variant) => variant._id.toString() === item.variants[0]._id
+            );
+            if (changeVariant) {
+                changeVariant.stock -= item.quantity
+                console.log('this is the final stock ', changeVariant.stock)
+                if (changeVariant.stock < 0) {
+                    return res.status(400).json({ message: "Out of Stock" })
+                }
+                await allVariants.save()
+            }
+            console.log('this is the all variants', allVariants)
+        }
+
+
+        const orderItems = cartItems.map((item) => ({
+            productId: item.id,
+            quantity: item.quantity,
+            price: item.variants[0].price,
+            variant: item.variants[0]
+            // variantId:changeVariant
+        }))
+
+        const order = new Order({
             userId,
-            orderItems:[{
-                productId:cartItems[0].id,
-                quantity:cartItems[0].quantity,
-                price:cartItems[0].variants[0].price
-            }],
-            totalPrice:total,
-            discount:0,
-            finalAmount:total + shippingCharge,
-            address:mainAddress._id,
+            orderItems,
+            totalPrice: total,
+            discount: 0,
+            finalAmount: total + shippingCharge,
+            address: mainAddress._id,
             paymentMethod,
-            shippingCost:shippingCharge,
-           
+            shippingCost: shippingCharge,
         })
         await order.save()
-        const allVariants=await Product.findById(productId,'variants')
-       
-        const changeVariant= allVariants.variants.find((item)=>item._id == cartItems[0].variants[0]._id)
-   
-        changeVariant.stock-=cartItems[0].quantity
-        await allVariants.save()
+        console.log('haskjdhf')
+        // const allVariants=await Product.findById(productId,'variants')
 
-        await Cart.updateOne({userId},{$set:{items:[]}})
+        // const changeVariant= allVariants.variants.find((item)=>item._id == cartItems[0].variants[0]._id)
 
-        return res.status(200).json({message:"order created"})
+
+
+
+        await Cart.updateOne({ userId }, { $set: { items: [] } })
+
+        return res.status(200).json({ message: "order created" })
 
     } catch (error) {
-        console.log('error while creating order',error)
-        return res.status(500).json({message:"error while creating order"})
+        console.log('error while creating order', error)
+        return res.status(500).json({ message: "error while creating order", error })
     }
 }
 
-module.exports={
-    createOrder
+const showOrders = async (req, res) => {
+    const { userId } = req.params
+    console.log('this is the user id', userId)
+
+
+    try {
+        const orderDetails = await Order.find({ userId }).populate('orderItems.productId', 'productImg title').populate('address',)
+        // const orderDetails=await Order.find({userId})
+        // .populate({
+        //     path:'orderItems.productId',
+        //     select:'productImg title',
+        //     populate:[
+        //         {path:''}
+        //     ]
+        // })
+
+        if (!orderDetails) return res.status(400).json({ message: 'no orders ' })
+
+        return res.status(200).json({ message: "order details fetched", orderDetails })
+
+    } catch (error) {
+        console.log('error while fetching the order details', error)
+        return res.status(500).json({ message: "error while fetching the data" })
+    }
+}
+
+const cancelOrder = async (req, res) => {
+    const { orderId } = req.params
+    console.log('this is canceling order id', orderId)
+    try {
+        // const order=await Cart.findByIdAndDelete(mongoose.Types.ObjectId(orderId))
+        const order = await Order.findByIdAndUpdate(orderId, { status: 'Cancelled' }, { new: true })
+        if (!order) return res.status(400).json({ message: 'no order to update' })
+        return res.status(200).json({ message: "Order Cancelled" })
+    } catch (error) {
+        console.log('error while cancelling the order', error)
+        return res.status(500).json({ message: "error while cancelling the order", error })
+    }
+}
+
+const showAllOrders = async (req, res) => {
+
+    try {
+        const orders = await Order.find().populate('address').populate('userId', 'lastName firstName email').populate('orderItems.productId', 'productImg title')
+        if (!orders) return res.status(400).json({ message: 'no order found' })
+        return res.status(200).json({ message: "order details fetched", orders })
+    } catch (error) {
+        console.log('error while fetching the order details', error)
+        return res.status(500).json({ message: 'error while fetching the order details' })
+    }
+}
+
+module.exports = {
+    createOrder,
+    showOrders,
+    cancelOrder,
+    showAllOrders
 }

@@ -16,7 +16,7 @@ const Sidebar = () => {
   const menuItems = [
     { icon: FaHome, text: 'Dashboard', href: '/dashboard' },
     { icon: FaBox, text: 'Products', href: '/showProduct' },
-    { icon: FaShoppingCart, text: 'Orders', href: '#' },
+    { icon: FaShoppingCart, text: 'Orders', href: '/orderDetails' },
     { icon: FaUsers, text: 'Customers', href: '/users' },
     { icon: FaList, text: 'Categories', href: '/categoryManagement' },
     { icon: FaIndustry , text: 'Brand', href: '/BrandManagement' },

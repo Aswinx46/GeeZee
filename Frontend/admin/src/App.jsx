@@ -16,6 +16,8 @@ import Layout from './components/sidebar/layout'
 import EditProduct from './components/productManagement/editProduct';
 import ProtectedRoute from './components/protectedRoute/protectedRoute';
 import BrandManagement from './components/BrandManagement/BrandManagement';
+import OrderDetails from './components/orderDetails/SpecificOrderDetail';
+import OrderTable from './components/orderDetails/OrderTable';
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
   
@@ -41,6 +43,7 @@ function App() {
           <Route path='/showProduct' element={<ProtectedRoute> <ShowProduct /> </ProtectedRoute>} />
           <Route path='/editProduct' element={<ProtectedRoute> <EditProduct /></ProtectedRoute>} />
           <Route path='/BrandManagement' element={<ProtectedRoute> <BrandManagement /></ProtectedRoute>} />
+          <Route path='/orderDetails' element={<ProtectedRoute> <OrderTable /></ProtectedRoute>} />
         </Routes>
       </LayoutWrapper>
     </BrowserRouter>

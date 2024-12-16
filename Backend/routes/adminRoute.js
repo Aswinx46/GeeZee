@@ -4,7 +4,7 @@ const adminController=require('../controllers/adminController')
 const auth=require('../auth/adminAuth')
 const categoryController=require('../controllers/categoryController')
 const productController=require('../controllers/productController')
-
+const OrderController=require('../controllers/OrderController')
 const brandController=require('../controllers/BrandController')
 
 admin_route.post('/login',adminController.login)
@@ -26,4 +26,7 @@ admin_route.put('/editProduct/:id',auth.adminAuth,productController.editProduct)
 admin_route.get('/brands',auth.adminAuth,brandController.showBrand)
 admin_route.post('/addBrand',auth.adminAuth,brandController.addBrand)
 admin_route.patch('/editBrand/:id',auth.adminAuth,brandController.changeStatus)
+
+admin_route.get('/showOrders',auth.adminAuth,OrderController.showAllOrders)
+
 module.exports=admin_route

@@ -10,7 +10,7 @@ const orderSchema=new mongoose.Schema({
     },
     userId:{
         type:Schema.Types.ObjectId,
-        ref:"User",
+        ref:"user",
         required:true
     },
     orderItems:[{
@@ -28,8 +28,27 @@ const orderSchema=new mongoose.Schema({
         price:{
             type:Number,
             required:true,
+        },
+        // variantId: {
+        //     type: Schema.Types.ObjectId,
+        //     required: true, // ID of the selected variant
+        // },
+        // variantId:{
+        //     type:String,
+        //     required:true
+        // }
+        variant: {
+            _id: { 
+                type: mongoose.Schema.Types.ObjectId, 
+                required: true 
+            }, // Variant ID
 
-        }
+            selectedAttributes: {
+                type: Map,
+                of: String, // Assuming attributes are key-value pairs
+                required: false // Optional if no attributes
+            },
+        },
     }],
     totalPrice:{
         type:Number,
@@ -56,8 +75,8 @@ const orderSchema=new mongoose.Schema({
     },
     status:{
         type:String,
-        required:false,
-        enum:['Pending','Processing','Shipped','Delivered','Cancelled','Return Request','Returned']
+        enum:['Pending','Processing','Shipped','Delivered','Cancelled','Return Request','Returned'],
+        default:'Pending'
     },
     createdOn:{
         type:Date,
@@ -88,7 +107,8 @@ const orderSchema=new mongoose.Schema({
             today.setDate(today.getDate() + 5);
             return today
         }
-    }
+    },
+   
 
 })
 

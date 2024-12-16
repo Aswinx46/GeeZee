@@ -173,7 +173,7 @@ const login =async(req,res)=>{
             if(user.status=='inactive') return res.status(400).json({message:"the user is blocked by admin"})
             if(user.googleId)
             {
-                 token= await jwt.sign({email:email},process.env.ACCESS_TOKEN_SECRET_KEY,{expiresIn:'1h'})
+                 token= await jwt.sign({email:email},process.env.ACCESS_TOKEN_SECRET_KEY,{expiresIn:'1d'})
                  refreshToken=await jwt.sign({email:email},process.env.REFRESH_TOKEN_SECRET_KEY,{expiresIn:'7d'})
                 // return res.status(200).json({message:"the user logged",user,token,refreshToken})
                 console.log(refreshToken)
@@ -182,7 +182,7 @@ const login =async(req,res)=>{
             }else{
                 const isPasswordValid=await bcrypt.compare(password,user.password)
                 if(!isPasswordValid)return res.status(400).json({message:"invalid password"})
-                     token= await jwt.sign({email:email},process.env.ACCESS_TOKEN_SECRET_KEY,{expiresIn:'1h'})
+                     token= await jwt.sign({email:email},process.env.ACCESS_TOKEN_SECRET_KEY,{expiresIn:'1d'})
                      refreshToken=await jwt.sign({email:email},process.env.REFRESH_TOKEN_SECRET_KEY,{expiresIn:'7d'})
                     // return res.status(200).json({message:"the user logged",user,token,refreshToken})
                     console.log(refreshToken)

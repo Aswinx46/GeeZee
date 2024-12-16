@@ -16,7 +16,7 @@ const login=async(req,res)=>{
                 const passwordVerify= await bcrypt.compare(password,user.password)
                 console.log(passwordVerify)
                 if(!passwordVerify) return res.status(400).json({message:"invalid password"})
-                    token=await jwt.sign({email:user.email},process.env.ADMIN_ACCESS_TOKEN_KEY,{expiresIn:'1h'})
+                    token=await jwt.sign({email:user.email},process.env.ADMIN_ACCESS_TOKEN_KEY,{expiresIn:'7h'})
                     refreshToken=await jwt.sign({email:user.email},process.env.ADMIN_REFRESH_TOKEN_KEY,{expiresIn:'7d'})
                     res.cookie('refreshToken',refreshToken,{
                         httpOnly:true,

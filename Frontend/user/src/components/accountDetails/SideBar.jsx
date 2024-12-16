@@ -8,8 +8,9 @@ import AccountDetails from './AccountDetails';
 import WalletPage from './Wallet';
 import Home from '../home/Home';
 import OrderDetails from './OrderDetails';
+import OrderTable from '../orderDetails/orderTable'
 const menuItems = [
-  { id: 1, icon: ShoppingCart, label: 'Orders', path: '/orders' },
+  { id: 1, icon: ShoppingCart, label: 'Orders', path: '/orderDetailsTable' },
   { id: 2, icon: Heart, label: 'Wishlist', path: '/home/wishlist' },
   { id: 3, icon: MapPin, label: 'Address', path: '/address' },
   { id: 4, icon: Key, label: 'Password', path: '/changePassword' },
@@ -27,7 +28,7 @@ const Sidebar = () => {
     switch(activeItem)
     {
       case 1:
-        return <OrderDetails/>
+        return <OrderTable/>
       
       case 2:
         return <Wishlist/>

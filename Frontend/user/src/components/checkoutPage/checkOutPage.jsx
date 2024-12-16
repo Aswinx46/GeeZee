@@ -67,6 +67,8 @@ const CheckoutPage = () => {
     console.log('this is the items',cartItems)
     console.log('this is the user id',userId)
     console.log('this is the paymnent method',paymentMethod)
+    console.log('this is the variant id',cartItems[0].variants[0]._id)
+    const variantId=cartItems[0].variants[0]._id
     const blockedProduct=cartItems.some((item)=>item.productStatus == 'inactive' ||item.brandStatus == 'inactive' || item.categoryStatus == 'inactive')
     console.log(blockedProduct)
     if(blockedProduct)
@@ -75,13 +77,15 @@ const CheckoutPage = () => {
         return 
     }
     try {
-        const respone=await axios.post(`/createOrder/${userId}`,{mainAddress,cartItems,paymentMethod,total,shippingCharge})
+        const respone=await axios.post(`/createOrder/${userId}/${variantId}`,{mainAddress,cartItems,paymentMethod,total,shippingCharge})
         toast.success(respone.data.message)
         navigate('/checkoutSuccess')
         
     } catch (error) {
         console.log('error while creating order',error)
-        toast.error('error while creating order')
+        // toast.error('error while creating order')
+        setUpdate(!update)
+        toast.error(error.response.data.message)
     }
     
   }
