@@ -136,7 +136,7 @@ const cancelOrder = async (req, res) => {
 const showAllOrders = async (req, res) => {
 
     try {
-        const orders = await Order.find().populate('address').populate('userId', 'lastName firstName email').populate('orderItems.productId', 'productImg title')
+        const orders = await Order.find().populate('address').populate('userId', 'lastName firstName email phoneNo').populate('orderItems.productId', 'productImg title')
         if (!orders) return res.status(400).json({ message: 'no order found' })
         return res.status(200).json({ message: "order details fetched", orders })
     } catch (error) {
@@ -145,9 +145,26 @@ const showAllOrders = async (req, res) => {
     }
 }
 
+const changeOrderStatus=async (req,res) => {
+    const{orderId}=req.params
+    const {newStatus}=req.body
+    console.log('this is the order id',orderId)
+    console.log('this is the status',newStatus)
+    try {
+        
+        const order=await Order.findByIdAndUpdate(orderId,{status:newStatus},{new:true})
+        if(!order) return res.status(400).json({message:"no order found"})
+            return res.status(200).json({message:'Order status Updated'})
+    } catch (error) {
+        console.log('error while changing the status of the order',error)
+        return res.status(500).json({message:"error while changing the status"})
+    }
+}
+
 module.exports = {
     createOrder,
     showOrders,
     cancelOrder,
-    showAllOrders
+    showAllOrders,
+    changeOrderStatus
 }

@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { motion } from 'framer-motion';
 import Cropper from 'react-easy-crop';
 import cloudAxios from 'axios'
+import EditBrandModal from './EditBrandModal';
+
 const BrandManagement = () => {
     const [brands, setBrands] = useState([]);
     const [newBrand, setNewBrand] = useState('');
@@ -14,7 +16,6 @@ const BrandManagement = () => {
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
     const [editBrandName, setEditBrandName] = useState('');
- 
 
     // Image handling states
     const [selectedImages, setSelectedImages] = useState([]);
@@ -27,7 +28,7 @@ const BrandManagement = () => {
 
     useEffect(() => {
         fetchBrands();
-    }, [fetch]);
+    }, [fetch,isEditOpen]);
 
     const fetchBrands = async () => {
         try {
@@ -216,6 +217,28 @@ const BrandManagement = () => {
             toast.error('Error updating brand status');
         }
     };
+
+    const handleEdit = async(index) => {
+        const editingBrand = brands.find((_,i) => i === index);
+        console.log('this is the editing brand',editingBrand);
+        setSelectedId(editingBrand._id);
+        setEditBrandName(editingBrand.name);
+        setIsEditOpen(true);
+    };
+
+    // const handleSaveEdit = async () => {
+    //     try {
+    //         const response = await axios.patch(`/updateBrand/${selectedId}`, {
+    //             name: editBrandName
+    //         });
+    //         toast.success('Brand updated successfully');
+    //         setFetch(!fetch);
+    //         setIsEditOpen(false);
+    //     } catch (error) {
+    //         console.log('Error updating brand', error);
+    //         toast.error(error.response?.data?.message || 'Error updating brand');
+    //     }
+    // };
 
     return (
         <div className="min-h-screen bg-white p-8">
@@ -449,6 +472,7 @@ const BrandManagement = () => {
                                             <motion.button
                                                 whileHover={{ scale: 1.1 }}
                                                 whileTap={{ scale: 0.95 }}
+                                                onClick={()=>handleEdit(index)}
                                                 className="text-green-600 hover:text-green-700 transition-colors"
                                             >
                                                 <FaEdit size={18} />
@@ -467,6 +491,13 @@ const BrandManagement = () => {
                         </tbody>
                     </table>
                 </motion.div>
+                <EditBrandModal 
+                    isOpen={isEditOpen}
+                    setIsOpen={setIsEditOpen}
+                    brandName={editBrandName}
+                    setBrandName={setEditBrandName}
+                    
+                brandId={selectedId} />
             </div>
         </div>
     );

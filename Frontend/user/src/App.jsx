@@ -29,6 +29,7 @@ import OrderDetails from './components/accountDetails/OrderDetails';
 import CheckoutPage from './components/checkoutPage/checkOutPage';
 import CheckOutSuccess from './components/checkoutPage/CheckOutSuccess'
 import OrderDetailsTable from './components/orderDetails/orderTable';
+import BestSellers from './components/bestSeller/ProductCard';
 function App() {
 
 
@@ -61,6 +62,7 @@ function App() {
         <Route path="/checkoutPage" element={<CheckoutPage/>}></Route>
         <Route path="/checkoutSuccess" element={<CheckOutSuccess/>}></Route>
         <Route path="/orderDetailsTable" element={<OrderDetailsTable/>}></Route>
+        <Route path="/bestSeller" element={<BestSellers/>}></Route>
         
      
     </Routes>

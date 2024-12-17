@@ -7,6 +7,8 @@ const categoryController=require('../controllers/categoryController')
 const cartController=require('../controllers/cartController')
 const addressController=require('../controllers/AddressController')
 const orderController=require('../controllers/OrderController')
+const brandController=require('../controllers/BrandController')
+
 
 
 user_route.post('/signup',userController.signup)
@@ -19,6 +21,7 @@ user_route.post('/refreshToken',userController.refreshToken)
 user_route.get('/products',productController.showProductListed)
 user_route.get('/relatedProducts/:id',productController.showRelatedProducts)
 user_route.get('/showProductVariantQuantity/:id',productController.showProductVariantQuantity)
+user_route.get('/filterProducts',productController.filterProducts)
 
 user_route.post('/cart',auth.authToken,cartController.addToCart)
 user_route.get('/cartItems/:id',auth.authToken,cartController.showCartItems)
@@ -35,6 +38,10 @@ user_route.put('/editAddress',auth.authToken,addressController.editAddress)
 user_route.post('/createOrder/:userId/:variantId',auth.authToken,orderController.createOrder)
 user_route.get('/orderDetails/:userId',auth.authToken,orderController.showOrders)
 user_route.patch('/cancelOrder/:orderId',auth.authToken,orderController.cancelOrder)
+
+user_route.get('/brands',auth.authToken,brandController.showBrand)
+user_route.get('/categories',auth.authToken,categoryController.showCategory)
+
 
 user_route.get('/category',categoryController.showCategory)
 module.exports=user_route

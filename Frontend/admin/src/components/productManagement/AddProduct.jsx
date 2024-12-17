@@ -57,6 +57,7 @@ const ProductManagement = () => {
 
             const response = await axios.get('/brands');
             setBrands(response.data.brands);
+            console.log('this is the brand',response.data.brands)
             // console.log(response.data.brands)
         }
         getCategory()
@@ -134,9 +135,12 @@ const ProductManagement = () => {
         const data=new FormData(event.target)
         const selectedCategory=categories.find((cat)=>cat.categoryName==data.get('category'))
         const selectedCategoryId=selectedCategory._id
-        // console.log( 'this is the brand name =', data.get('brand'))
+        
+        console.log( 'this is the brand name =', data.get('brand'))
+        console.log('this is hte brands',brands)
         const selectedBrand=brands.find((brand)=>brand.name==data.get('brand'))
-        // console.log( 'this is the selected brand name', selectedBrand)
+
+        console.log( 'this is the selected brand name', selectedBrand)
         const selectedBrandId=selectedBrand._id
         console.log(selectedCategoryId)
           try {

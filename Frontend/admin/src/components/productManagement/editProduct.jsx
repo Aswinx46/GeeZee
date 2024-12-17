@@ -21,7 +21,7 @@ const EditProduct = () => {
     const [zoom, setZoom] = useState(1);
     const [rotation, setRotation] = useState(0);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-    // const[product,setProduct]=useState({spec:[]})
+ 
     const [product, setProduct] = useState(store.getState().product.product)
     const [oldUrl, setOldUrl] = useState([])
     const [success, setSuccess] = useState(false)
@@ -194,6 +194,7 @@ const EditProduct = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+        console.log('this is the variant from the parent',varients)
         // Validate all fields
         console.log('this is the product',product)
         const newErrors = {};
@@ -215,14 +216,7 @@ const EditProduct = () => {
         if (product.spec.length <= 0) {
             newErrors.spec = 'Specifications are required';
         }
-        // if (product.SubHeadings.length<=0) {
-        //     newErrors.SubHeadings = 'SubHeadings are required';
-        // }
-        // if (product.subHeadingdescription.length<=0) {
-        //     newErrors.subHeadingdescription = 'subHeadingdescription are required';
-        // }
-
-        // If there are errors, show toast and stop submission
+  
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
@@ -267,13 +261,13 @@ const EditProduct = () => {
             console.log(product)
             if (urls.length > 0) {
                 console.log('jhfoasjdf;jaso')
-                const response = await axios.put(`/editProduct/${product._id}`, { product, urls: [...oldUrl, ...urls] })
+                const response = await axios.put(`/editProduct/${product._id}`, { product, urls: [...oldUrl, ...urls] ,variants:varients })
                 console.log(product)
                 console.log(response)
                 setSuccess(true)
                 navigate('/showProduct')
             } else {
-                const response = await axios.put(`/editProduct/${product._id}`, { product, urls: [...oldUrl, ...urls] })
+                const response = await axios.put(`/editProduct/${product._id}`, { product, urls: [...oldUrl, ...urls] ,variants:varients})
                 setSuccess(true)
                 navigate('/showProduct')
             }
@@ -562,13 +556,7 @@ const EditProduct = () => {
                             transition={{ delay: 1 }}
                             className="flex justify-start"
                         >
-                            <button
-                                type="button"
-                                onClick={(e) => handleVariantEdit(e)}
-                                className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-gray-900"
-                            >
-                                Edit Varient
-                            </button>
+                         
                         </motion.div>
                         <motion.button
                             whileHover={{ scale: 1.05 }}

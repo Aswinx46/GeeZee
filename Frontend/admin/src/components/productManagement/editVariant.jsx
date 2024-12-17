@@ -37,6 +37,7 @@ const AttributeModal = ({ isOpen, onClose, onSave, Varient, index,setVarient,set
             }
             return updatedEntries
         })
+
     }
 
     
@@ -52,6 +53,7 @@ const AttributeModal = ({ isOpen, onClose, onSave, Varient, index,setVarient,set
           }, {});
         setVarient((prev)=>([...prev.map((item, i)=>i===index?({...item,price,stock,selectedAttributes:{...result}}):item)]))
         setIsOpen(false);
+        console.log(varients)
     };
 
     return (
@@ -72,22 +74,7 @@ const AttributeModal = ({ isOpen, onClose, onSave, Varient, index,setVarient,set
                     >
                         <h2 className="text-2xl font-bold mb-4">Add Attribute</h2>
                         <div className="space-y-4">
-                            {/* <div>
-                                <label htmlFor="attributeName" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Attribute Name
-                                </label>
-                                {entries.map(([key, value], index) => (
-                                    <input
-                                        key={index}
-                                        type="text"
-                                        id="attributeName"
-                                        value={key} // Display the attribute name
-                                        onChange={(e) => handleChange(index, 'key', e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    />
-                                ))}
-
-                            </div> */}
+                     
                             <div>
                                 <label htmlFor="attributeValue" className="block text-sm font-medium text-gray-700 mb-1">
                                     Attribute Value
@@ -113,7 +100,7 @@ const AttributeModal = ({ isOpen, onClose, onSave, Varient, index,setVarient,set
                                     type="number"
                                     id="price"
                                     value={price|| ""}
-                                    onChange={(e) => setPrice(e.target.value)}
+                                    onChange={(e) => setPrice(Number(e.target.value))}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                             </div>
@@ -125,7 +112,7 @@ const AttributeModal = ({ isOpen, onClose, onSave, Varient, index,setVarient,set
                                     type="number"
                                     id="stock"
                                     value={stock}
-                                    onChange={(e) => setStock(e.target.value)}
+                                    onChange={(e) => setStock(Number(e.target.value))}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                             </div>

@@ -17,7 +17,7 @@ const ProductPage = () => {
             try {
                 const productsResponse = await axios.get('/products')
                 setProducts(productsResponse.data.products)
-
+                console.log(productsResponse.data.products)
                 const categoryResponse = await axios.get('/category')
                 setCategory(categoryResponse.data.category)
             } catch (error) {
@@ -157,7 +157,7 @@ const ProductPage = () => {
                                         </div>
                                         <div className="p-3">
                                             <h3 className="text-sm font-semibold mb-2 line-clamp-2 text-white">{product.title}</h3>
-                                            <p className="text-lg font-bold text-[#8b5cf6] mb-2">₹{product.price}</p>
+                                            <p className="text-lg font-bold text-[#8b5cf6] mb-2">₹{product.variants[0].price}</p>
                                             <button onClick={() => handleDeal(index)} className="w-full bg-[#8b5cf6] text-white px-3 py-1.5 rounded-full hover:bg-[#7c3aed] transition-all text-sm font-semibold">
                                                 View Deal
                                             </button>

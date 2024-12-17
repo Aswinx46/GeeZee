@@ -4,6 +4,8 @@ import { ChevronRight } from 'lucide-react';
 import axios  from '../../../axios/adminAxios';
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import SpecificOrderDetails from './SpecificOrderDetail'
+
 import {
   Table,
   TableBody,
@@ -27,20 +29,36 @@ const dummyOrders = [
 const OrderTable = () => {
  
 const[allOrderItems,setAllOrderItems]=useState([])
-
+const [neededItems,setNeededItems]=useState([])
+const[isOpen,setIsOpen]=useState(false)
+const [orderID,setOrderId]=useState()
+const[orderDetails,setOrderDetails]=useState({})
     useEffect(()=>{
         const fetchData=async () => {
             try {
                 const response=await axios.get('/showOrders')
                 console.log(response.data.orders)
-                setAllOrderItems(response.data.order)
+                setAllOrderItems(response.data.orders)
+               const neededDetails = response.data.orders.map((order) => {
+        return {
+          name: order.orderItems[0]?.productId?.title || 'N/A',
+          productImg: order.orderItems[0]?.productId?.productImg || '',
+          orderId: order.orderId || 'N/A',
+          orderDate: order.invoiceDate || 'N/A',
+          finalAmount: order.finalAmount || 0,
+          status: order.status || 'Pending',
+          id:order._id
+        };
+      });
+      setNeededItems(neededDetails)
+                console.log('this isthe needed details',neededDetails)
             } catch (error) {
                 console.log('error while fetching order details',error)
 
             }
         }
         fetchData()
-    },[])
+    },[isOpen])
 
 
     const statusColors = {
@@ -68,7 +86,14 @@ const[allOrderItems,setAllOrderItems]=useState([])
   };
 
   const handleViewDetails = (orderId) => {
-    
+    setOrderId(orderId)
+    const orderDetail=allOrderItems.find((order)=>order._id == orderId)
+    console.log('this is the specfic order',orderDetail)
+    setOrderDetails(orderDetail)
+
+    setIsOpen(true)
+
+    console.log('this is the order id',orderId)
   };
 
   return (
@@ -92,12 +117,12 @@ const[allOrderItems,setAllOrderItems]=useState([])
             </TableRow>
           </TableHeader>
           <TableBody>
-            {dummyOrders.map((order) => (
+            {neededItems.map((order) => (
               <motion.tr key={order.id} variants={rowVariants}>
-                 <TableCell className="font-medium">{order.product}</TableCell>
-                <TableCell className="font-medium">{order.id}</TableCell>
-                <TableCell>{order.date}</TableCell>
-                <TableCell>${order.total.toFixed(2)}</TableCell>
+                 <TableCell className="font-medium">{order.name}</TableCell>
+                <TableCell className="font-medium">{order.orderId}</TableCell>
+                <TableCell>{order.orderDate.split('T')[0]}</TableCell>
+                <TableCell>₹{order.finalAmount.toFixed(2)}</TableCell>
                 <TableCell>
                   <Badge variant="outline" className={`${statusColors[order.status]} text-white`}>
                     {order.status}
@@ -118,6 +143,7 @@ const[allOrderItems,setAllOrderItems]=useState([])
           </TableBody>
         </Table>
       </div>
+      {isOpen && <SpecificOrderDetails isOpen={isOpen} setIsOpen={setIsOpen} orderID={orderID} orderDetails={orderDetails}/>}
     </motion.div>
   );
 };

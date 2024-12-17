@@ -50,12 +50,14 @@ const ProductDetails = () => {
   const navigate=useNavigate()
   const dispatch=useDispatch()
   useEffect(() => {
+    console.log('this is useEffect')
     const fetchProduct=async () => {
       console.log(id)
     if(!id)
     {
       console.log('this is the if case')
       const productSelected = localStorage.getItem('selectedProduct');
+      console.log('this is the product selected',productSelected)
       const produc = productSelected ? JSON.parse(productSelected) : [];
       console.log(produc)
       const single = produc[0];

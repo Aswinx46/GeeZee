@@ -27,7 +27,9 @@ const showBrand=async(req,res)=>{
 
     try {
         const brands=await Brand.find()
-        console.log(brands)
+        console.log('this is the brand',brands)
+       if(!brands) return res.status(400).json({message:'no brand available'})
+        
         return res.status(200).json({messaage:"brands fetched",brands})
 
     } catch (error) {
@@ -35,6 +37,22 @@ const showBrand=async(req,res)=>{
         return res.status(400),json({message:"error while fetching the brand list"})
     }
 }
+
+
+const changeBrandName=async (req,res) => {
+    const {brandId}=req.params
+    const {brandName}=req.body
+    console.log(brandId,brandName)
+    try {
+        const ChangedBrand=await Brand.findByIdAndUpdate(brandId,{name:brandName})
+        if(!changeBrandName)return res.status(400).json({message:" no brand found"})
+            return res.status(200).json({message:"brand name changed"})
+    } catch (error) {
+        console.log('error while updating brand',error)
+        return res.status(500).json({message:"error while updating brand"})
+    }
+}
+
 
 const changeStatus=async (req,res) => {
     console.log('this is changeStatus')
@@ -57,5 +75,6 @@ const changeStatus=async (req,res) => {
 module.exports={
     addBrand,
     showBrand,
-    changeStatus
+    changeStatus,
+    changeBrandName
 }

@@ -29,7 +29,8 @@ useEffect(()=>{
         const combinedItems=orderDetails.data.orderDetails.flatMap((order)=>
             order.orderItems.map((item)=>({
                 ...item,status:order.status,invoiceDate:order.invoiceDate,address:order.address,paymentMethod:order.paymentMethod,
-                totalPrice:order.totalPrice,shippingCost:order.shippingCost,finalAmount:order.finalAmount,orderId:order.orderId,orderObjectId:order._id
+                totalPrice:order.totalPrice,shippingCost:order.shippingCost,finalAmount:order.finalAmount,orderId:order.orderId,orderObjectId:order._id,
+                variants:order.orderItems[0].variant.selectedAttributes
             })))
             setParticularOrderDetails(combinedItems[0])
         console.log('this is the combined items',combinedItems)
@@ -105,7 +106,7 @@ useEffect(()=>{
           <TableBody>
             {allOrderItems.map((item) => (
               <TableRow key={item._id} className={`${item.status === 'Cancelled' ? 'bg-red-50 opacity-70' : ''}`}>
-                <TableCell onClick={()=>handleProductDetail(item)} className={`font-medium ${item.status === 'Cancelled' ? 'line-through text-gray-500' : ''}`}>{item.productId.title}</TableCell>
+                <TableCell onClick={()=>handleProductDetail(item)} className={`font-medium ${item.status === 'Cancelled' ? 'line-through text-gray-500' : ''}`}>{item.productId.title}<br/> {Object.entries(item.variant.selectedAttributes).map((key)=><h1>{key.join(' : ')}</h1>)}  </TableCell>
                 <TableCell onClick={()=>handleProductDetail(item)} className="font-medium"><img className={`h-15 w-20 object-cover rounded-md shadow-sm hover:scale-105 transition-transform duration-200 ${item.status === 'Cancelled' ? 'grayscale' : ''}`} src={item.productId.productImg[0]} alt={item.productId.title}/></TableCell>
                 <TableCell onClick={()=>handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'line-through text-gray-500' : ''}`}>{item.quantity}</TableCell>
                 <TableCell onClick={()=>handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'line-through text-gray-500' : ''}`}>₹{item.price}</TableCell>

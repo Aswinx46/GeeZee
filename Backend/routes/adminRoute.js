@@ -26,7 +26,9 @@ admin_route.put('/editProduct/:id',auth.adminAuth,productController.editProduct)
 admin_route.get('/brands',auth.adminAuth,brandController.showBrand)
 admin_route.post('/addBrand',auth.adminAuth,brandController.addBrand)
 admin_route.patch('/editBrand/:id',auth.adminAuth,brandController.changeStatus)
+admin_route.patch('/editBrandName/:brandId',auth.adminAuth,brandController.changeBrandName)
 
 admin_route.get('/showOrders',auth.adminAuth,OrderController.showAllOrders)
+admin_route.patch('/changeOrderStatus/:orderId',auth.adminAuth,OrderController.changeOrderStatus)
 
 module.exports=admin_route

@@ -56,11 +56,12 @@ const editProduct=async (req,res) => {
    
   
     const {title,sku,price,availableQuantity,brand,subHeadDescription,description,status,categoryId,stock,category,spec,subHead}=req.body.product
-//    console.log('this is the category id',categoryId)
+//    console.log('this is the variants id',categoryId)
     console.log('this is the brand name',brand)
     const oldCatId=categoryId._id
     const{urls}=req.body
-  console.log('this is the name of the editing brand',brand)
+    const{variants}=req.body
+//   console.log('this is the name of the editing brand',variants)
     
     try {
 
@@ -85,7 +86,8 @@ const editProduct=async (req,res) => {
                 spec,
                 subHead,
                 subHeadDescription,
-                brand:checkBrand._id
+                brand:checkBrand._id,
+                variants
             })
             // console.log("Spec saved " , spec)
            
@@ -103,7 +105,8 @@ const editProduct=async (req,res) => {
                 stock,
                 categoryId:checkCategory._id,
                 subHead,
-                brand:checkBrand._id
+                brand:checkBrand._id,
+                variants
             })
            
             return res.status(200).json({message:"product edited"})
@@ -170,13 +173,82 @@ const showRelatedProducts=async (req,res) => {
     }
 }
 
+const filterProducts=async(req,res)=>{
+    console.log(req.query)
+    try {
+        const{sortBy,brands,categories,minPrice,maxPrice}=req.query
+        const filter = {};
+
+        if (brands) {
+            filter.brand = { $in: brands }; 
+          }
+        
+          if (categories) {
+            filter.categoryId = { $in: categories }; 
+          }
+
+          if (minPrice || maxPrice) {
+            filter.price = {};
+            if (minPrice) filter.price.$gte = Number(minPrice); 
+            if (maxPrice) filter.price.$lte = Number(maxPrice); 
+          }
+
+          const products = await Product.find(filter);
+
+         
+          if (sortBy) {
+            const sortOptions = {};
+            switch (sortBy) {
+              case 'popularity':
+                sortOptions.popularity = 1; 
+                break;
+              case 'price-low-high':
+                sortOptions.price = 1;
+                break;
+              case 'price-high-low':
+                sortOptions.price = -1;
+                break;
+              case 'average-rating':
+                sortOptions.rating = -1; 
+                break;
+              case 'featured':
+                sortOptions.featured = 1; 
+                break;
+              case 'new-arrivals':
+                sortOptions.createdAt = -1; 
+                break;
+              case 'a-z':
+                sortOptions.title = 1;
+                break;
+              case 'z-a':
+                sortOptions.title = -1;
+                break;
+              default:
+                break;
+            }
+      
+            
+            const sortedProducts = await Product.find(filter).sort(sortOptions);
+            return res.status(200).json(sortedProducts);
+          }
+      
+          return res.status(200).json(products);
+
+        
+    } catch (error) {
+        console.log('error while filtering the product',error)
+        return res.status(500).json({message:'error while filtering the product'})
+    }
+}
+
 module.exports={
     addProduct,
     showProduct,
     editProduct,
     showProductListed,
     showRelatedProducts,
-    showProductVariantQuantity
+    showProductVariantQuantity,
+    filterProducts
     
 }
 
