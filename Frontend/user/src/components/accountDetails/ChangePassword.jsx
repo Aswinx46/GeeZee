@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff } from 'lucide-react';
-
+import axios from '../../axios/userAxios'
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 const ChangePassword = () => {
+
+  const user=useSelector(state=>state.user.user)
   const [formData, setFormData] = useState({
     oldPassword: '',
     newPassword: '',
@@ -61,7 +65,7 @@ const ChangePassword = () => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     const validationErrors = validateForm();
 
@@ -69,8 +73,20 @@ const ChangePassword = () => {
       setErrors(validationErrors);
       return;
     }
+    try {
+      
+      const changePassword=await axios.patch(`/changePassword/${user._id}`,{formData})
+      setFormData({
+        oldPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      })
+      toast.success(changePassword.data.message)
+    } catch (error) {
+      console.log('error while changing password',error)
+      toast.error(error.response.data.message)
+    }
 
-    // Handle password change logic here
     console.log('Password change submitted:', formData);
   };
 

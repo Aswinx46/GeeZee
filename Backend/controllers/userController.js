@@ -220,12 +220,46 @@ const refreshToken=async(req,res)=>{
         }
 }
 
+const changePassword=async (req,res) => {
+    try {
+        const{userId}=req.params
+        const{formData}=req.body
+        console.log(userId)
+        
+        const oldPassword=formData.oldPassword
+        const newPassword=formData.newPassword
+        const confirmPassword=formData.confirmPassword
+        console.log(oldPassword,newPassword,confirmPassword);
+
+        const user=await User.findById(userId,'password')
+        console.log(user.password)
+        if(!user)return res.status(400).json({message:"no user found"})
+          const oldPasswordVerify= await bcrypt.compare(oldPassword,user.password)
+        if(!oldPasswordVerify) return res.status(400).json({message:'old password is wrong'})
+            if(newPassword == confirmPassword)
+            {
+                const newHashedPassword=await securePassword(newPassword)
+                console.log(newHashedPassword,'this is new')
+                user.password = newHashedPassword
+                await user.save()
+                return res.status(200).json({message:'password changed'})
+            }else{
+                return res.status(400).json({message:'password and confirm password not equal'})
+            }
+        console.log(oldPasswordVerify) 
+    } catch (error) {
+        console.log('error while changing the password',error)
+        return res.status(500).json({message:'error while changing password'})
+    }
+}
+
 module.exports={
     signup,
     otpVerification,
     resendOtp,
     googleSave,
     login,
-    refreshToken
+    refreshToken,
+    changePassword
 
 }
