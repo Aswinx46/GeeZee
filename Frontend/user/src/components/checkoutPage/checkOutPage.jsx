@@ -26,7 +26,7 @@ const CheckoutPage = () => {
 
   useEffect(()=>{
     const fetchData=async () => {
-        const addresses=await axios.get(`/showAddress/${userId}`)
+        const addresses=await axios.get(`/showAddress/${userId}`)??[]
         const defaultAdd=addresses.data.address.find((address)=>address.defaultAddress == true)
         setDefaultAddress(defaultAdd)
 
@@ -35,9 +35,10 @@ const CheckoutPage = () => {
           });
 
         // const savedAddress=addresses.data.address.filter((address)=>address._id != mainAddress)
-        const savedAddress = addresses.data.address.filter((address) => address._id !== (selectedAddress?._id || defaultAdd._id));
+        const savedAddress = addresses.data.address.filter((address) => address._id !== (selectedAddress?._id || defaultAdd?._id));
         console.log('this is hte saved addresses',savedAddress)
         setSavedAddresses(savedAddress)
+        console.log(savedAddress)
         const cartItems=await axios.get(`/cartItems/${userId}`)
         
         console.log(cartItems.data.result)
@@ -126,7 +127,8 @@ const CheckoutPage = () => {
             <div className="px-4 py-5 sm:p-6">
               <h1 className="text-2xl font-bold text-gray-900 mb-6">Shipping Address</h1>
               {/* Default Address */}
-              <motion.div
+
+              {mainAddress&&<motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
@@ -141,7 +143,7 @@ const CheckoutPage = () => {
                   <p>{mainAddress.phone}</p>
                 </div>
               </motion.div>
-
+}
              {/* Add New Address Button */}
 
               <motion.button

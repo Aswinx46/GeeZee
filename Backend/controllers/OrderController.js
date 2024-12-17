@@ -100,15 +100,7 @@ const showOrders = async (req, res) => {
 
     try {
         const orderDetails = await Order.find({ userId }).populate('orderItems.productId', 'productImg title').populate('address',)
-        // const orderDetails=await Order.find({userId})
-        // .populate({
-        //     path:'orderItems.productId',
-        //     select:'productImg title',
-        //     populate:[
-        //         {path:''}
-        //     ]
-        // })
-
+     
         if (!orderDetails) return res.status(400).json({ message: 'no orders ' })
 
         return res.status(200).json({ message: "order details fetched", orderDetails })
@@ -123,6 +115,23 @@ const cancelOrder = async (req, res) => {
     const { orderId } = req.params
     console.log('this is canceling order id', orderId)
     try {
+
+        const selectedOrder=await Order.findById(orderId,'orderItems')
+        console.log(selectedOrder)
+        const details=selectedOrder.orderItems.map((items)=>({
+            variantId:items.variant._id,
+            quantity:items.quantity,
+            productId:items.productId
+        }))
+
+        for (const item of details) {
+            await Product.findOneAndUpdate(
+                { _id: item.productId, "variants._id": item.variantId },  
+                { $inc: { "variants.$.stock": item.quantity } } 
+            );
+        }
+        
+
         // const order=await Cart.findByIdAndDelete(mongoose.Types.ObjectId(orderId))
         const order = await Order.findByIdAndUpdate(orderId, { status: 'Cancelled' }, { new: true })
         if (!order) return res.status(400).json({ message: 'no order to update' })
@@ -152,6 +161,7 @@ const changeOrderStatus=async (req,res) => {
     console.log('this is the status',newStatus)
     try {
         
+       
         const order=await Order.findByIdAndUpdate(orderId,{status:newStatus},{new:true})
         if(!order) return res.status(400).json({message:"no order found"})
             return res.status(200).json({message:'Order status Updated'})

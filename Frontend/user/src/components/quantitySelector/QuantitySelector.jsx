@@ -2,15 +2,19 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'react-toastify';
 
 const MinimalQuantitySelector = ({ initialQuantity = 1, onQuantityChange,receiveQuantity }) => {
   const [quantity, setQuantity] = useState(initialQuantity);
 
   const updateQuantity = (newQuantity) => {
     const updatedQuantity = Math.max(1, newQuantity);
-    setQuantity(updatedQuantity);
-    onQuantityChange(updatedQuantity);
-    
+    if(updatedQuantity <= 5){
+      setQuantity(updatedQuantity);
+      onQuantityChange(updatedQuantity);
+    }else{
+      toast.warn('max quantity exeeded')
+    }
   };
   useEffect(()=>{
     receiveQuantity(quantity)
