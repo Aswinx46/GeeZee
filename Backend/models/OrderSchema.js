@@ -105,8 +105,19 @@ const orderSchema=new mongoose.Schema({
         type:Number,
         default:40
     },
+    
     returnReason:{
         type:String,
+        required:false
+    },
+    CancellationReason:{
+        type:String,
+        default:'none',
+        required:false
+    },
+    returnReason:{
+        type:String,
+        default:'none',
         required:false
     },
     deliveryDate:{

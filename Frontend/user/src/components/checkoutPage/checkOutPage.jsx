@@ -60,7 +60,7 @@ const CheckoutPage = () => {
       document.body.removeChild(script);
     };
   }, []);
-  
+
 
 
 
@@ -95,9 +95,8 @@ const CheckoutPage = () => {
       //   console.log('this is inside razorpay')
       // }
       const response = await axios.post(`/createOrder/${userId}/${variantId}`, { mainAddress, cartItems, paymentMethod, total, shippingCharge })
-      console.log('this is the response',response)
-      if(paymentMethod == 'Razorpay')
-      {
+      console.log('this is the response', response)
+      if (paymentMethod == 'Razorpay') {
         console.log('inside razor')
         const { razorpayOrderId, amount, currency } = response.data;
         const options = {
@@ -110,16 +109,16 @@ const CheckoutPage = () => {
           handler: async (response) => {
             console.log('Payment Success:', response);
             toast.success('Payment Successful');
-            navigate("/checkoutSuccess");   
+            navigate("/checkoutSuccess");
             // Optionally send payment confirmation to the backend
 
-            await axios.post('/confirmPayment', {
+            await axios.post(`/confirmPayment/${userId}`, {
               paymentId: response.razorpay_payment_id,
               orderId: razorpayOrderId,
-              signature:response.razorpay_signature
+              signature: response.razorpay_signature
             });
             // toast.success("Payment Successful");
-         
+
           },
           prefill: {
             name: mainAddress.name,
@@ -142,13 +141,13 @@ const CheckoutPage = () => {
           console.error('Payment Failed:', response);
           toast.error('Payment Failed. Please try again.');
         });
-      }else{
+      } else {
         console.log('this is else case')
         toast.success(response.data.message)
         navigate('/checkoutSuccess')
       }
 
-      
+
 
     } catch (error) {
       console.log('error while creating order', error)

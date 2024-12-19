@@ -41,7 +41,7 @@ user_route.put('/editAddress', auth.authToken, addressController.editAddress)
 user_route.post('/createOrder/:userId/:variantId', auth.authToken, orderController.createOrder)
 user_route.get('/orderDetails/:userId', auth.authToken, orderController.showOrders)
 user_route.patch('/cancelOrder/:orderId', auth.authToken, orderController.cancelOrder)
-user_route.post('/confirmPayment',auth.authToken,orderController.verifyPayment)
+user_route.post('/confirmPayment/:userId',auth.authToken,orderController.verifyPayment)
 
 user_route.get('/brands', auth.authToken, brandController.showBrand)
 user_route.get('/categories', auth.authToken, categoryController.showCategory)

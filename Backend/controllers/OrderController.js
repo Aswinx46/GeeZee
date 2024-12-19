@@ -61,7 +61,7 @@ const createOrder = async (req, res) => {
             }
             console.log('this is the all variants', allVariants)
         }
-        let razorPayIdOrder=''
+        let razorPayIdOrder=null    
         if (paymentMethod === 'Razorpay') {
             const razorpayOptions = {
                 amount: (total + shippingCharge) * 100,
@@ -108,13 +108,14 @@ const createOrder = async (req, res) => {
         console.log('haskjdhf')
 
 
+  
 
 
-
-        await Cart.updateOne({ userId }, { $set: { items: [] } })
+       
 
    
         if (paymentMethod != 'Razorpay') {
+            await Cart.updateOne({ userId }, { $set: { items: [] } })
             console.log('this is inside the cod')
             return res.status(200).json({ message: "order created" })
 
@@ -130,6 +131,7 @@ const createOrder = async (req, res) => {
 
 const verifyPayment = async (req, res) => {
     const { paymentId, orderId,signature } = req.body;
+    const{userId}=req.params
     console.log('this is the payment id',paymentId,'this is the orderid',orderId)
     try {
         // Step 1: Fetch payment details from Razorpay
@@ -157,6 +159,7 @@ const verifyPayment = async (req, res) => {
             { paymentStatus: 'Paid', paymentId },
             { new: true }
         );
+        await Cart.updateOne({ userId }, { $set: { items: [] } })
 
         if (!order) {
             return res.status(404).json({ message: 'Order not found. Payment could not be linked.' });
