@@ -14,23 +14,23 @@ const BestSeller = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [hoveredProduct, setHoveredProduct] = useState(null);
-  const[isOpen,setIsOpen]=useState(false)
+  const [isOpen, setIsOpen] = useState(false)
 
-  useEffect(()=>{
-    const fetchData=async()=>{
-        const response=await axios.get('/products')
-        console.log(response.data.products)
-        setProducts(response.data.products)
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await axios.get('/products')
+      console.log(response.data.products)
+      setProducts(response.data.products)
     }
     fetchData()
-  },[])
-  const navigate=useNavigate()
-  const handleItem=(item)=>{
+  }, [])
+  const navigate = useNavigate()
+  const handleItem = (item) => {
     console.log('hasdgfkhjsa')
     console.log(item)
     localStorage.setItem("selectedProduct", JSON.stringify([item]));
     navigate('/productDetails')
-}
+  }
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -55,7 +55,7 @@ const BestSeller = () => {
 
   const overlayVariants = {
     hidden: { opacity: 0 },
-    visible: { 
+    visible: {
       opacity: 1,
       transition: {
         duration: 0.3
@@ -64,11 +64,11 @@ const BestSeller = () => {
   };
 
   const detailsVariants = {
-    hidden: { 
+    hidden: {
       opacity: 0,
       x: 100
     },
-    visible: { 
+    visible: {
       opacity: 1,
       x: 0,
       transition: {
@@ -88,7 +88,7 @@ const BestSeller = () => {
 
   const buttonVariants = {
     initial: { scale: 1 },
-    hover: { 
+    hover: {
       scale: 1.05,
       transition: {
         type: "spring",
@@ -96,7 +96,7 @@ const BestSeller = () => {
         damping: 10
       }
     },
-    tap: { 
+    tap: {
       scale: 0.95,
       transition: {
         type: "spring",
@@ -108,7 +108,7 @@ const BestSeller = () => {
 
   const filterIconVariants = {
     initial: { rotate: 0 },
-    hover: { 
+    hover: {
       rotate: 90,
       transition: {
         type: "spring",
@@ -118,7 +118,7 @@ const BestSeller = () => {
     }
   };
 
-  const handleFilter=()=>{
+  const handleFilter = () => {
     setIsOpen(true)
   }
 
@@ -170,7 +170,7 @@ const BestSeller = () => {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
           >
             {products.map((product) => (
-              <ProductCard key={product._id} product={product} {...{selectedProduct, setSelectedProduct}} />
+              <ProductCard key={product._id} product={product} {...{ selectedProduct, setSelectedProduct }} />
             ))}
           </motion.div>
         )}
@@ -240,7 +240,7 @@ const BestSeller = () => {
                       {selectedProduct.description && (
                         <li>{selectedProduct.description}</li>
                       )}
-                      {selectedProduct.variants[0].selectedAttributes && 
+                      {selectedProduct.variants[0].selectedAttributes &&
                         Object.entries(selectedProduct.variants[0].selectedAttributes).map(([key, value]) => (
                           <li key={key}>{`${key}: ${value}`}</li>
                         ))
@@ -253,23 +253,23 @@ const BestSeller = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
                   >
-                    
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={()=>handleItem(selectedProduct)}
-                        className="w-full bg-[#39FF14] text-black py-3 px-6 rounded-lg font-semibold"
-                      >
-                        View Details
-                      </motion.button>
-                   
+
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleItem(selectedProduct)}
+                      className="w-full bg-[#39FF14] text-black py-3 px-6 rounded-lg font-semibold"
+                    >
+                      View Details
+                    </motion.button>
+
                   </motion.div>
                 </div>
               </div>
             </motion.div>
           </motion.div>
         )}
-        {isOpen && <Filter isOpen={isOpen} setIsOpen={setIsOpen} {...{setProducts}}/>}
+        {isOpen && <Filter isOpen={isOpen} setIsOpen={setIsOpen} {...{ setProducts }} />}
       </AnimatePresence>
     </div>
   );

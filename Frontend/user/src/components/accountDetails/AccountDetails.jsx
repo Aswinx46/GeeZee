@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-
+import { useSelector } from 'react-redux';
+import axios from '../../axios/userAxios'
+import { toast } from 'react-toastify';
+import changeEmailVerification from './ChangeEmailOtpVerification'
 const AccountDetails = () => {
+
+  const user = useSelector(state => state.user.user)
+  const[isOpen,setIsOpen]=useState(false)
   const [formData, setFormData] = useState({
-    firstName: 'Aswin',
-    lastName: 'BT',
-    email: 'aswin@gmail.com',
-    phone: '12345678'
+    firstName: user.firstName,
+    lastName: user.lastName,
+    phone: user.phoneNo
   });
 
   const handleChange = (e) => {
@@ -17,8 +22,15 @@ const AccountDetails = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
+    try {
+      const updateInformation=await axios.put(`/changeUserInfo/${user._id}`,{formData})
+      toast.success(updateInformation.data.message)
+    } catch (error) {
+      console.log('error while updating the user')
+      toast.error(error.response.data.message)
+    }
     console.log('Form submitted:', formData);
     // Handle form submission here
   };
@@ -26,7 +38,7 @@ const AccountDetails = () => {
   const formFields = [
     { id: 'firstName', label: 'First name', type: 'text' },
     { id: 'lastName', label: 'Last name', type: 'text' },
-    { id: 'email', label: 'Email', type: 'email' },
+    // { id: 'email', label: 'Email', type: 'email' },
     { id: 'phone', label: 'Phone no', type: 'tel' }
   ];
 
@@ -55,7 +67,7 @@ const AccountDetails = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 + index * 0.1 }}
             >
-              <label 
+              <label
                 htmlFor={field.id}
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
@@ -87,6 +99,7 @@ const AccountDetails = () => {
           </motion.button>
         </form>
       </motion.div>
+      {isOpen && <changeEmailVerification isOpen={isOpen} setIsOpen={setIsOpen} formData={formData} userId={user._id}/>}
     </div>
   );
 };

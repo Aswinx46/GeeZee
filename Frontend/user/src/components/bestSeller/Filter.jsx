@@ -7,34 +7,34 @@ import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import axios from '../../axios/userAxios'
-const FilterModal = ({isOpen , setIsOpen,setProducts}) => {
-//   const [isOpen, setIsOpen] = useState(false);
-    const [priceRange, setPriceRange] = useState([0, 10000000]);
-    const [brands, setBrands] = useState([])
-    const [categories, setCategories] = useState([])
-    const [selectedSort, setSelectedSort] = useState("");
-    const [selectedBrands, setSelectedBrands] = useState([]);
-    const [selectedCategories, setSelectedCategories] = useState([]);
+const FilterModal = ({ isOpen, setIsOpen, setProducts }) => {
+  //   const [isOpen, setIsOpen] = useState(false);
+  const [priceRange, setPriceRange] = useState([0, 1000000]);
+  const [brands, setBrands] = useState([])
+  const [categories, setCategories] = useState([])
+  const [selectedSort, setSelectedSort] = useState("");
+  const [selectedBrands, setSelectedBrands] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
 
 
-    useEffect(()=>{
-        const fetchData=async (req,res) => {
-            try {
-                const brands=await axios.get('/brands')
-                console.log('this is the brands',brands.data.brands)
-                const categories=await axios.get('/categories')
-                console.log('this is categories',categories.data.category)
-                const brandName=brands.data.brands
-                const categoryName=categories.data.category
-                console.log(brandName,categoryName)
-                setBrands(brandName)
-                setCategories(categoryName)
-            } catch (error) {
-                console.log('error while fetching the data in filter component',error)
-            }
-        }
-        fetchData()
-      },[])
+  useEffect(() => {
+    const fetchData = async (req, res) => {
+      try {
+        const brands = await axios.get('/brands')
+        console.log('this is the brands', brands.data.brands)
+        const categories = await axios.get('/categories')
+        console.log('this is categories', categories.data.category)
+        const brandName = brands.data.brands
+        const categoryName = categories.data.category
+        console.log(brandName, categoryName)
+        setBrands(brandName)
+        setCategories(categoryName)
+      } catch (error) {
+        console.log('error while fetching the data in filter component', error)
+      }
+    }
+    fetchData()
+  }, [])
 
 
 
@@ -45,7 +45,7 @@ const FilterModal = ({isOpen , setIsOpen,setProducts}) => {
     open: { x: 0, opacity: 1 }
   };
 
-  const handleSortChange=(value)=>{
+  const handleSortChange = (value) => {
     setSelectedSort(value)
     console.log(value)
   }
@@ -57,32 +57,32 @@ const FilterModal = ({isOpen , setIsOpen,setProducts}) => {
       prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand]
     );
   };
-  
+
   const handleCategoryChange = (category) => {
     setSelectedCategories((prev) =>
       prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]
     );
-    
+
   };
 
-  const handleApplyFilter=async()=>{
-    console.log('this is category',selectedCategories)
-    console.log('this is brand',selectedBrands)
+  const handleApplyFilter = async () => {
+    console.log('this is category', selectedCategories)
+    console.log('this is brand', selectedBrands)
     console.log(priceRange)
-    console.log('this is sort',selectedSort)
+    console.log('this is sort', selectedSort)
 
     const response = await axios.get("/filterProducts", {
-        params: {
-          sortBy: selectedSort,
-          brands: selectedBrands,
-          categories: selectedCategories,
-          minPrice: priceRange[0],
-          maxPrice: priceRange[1],
-        },
-      });
-      console.log(response.data)
-      setProducts(response.data)
-      
+      params: {
+        sortBy: selectedSort,
+        brands: selectedBrands,
+        categories: selectedCategories,
+        minPrice: priceRange[0],
+        maxPrice: priceRange[1],
+      },
+    });
+    console.log(response.data)
+    setProducts(response.data)
+
   }
 
   return (
@@ -103,9 +103,9 @@ const FilterModal = ({isOpen , setIsOpen,setProducts}) => {
             <div className="p-6 space-y-6">
               <div className="flex justify-between items-center border-b border-zinc-800 pb-4">
                 <h2 className="text-2xl font-bold text-[#39FF14]">Filters</h2>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={toggleModal}
                   className="text-gray-400 hover:text-[#39FF14] transition-colors"
                 >
@@ -154,10 +154,10 @@ const FilterModal = ({isOpen , setIsOpen,setProducts}) => {
                   <div className="space-y-2 mt-2">
                     {brands.map((brand) => (
                       <div key={brand} className="flex items-center space-x-2">
-                        <Checkbox id={brand} 
-                        checked={selectedBrands.includes(brand._id)}
-                        onCheckedChange={() => handleBrandChange(brand._id)}    
-                        className="border-zinc-700 data-[state=checked]:bg-[#39FF14] data-[state=checked]:border-[#39FF14]" />
+                        <Checkbox id={brand}
+                          checked={selectedBrands.includes(brand._id)}
+                          onCheckedChange={() => handleBrandChange(brand._id)}
+                          className="border-zinc-700 data-[state=checked]:bg-[#39FF14] data-[state=checked]:border-[#39FF14]" />
                         <Label htmlFor={brand} className="text-gray-300 hover:text-white cursor-pointer">{brand.name}</Label>
                       </div>
                     ))}
@@ -169,10 +169,10 @@ const FilterModal = ({isOpen , setIsOpen,setProducts}) => {
                   <div className="space-y-2 mt-2">
                     {categories.map((category) => (
                       <div key={category} className="flex items-center space-x-2">
-                        <Checkbox id={category} 
-                         checked={selectedCategories.includes(category._id)}
-                         onCheckedChange={() => handleCategoryChange(category._id)}
-                        className="border-zinc-700 data-[state=checked]:bg-[#39FF14] data-[state=checked]:border-[#39FF14]" />
+                        <Checkbox id={category}
+                          checked={selectedCategories.includes(category._id)}
+                          onCheckedChange={() => handleCategoryChange(category._id)}
+                          className="border-zinc-700 data-[state=checked]:bg-[#39FF14] data-[state=checked]:border-[#39FF14]" />
                         <Label htmlFor={category} className="text-gray-300 hover:text-white cursor-pointer">{category.categoryName}</Label>
                       </div>
                     ))}

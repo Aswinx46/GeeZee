@@ -1,101 +1,169 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, ChevronDown, ChevronUp, Signature } from 'lucide-react';
 import axios from '../../axios/userAxios'
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import AddressModal from './AddNewAddress';
 import { toast } from 'react-toastify';
+import { RAZORPAY_KEY_ID } from '@/config/razorPayKey';
 const CheckoutPage = () => {
-//   const [showNewAddressForm, setShowNewAddressForm] = useState(false);
+  //   const [showNewAddressForm, setShowNewAddressForm] = useState(false);
   const [showSavedAddresses, setShowSavedAddresses] = useState(false);
-  const[savedAddresses,setSavedAddresses]=useState([])
-  const[selectedAddress,setSelectedAddress]=useState()
-  const [update,setUpdate]=useState(false)
-  const[defaultAddress,setDefaultAddress]=useState({})
-  const[cartItems,setCartItems]=useState([])
-  const[mainAddress,setMainAddress]=useState({})
-  const user=useSelector(state=>state.user.user)
-  const userId=user._id
+  const [savedAddresses, setSavedAddresses] = useState([])
+  const [selectedAddress, setSelectedAddress] = useState()
+  const [update, setUpdate] = useState(false)
+  const [defaultAddress, setDefaultAddress] = useState({})
+  const [cartItems, setCartItems] = useState([])
+  const [mainAddress, setMainAddress] = useState({})
+  const user = useSelector(state => state.user.user)
+  const userId = user._id
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [couponCode, setCouponCode] = useState('');
   const [couponApplied, setCouponApplied] = useState(false);
-  const[isOpen,setIsOpen]=useState(false)
-  const navigate=useNavigate()
-  const [shippingCharge,setShippingCharge]=useState(40)
+  const [isOpen, setIsOpen] = useState(false)
+  const navigate = useNavigate()
+  const [shippingCharge, setShippingCharge] = useState(40)
 
-  useEffect(()=>{
-    const fetchData=async () => {
-        const addresses=await axios.get(`/showAddress/${userId}`)??[]
-        const defaultAdd=addresses.data.address.find((address)=>address.defaultAddress == true)
-        setDefaultAddress(defaultAdd)
+  useEffect(() => {
+    console.log('Razorpay Key:', RAZORPAY_KEY_ID);
+    const fetchData = async () => {
+      const addresses = await axios.get(`/showAddress/${userId}`) ?? []
+      const defaultAdd = addresses.data.address.find((address) => address.defaultAddress == true)
+      setDefaultAddress(defaultAdd)
 
-        setMainAddress((prev) => {
-            return selectedAddress ? selectedAddress : defaultAdd;
-          });
+      setMainAddress((prev) => {
+        return selectedAddress ? selectedAddress : defaultAdd;
+      });
 
-        // const savedAddress=addresses.data.address.filter((address)=>address._id != mainAddress)
-        const savedAddress = addresses.data.address.filter((address) => address._id !== (selectedAddress?._id || defaultAdd?._id));
-        console.log('this is hte saved addresses',savedAddress)
-        setSavedAddresses(savedAddress)
-        console.log(savedAddress)
-        const cartItems=await axios.get(`/cartItems/${userId}`)
-        
-        console.log(cartItems.data.result)
-        setCartItems(cartItems.data.result)
+      // const savedAddress=addresses.data.address.filter((address)=>address._id != mainAddress)
+      const savedAddress = addresses.data.address.filter((address) => address._id !== (selectedAddress?._id || defaultAdd?._id));
+      console.log('this is hte saved addresses', savedAddress)
+      setSavedAddresses(savedAddress)
+      console.log(savedAddress)
+      const cartItems = await axios.get(`/cartItems/${userId}`)
+
+      console.log(cartItems.data.result)
+      setCartItems(cartItems.data.result)
 
 
     }
     fetchData()
-  },[update,isOpen])
+  }, [update, isOpen])
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+  
 
 
 
-  const calculateSubTotal=()=>{
-    return cartItems.reduce((total,item)=>{
-        const itemTotal=item.variants[0].price * item.quantity
-        return total + itemTotal ;
-    },0)
+  const calculateSubTotal = () => {
+    return cartItems.reduce((total, item) => {
+      const itemTotal = item.variants[0].price * item.quantity
+      return total + itemTotal;
+    }, 0)
   }
 
-  const total=calculateSubTotal()
+  const total = calculateSubTotal()
 
-  
-  const handlePlaceOrder=async(e)=>{
+
+  const handlePlaceOrder = async (e) => {
     e.preventDefault()
     console.log(defaultAddress)
-    console.log('this is main address',mainAddress)
-    console.log('this is the items',cartItems)
-    console.log('this is the user id',userId)
-    console.log('this is the paymnent method',paymentMethod)
-    console.log('this is the variant id',cartItems[0].variants[0]._id)
-    const variantId=cartItems[0].variants[0]._id
-    const blockedProduct=cartItems.some((item)=>item.productStatus == 'inactive' ||item.brandStatus == 'inactive' || item.categoryStatus == 'inactive')
+    console.log('this is main address', mainAddress)
+    console.log('this is the items', cartItems)
+    console.log('this is the user id', userId)
+    console.log('this is the paymnent method', paymentMethod)
+    console.log('this is the variant id', cartItems[0].variants[0]._id)
+    const variantId = cartItems[0].variants[0]._id
+    const blockedProduct = cartItems.some((item) => item.productStatus == 'inactive' || item.brandStatus == 'inactive' || item.categoryStatus == 'inactive')
     console.log(blockedProduct)
-    if(blockedProduct)
-    {
-        toast.error('Product is blocked by admin remove the product to continue purchase')
-        return 
+    if (blockedProduct) {
+      toast.error('Product is blocked by admin remove the product to continue purchase')
+      return
     }
     try {
-        const respone=await axios.post(`/createOrder/${userId}/${variantId}`,{mainAddress,cartItems,paymentMethod,total,shippingCharge})
-        toast.success(respone.data.message)
+      // if(paymentMethod === 'Razorpay')
+      // {
+      //   console.log('this is inside razorpay')
+      // }
+      const response = await axios.post(`/createOrder/${userId}/${variantId}`, { mainAddress, cartItems, paymentMethod, total, shippingCharge })
+      console.log('this is the response',response)
+      if(paymentMethod == 'Razorpay')
+      {
+        console.log('inside razor')
+        const { razorpayOrderId, amount, currency } = response.data;
+        const options = {
+          key: RAZORPAY_KEY_ID, // Replace with your Razorpay key
+          amount,
+          currency,
+          name: 'GeeZee',
+          description: 'Order Payment',
+          order_id: razorpayOrderId,
+          handler: async (response) => {
+            console.log('Payment Success:', response);
+            toast.success('Payment Successful');
+            navigate("/checkoutSuccess");   
+            // Optionally send payment confirmation to the backend
+
+            await axios.post('/confirmPayment', {
+              paymentId: response.razorpay_payment_id,
+              orderId: razorpayOrderId,
+              signature:response.razorpay_signature
+            });
+            // toast.success("Payment Successful");
+         
+          },
+          prefill: {
+            name: mainAddress.name,
+            email: mainAddress.email,
+            contact: mainAddress.phone,
+          },
+          theme: {
+            color: '#3399cc',
+          }, method: {
+            netbanking: true,
+            card: true,
+            upi: true, // Enables UPI
+            wallet: true,
+          },
+        };
+        const razorpay = new window.Razorpay(options);
+        razorpay.open();
+
+        razorpay.on('payment.failed', (response) => {
+          console.error('Payment Failed:', response);
+          toast.error('Payment Failed. Please try again.');
+        });
+      }else{
+        console.log('this is else case')
+        toast.success(response.data.message)
         navigate('/checkoutSuccess')
-        
+      }
+
+      
+
     } catch (error) {
-        console.log('error while creating order',error)
-        // toast.error('error while creating order')
-        setUpdate(!update)
-        toast.error(error.response.data.message)
+      console.log('error while creating order', error)
+      // toast.error('error while creating order')
+      setUpdate(!update)
+      toast.error(error.response.data.message)
     }
-    
+
   }
- 
-  const handleEditCart=()=>{
+
+  const handleEditCart = () => {
     navigate('/cart')
   }
 
-  const handleNewAddress=()=>{
+  const handleNewAddress = () => {
     console.log('kajsfd')
     setIsOpen(true)
     console.log(isOpen)
@@ -106,8 +174,8 @@ const CheckoutPage = () => {
   const handleSelectAddress = async (address) => {
     toast.success('Address changed')
     try {
-            setSelectedAddress(address)
-        setUpdate(!update)
+      setSelectedAddress(address)
+      setUpdate(!update)
     } catch (error) {
       console.error('Error updating default address:', error);
     }
@@ -128,7 +196,7 @@ const CheckoutPage = () => {
               <h1 className="text-2xl font-bold text-gray-900 mb-6">Shipping Address</h1>
               {/* Default Address */}
 
-              {mainAddress&&<motion.div
+              {mainAddress && <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
@@ -143,8 +211,8 @@ const CheckoutPage = () => {
                   <p>{mainAddress.phone}</p>
                 </div>
               </motion.div>
-}
-             {/* Add New Address Button */}
+              }
+              {/* Add New Address Button */}
 
               <motion.button
                 whileHover={{ scale: 1.02 }}
@@ -156,7 +224,7 @@ const CheckoutPage = () => {
                 Add New Address
               </motion.button>
 
-        
+
               {/* Saved Addresses */}
               <motion.div
                 initial={{ opacity: 0 }}
@@ -224,54 +292,53 @@ const CheckoutPage = () => {
                 className="mb-8"
               >
 
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Product Details</h2>
-                {cartItems.map((item,i)=>(
-                <div key={i} className={`flex items-center border-t border-b border-gray-200 py-4 relative ${
-                  item.productStatus === 'inactive' || item.brandStatus === 'inactive' || item.categoryStatus === 'inactive' 
-                  ? 'bg-gray-100' 
-                  : ''
-                }`}>
-                  {(item.productStatus === 'inactive' || item.brandStatus === 'inactive' || item.categoryStatus === 'inactive') && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-                      <div className="bg-red-600 text-white px-6 py-3 rounded-lg font-bold text-lg  shadow-xl border-2 border-white">
-                        BLOCKED BY ADMIN
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Product Details</h2>
+                {cartItems.map((item, i) => (
+                  <div key={i} className={`flex items-center border-t border-b border-gray-200 py-4 relative ${item.productStatus === 'inactive' || item.brandStatus === 'inactive' || item.categoryStatus === 'inactive'
+                    ? 'bg-gray-100'
+                    : ''
+                    }`}>
+                    {(item.productStatus === 'inactive' || item.brandStatus === 'inactive' || item.categoryStatus === 'inactive') && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+                        <div className="bg-red-600 text-white px-6 py-3 rounded-lg font-bold text-lg  shadow-xl border-2 border-white">
+                          BLOCKED BY ADMIN
+                        </div>
                       </div>
+                    )}
+                    <img
+                      src={item.productImg[0]}
+                      alt={item.title}
+                      className="h-24 w-24 object-cover rounded-md"
+                    />
+                    <div className="ml-4 flex-1">
+                      <h3 className="text-lg font-medium text-gray-900">{item.title}</h3>
+                      {Object.entries(item.variants[0].selectedAttributes).map((val, i) => (
+                        <h3 key={i} className="text-sm font-medium text-gray-700">
+                          {val.join(' - ')}
+                        </h3>
+                      ))}
+                      <p className="mt-1 text-sm text-gray-500">
+                        Quantity: {item.quantity}
+                      </p>
                     </div>
-                  )}
-                  <img 
-                    src={item.productImg[0]} 
-                    alt={item.title} 
-                    className="h-24 w-24 object-cover rounded-md" 
-                  />
-                  <div className="ml-4 flex-1">
-                    <h3 className="text-lg font-medium text-gray-900">{item.title}</h3>
-                    {Object.entries(item.variants[0].selectedAttributes).map((val,i)=>(
-                      <h3 key={i} className="text-sm font-medium text-gray-700">
-                        {val.join(' - ')}
-                      </h3>
-                    ))}
-                    <p className="mt-1 text-sm text-gray-500">
-                      Quantity: {item.quantity}
+                    <p className="text-lg font-medium text-gray-900">
+                      ₹{item.variants[0].price}
                     </p>
                   </div>
-                  <p className="text-lg font-medium text-gray-900">
-                    ₹{item.variants[0].price}
-                  </p>
-                </div>
                 ))}
               </motion.div>
 
-     
-         
+
+
 
               {/* New Address Form */}
-            
+
 
               {/* Place Order Button */}
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-           
+
                 onClick={handleEditCart}
                 className="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800 transition-colors"
               >
@@ -279,7 +346,7 @@ const CheckoutPage = () => {
               </motion.button>
             </div>
           </motion.div>
-                  
+
           {/* Right side - Payment Section */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
@@ -296,13 +363,13 @@ const CheckoutPage = () => {
                   <span>₹{total}</span>
                 </div>
                 <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    className="flex justify-between text-green-600"
-                  >
-                    <span>Shipping Charge</span>
-                    <span>₹{shippingCharge}</span>
-                  </motion.div>
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="flex justify-between text-green-600"
+                >
+                  <span>Shipping Charge</span>
+                  <span>₹{shippingCharge}</span>
+                </motion.div>
                 {couponApplied && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
@@ -316,7 +383,7 @@ const CheckoutPage = () => {
                 <div className="border-t pt-4">
                   <div className="flex justify-between font-semibold">
                     <span>Total</span>
-                    <span>₹{couponApplied ? total - 20 : total+shippingCharge}</span>
+                    <span>₹{couponApplied ? total - 20 : total + shippingCharge}</span>
                   </div>
                 </div>
               </div>
@@ -379,6 +446,15 @@ const CheckoutPage = () => {
                 <label className="flex items-center space-x-3">
                   <input
                     type="radio"
+                    checked={paymentMethod === 'Razorpay'}
+                    onChange={() => setPaymentMethod('Razorpay')}
+                    className="form-radio text-black"
+                  />
+                  <span>RazorPay</span>
+                </label>
+                <label className="flex items-center space-x-3">
+                  <input
+                    type="radio"
                     checked={paymentMethod === 'Cash on Delivery'}
                     onChange={() => setPaymentMethod('Cash on Delivery')}
                     className="form-radio text-black"
@@ -392,17 +468,17 @@ const CheckoutPage = () => {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-             
-              onClick={(e)=>handlePlaceOrder(e)}
+
+              onClick={(e) => handlePlaceOrder(e)}
               className="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800 transition-colors"
-              
+
             >
-                Place Order
+              Place Order
             </motion.button>
           </motion.div>
         </div>
       </div>
-      {isOpen && userId && <AddressModal isOpen={isOpen} setIsOpen={setIsOpen} userId={userId}/>}
+      {isOpen && userId && <AddressModal isOpen={isOpen} setIsOpen={setIsOpen} userId={userId} />}
     </div>
   );
 };

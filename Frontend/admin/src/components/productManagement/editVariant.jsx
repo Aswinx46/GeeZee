@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const AttributeModal = ({ isOpen, onClose, onSave, Varient, index,setVarient,setIsOpen }) => {
+const AttributeModal = ({ isOpen, onClose, onSave, Varient, index, setVarient, setIsOpen }) => {
     const [attributeName, setAttributeName] = useState('');
     const [attributeValue, setAttributeValue] = useState('');
     const [price, setPrice] = useState('');
@@ -18,40 +18,38 @@ const AttributeModal = ({ isOpen, onClose, onSave, Varient, index,setVarient,set
         setEntries(keys)
         setPrice(Varient[index]?.price)
         setStock(Varient[index]?.stock)
-       
+
 
     }, [])
     console.log(varients)
 
 
 
-    const handleChange=(index,field,value)=>{
-        setEntries((prev)=>{
-            const updatedEntries=[...prev]
-            if(field==='key')
-            {
-                updatedEntries[index][0]=value
-            }else if(field==='value')
-            {
-                updatedEntries[index][1]=value
+    const handleChange = (index, field, value) => {
+        setEntries((prev) => {
+            const updatedEntries = [...prev]
+            if (field === 'key') {
+                updatedEntries[index][0] = value
+            } else if (field === 'value') {
+                updatedEntries[index][1] = value
             }
             return updatedEntries
         })
 
     }
 
-    
+
     const handleSave = () => {
         // onSave({ attributeName, attributeValue, price, stock });
-        
-        console.log("this is entries",entries)
+
+        console.log("this is entries", entries)
         console.log(price)
         console.log(stock)
         const result = entries.reduce((obj, [key, value]) => {
             obj[key] = value;
             return obj;
-          }, {});
-        setVarient((prev)=>([...prev.map((item, i)=>i===index?({...item,price,stock,selectedAttributes:{...result}}):item)]))
+        }, {});
+        setVarient((prev) => ([...prev.map((item, i) => i === index ? ({ ...item, price, stock, selectedAttributes: { ...result } }) : item)]))
         setIsOpen(false);
         console.log(varients)
     };
@@ -74,7 +72,7 @@ const AttributeModal = ({ isOpen, onClose, onSave, Varient, index,setVarient,set
                     >
                         <h2 className="text-2xl font-bold mb-4">Add Attribute</h2>
                         <div className="space-y-4">
-                     
+
                             <div>
                                 <label htmlFor="attributeValue" className="block text-sm font-medium text-gray-700 mb-1">
                                     Attribute Value
@@ -99,7 +97,7 @@ const AttributeModal = ({ isOpen, onClose, onSave, Varient, index,setVarient,set
                                 <input
                                     type="number"
                                     id="price"
-                                    value={price|| ""}
+                                    value={price || ""}
                                     onChange={(e) => setPrice(Number(e.target.value))}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
@@ -121,7 +119,7 @@ const AttributeModal = ({ isOpen, onClose, onSave, Varient, index,setVarient,set
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                onClick={()=>setIsOpen(false)}
+                                onClick={() => setIsOpen(false)}
                                 className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
                             >
                                 Cancel

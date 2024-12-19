@@ -1,26 +1,26 @@
 import React, { useState } from 'react';
 import axios from '../../../axios/adminAxios'
 import { useNavigate } from "react-router";
-import {toast} from 'react-toastify'
+import { toast } from 'react-toastify'
 import { addToken } from '@/redux/slices/tokenSlice';
 import { useDispatch } from 'react-redux';
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
-  const navigate=useNavigate()
-  const dispatch=useDispatch()
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
   const validateForm = () => {
     let formErrors = {};
- 
-   
+
+
     if (!email) {
       formErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(email)) {
       formErrors.email = 'Email is invalid';
     }
 
- 
+
     if (!password) {
       formErrors.password = 'Password is required';
     } else if (password.length < 6) {
@@ -36,22 +36,22 @@ export default function AdminLoginPage() {
     if (validateForm()) {
 
       try {
-        
-        const response=await axios.post('/login',{email,password})
+
+        const response = await axios.post('/login', { email, password })
         console.log(response.data.user._id)
-        localStorage.setItem('id',response.data.user._id)
+        localStorage.setItem('id', response.data.user._id)
         dispatch(addToken(response.data.token))
         toast.success(response.data.message)
 
-        navigate('/dashboard',{replace:true})
-        
-        
+        navigate('/dashboard', { replace: true })
+
+
       } catch (error) {
         console.log(error)
         toast.error(error.response.data.message)
       }
-   
-     
+
+
     }
   };
 
@@ -78,7 +78,7 @@ export default function AdminLoginPage() {
                 name="email"
                 type="email"
                 autoComplete="email"
-                
+
                 className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-700 placeholder-gray-500 text-white bg-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
                 style={{ fontFamily: 'Arial, sans-serif' }}
                 placeholder="Email address"
@@ -96,7 +96,7 @@ export default function AdminLoginPage() {
                 name="password"
                 type="password"
                 autoComplete="current-password"
-                
+
                 className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-700 placeholder-gray-500 text-white bg-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
                 style={{ fontFamily: 'Arial, sans-serif' }}
                 placeholder="Password"

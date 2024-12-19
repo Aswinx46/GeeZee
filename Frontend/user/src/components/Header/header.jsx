@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, replace, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaHome, FaShoppingCart, FaSearch, FaUser, FaCrown, FaStore } from 'react-icons/fa';
-import {store} from '../../redux/store'
+import { store } from '../../redux/store'
 import logo from '../../assets/GeeZee.png'
 import { useSelector, useDispatch } from 'react-redux';
 import { removeUser } from '@/redux/slices/userSlice';
@@ -12,13 +12,13 @@ import { resetCounter } from '@/redux/slices/CartCounter';
 import Badge from '@mui/material/Badge';
 const Header = (props) => {
   const [isHovered, setIsHovered] = useState(null);
-  const navigate=useNavigate()
-  const[isLogin,setIsLogin]=useState(false)
-  const[checkToken,setCheckToken]=useState(false)
-  const[user,setUser]=useState({})
+  const navigate = useNavigate()
+  const [isLogin, setIsLogin] = useState(false)
+  const [checkToken, setCheckToken] = useState(false)
+  const [user, setUser] = useState({})
 
-  const userData = useSelector(state=>state.user.user);
-  const CartCount=useSelector(state=>state.cartCounter.count)
+  const userData = useSelector(state => state.user.user);
+  const CartCount = useSelector(state => state.cartCounter.count)
   console.log(userData)
   const dispatch = useDispatch()
 
@@ -35,11 +35,11 @@ const Header = (props) => {
     navigate('/login');
     console.log("Login button clicked");
   };
-  
 
 
-  const handleLogout = async() => {
-  
+
+  const handleLogout = async () => {
+    navigate('/', { replace: true });
     localStorage.removeItem('id');
     localStorage.removeItem('user');
     setIsLogin(false);
@@ -47,29 +47,29 @@ const Header = (props) => {
     dispatch(removeToken())
     localStorage.clear()
     dispatch(resetCounter())
-   await persistor.purge();
-    navigate('/', { replace: true });
+    await persistor.purge();
+   
     console.log("Logout button clicked");
   };
 
 
   return (
-    <motion.header 
+    <motion.header
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
       // className="bg-gradient-to-r from-indigo-950 via-purple-900 to-indigo-950 text-white shadow-xl border-b border-violet-500/30"
-            className="bg-gradient-to-r bg-black border-b border-purple-500"
+      className="bg-gradient-to-r bg-black border-b border-purple-500"
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20 text-white 	">
           {/* Logo */}
-          <motion.div 
+          <motion.div
             whileHover={{ scale: 1.05 }}
             className="flex items-center"
           >
             <Link to="/" className="">
-            <img className='h-20 w-30' src={logo}></img>
+              <img className='h-20 w-30' src={logo}></img>
             </Link>
           </motion.div>
 
@@ -81,10 +81,10 @@ const Header = (props) => {
               { name: 'Shop', icon: FaStore, path: '/productPage' },
               { name: 'Search', icon: FaSearch, path: '#' },
               { name: 'Cart', icon: FaShoppingCart, path: '/cart' },
-              { name: 'Account', icon: FaUser, path: '/sidebar' }
+              ...(userData ? [{ name: 'Account', icon: FaUser, path: '/sidebar' }] : [])
             ].map((item, index) => (
               <motion.div
-               
+
                 key={index}
                 whileHover={{ scale: 1.1 }}
                 onHoverStart={() => setIsHovered(index)}
@@ -95,20 +95,20 @@ const Header = (props) => {
                   className="flex items-center space-x-1 hover:text-violet-400 transition-colors duration-200"
                 >
                   {item.name === 'Cart' ? (
-                    <div  onClick={handleCartClick}> 
-                      
-                    <Badge
-                      badgeContent={CartCount} // Replace with dynamic cart count
-                      color="secondary"
-                      overlap="circular"
-                      anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
-                      }}
+                    <div onClick={handleCartClick}>
+
+                      <Badge
+                        badgeContent={CartCount} // Replace with dynamic cart count
+                        color="secondary"
+                        overlap="circular"
+                        anchorOrigin={{
+                          vertical: 'top',
+                          horizontal: 'right',
+                        }}
                       >
-                      <item.icon className={`text-lg ${isHovered === index ? 'text-violet-400' : ''}`} />
-                    </Badge>
-                      </div>
+                        <item.icon className={`text-lg ${isHovered === index ? 'text-violet-400' : ''}`} />
+                      </Badge>
+                    </div>
                   ) : (
                     <item.icon className={`text-lg ${isHovered === index ? 'text-violet-400' : ''}`} />
                   )}
@@ -118,19 +118,19 @@ const Header = (props) => {
                 </Link>
               </motion.div>
             ))}
-            
+
             {/* Login Button */}
             <motion.div
               whileHover={{ scale: 1.1 }}
             >
 
-              {userData ?      <button
+              {userData ? <button
                 onClick={handleLogout}
                 className="flex items-center space-x-1 hover:text-violet-400 transition-colors duration-200"
               >
                 <FaUser className="text-lg" />
                 <span className="font-medium">Logout</span>
-              </button> :      <button
+              </button> : <button
                 onClick={handleLogin}
                 className="flex items-center space-x-1 hover:text-violet-400 transition-colors duration-200"
               >
@@ -144,10 +144,10 @@ const Header = (props) => {
                 <FaUser className="text-lg" />
                 <span className="font-medium">Login</span>
               </button> */}
-         
+
             </motion.div>
           </nav>
-            
+
           {/* Mobile Menu Button */}
           <motion.button
             whileTap={{ scale: 0.95 }}
@@ -175,4 +175,3 @@ const Header = (props) => {
 };
 
 export default Header;
-

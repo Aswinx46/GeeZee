@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 const ChangePassword = () => {
 
-  const user=useSelector(state=>state.user.user)
+  const user = useSelector(state => state.user.user)
   const [formData, setFormData] = useState({
     oldPassword: '',
     newPassword: '',
@@ -65,7 +65,7 @@ const ChangePassword = () => {
     return newErrors;
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validateForm();
 
@@ -74,8 +74,8 @@ const ChangePassword = () => {
       return;
     }
     try {
-      
-      const changePassword=await axios.patch(`/changePassword/${user._id}`,{formData})
+
+      const changePassword = await axios.patch(`/changePassword/${user._id}`, { formData })
       setFormData({
         oldPassword: '',
         newPassword: '',
@@ -83,7 +83,7 @@ const ChangePassword = () => {
       })
       toast.success(changePassword.data.message)
     } catch (error) {
-      console.log('error while changing password',error)
+      console.log('error while changing password', error)
       toast.error(error.response.data.message)
     }
 
@@ -123,9 +123,8 @@ const ChangePassword = () => {
                 name="oldPassword"
                 value={formData.oldPassword}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border ${
-                  errors.oldPassword ? 'border-red-500' : 'border-gray-300'
-                } rounded-md focus:outline-none focus:ring-2 focus:ring-black transition-colors`}
+                className={`w-full px-4 py-2 border ${errors.oldPassword ? 'border-red-500' : 'border-gray-300'
+                  } rounded-md focus:outline-none focus:ring-2 focus:ring-black transition-colors`}
               />
               <button
                 type="button"
@@ -155,9 +154,8 @@ const ChangePassword = () => {
                 name="newPassword"
                 value={formData.newPassword}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border ${
-                  errors.newPassword ? 'border-red-500' : 'border-gray-300'
-                } rounded-md focus:outline-none focus:ring-2 focus:ring-black transition-colors`}
+                className={`w-full px-4 py-2 border ${errors.newPassword ? 'border-red-500' : 'border-gray-300'
+                  } rounded-md focus:outline-none focus:ring-2 focus:ring-black transition-colors`}
               />
               <button
                 type="button"
@@ -187,9 +185,8 @@ const ChangePassword = () => {
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border ${
-                  errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
-                } rounded-md focus:outline-none focus:ring-2 focus:ring-black transition-colors`}
+                className={`w-full px-4 py-2 border ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                  } rounded-md focus:outline-none focus:ring-2 focus:ring-black transition-colors`}
               />
               <button
                 type="button"

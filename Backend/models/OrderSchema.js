@@ -89,9 +89,18 @@ const orderSchema=new mongoose.Schema({
     },
     paymentMethod:{
         type:String,
-        enum:['Credit card','Debit Card','Net Banking','UPI','Cash on Delivery'],
+        enum:['Credit card','Debit Card','Net Banking','UPI','Cash on Delivery','Razorpay'],
         required:true
     },
+    paymentStatus: {
+        type: String,
+        enum: ['Pending', 'Awaiting Payment', 'Paid', 'Failed'],
+        default: 'Pending', 
+    },
+    razorpayOrderId:{
+       type: String,
+       required:false
+    },   
     shippingCost:{
         type:Number,
         default:40
