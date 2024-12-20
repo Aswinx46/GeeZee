@@ -8,6 +8,7 @@ const instance = axios.create({
   });
 
 
+
   instance.interceptors.request.use(
     (config)=>{
       const token=store.getState().token.token
@@ -42,7 +43,8 @@ const instance = axios.create({
           return instance(originalRequest);
         }catch(refreshError){
           console.log('refresh token failed',refreshError)
-          // window.location.href = '/';
+          window.location.href = '/';
+          
           return Promise.reject(refreshError);
         }
       }

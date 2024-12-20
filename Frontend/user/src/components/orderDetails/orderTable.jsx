@@ -18,6 +18,7 @@ const OrderDetails = () => {
     const[isOpen,setIsOpen]=useState(false)
     const[orderDetails,setOrderDetails]=useState([])
     const [allOrderItems,setAllOrderItems]=useState([])
+  
     const[particularOrderDetails,setParticularOrderDetails]=useState({})
     const user=useSelector((state)=>state.user.user)
 const userId=user._id
@@ -30,7 +31,7 @@ useEffect(()=>{
             order.orderItems.map((item)=>({
                 ...item,status:order.status,invoiceDate:order.invoiceDate,address:order.address,paymentMethod:order.paymentMethod,
                 totalPrice:order.totalPrice,shippingCost:order.shippingCost,finalAmount:order.finalAmount,orderId:order.orderId,orderObjectId:order._id,
-                variants:order.orderItems[0].variant.selectedAttributes
+                variants:order.orderItems[0].variant.selectedAttributes,orderItemId:item._id
             })))
             setParticularOrderDetails(combinedItems[0])
         console.log('this is the combined items',combinedItems)
@@ -101,6 +102,7 @@ useEffect(()=>{
               <TableHead className="text-right">Total</TableHead>
               <TableHead className="text-right">Status</TableHead>
               <TableHead className="text-right">orderId</TableHead>
+             { orderDetails[0]?.orderItems[0]?.variant.returnOrder ? <TableHead className="text-right">Return Order status</TableHead> : '' }  
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -113,6 +115,7 @@ useEffect(()=>{
                 <TableCell onClick={()=>handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'line-through text-gray-500' : ''}`}>₹{(item.quantity * item.price)}</TableCell>
                 <TableCell onClick={()=>handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'text-red-500 font-medium' : ''}`}>{item.status}</TableCell>
                 <TableCell onClick={()=>handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'text-gray-500' : ''}`}>{item.orderId}</TableCell>
+                <TableCell onClick={()=>handleProductDetail(item)} className={`text-right ${item.variant.returnOrder === 'Pending' ? 'text-red-500' : ''}`}>{item.variant.returnOrder}</TableCell>
               </TableRow>
             ))}
         

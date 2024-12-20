@@ -3,22 +3,25 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button"
 import axios from '../axios/userAxios'
-const OrderCancellationModal = ({ isOpen, onClose, onConfirm, orderId ,setIsOpen}) => {
+import { Textarea } from "@/components/ui/textarea"
+const OrderCancellationModal = ({ isOpen, onClose, onConfirm, orderId,isReturn,orderItemId, isCancel, setIsOpen }) => {
   const [isCancelled, setIsCancelled] = useState(false);
-
+  const [cancellationReason, setCancellationReason] = useState('');
+  const[returnReason,setReturnReason]=useState('')
+  // const[returnOrCancel,setReturnOrCancel]=useState()
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.8 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       scale: 1,
-      transition: { 
+      transition: {
         type: "spring",
         damping: 25,
         stiffness: 500
       }
     },
-    exit: { 
-      opacity: 0, 
+    exit: {
+      opacity: 0,
       scale: 0.8,
       transition: {
         type: "spring",
@@ -30,10 +33,10 @@ const OrderCancellationModal = ({ isOpen, onClose, onConfirm, orderId ,setIsOpen
 
   const contentVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
-      transition: { 
+      transition: {
         delay: 0.2,
         type: "spring",
         damping: 25,
@@ -42,16 +45,26 @@ const OrderCancellationModal = ({ isOpen, onClose, onConfirm, orderId ,setIsOpen
     }
   };
 
-  const handleConfirm = async() => {
+  const handleConfirm = async () => {
     console.log(orderId)
-     const response=await axios.patch(`/cancelOrder/${orderId}`)
+    if(isCancel)
+    {
+      console.log('this is inside canecl')
+      const response = await axios.patch(`/cancelOrder/${orderId}`,{reason:cancellationReason})
+    }else{
+      console.log('this is inside return')
+      console.log(returnReason)
+      console.log(orderId)
+      console.log(orderItemId,'this is the item id')
+      const respones= await axios.patch(`returnProduct/${orderId}/${orderItemId}`,{returnReason})
+    }
     setIsCancelled(true);
-    onConfirm();
+    
   };
 
   const handleClose = () => {
-    onClose();
-    setTimeout(() => setIsCancelled(false), 300); 
+   
+    setTimeout(() => setIsCancelled(false), 300);
   };
 
   return (
@@ -74,17 +87,17 @@ const OrderCancellationModal = ({ isOpen, onClose, onConfirm, orderId ,setIsOpen
               variant="ghost"
               size="icon"
               className="absolute top-2 right-2"
-              onClick={()=>setIsOpen(false)}
+              onClick={() => setIsOpen(false)}
             >
               <X className="h-4 w-4" />
             </Button>
 
             <AnimatePresence mode="wait">
               {!isCancelled ? (
-                <motion.div 
+                <motion.div
                   key="confirmation"
-                  variants={contentVariants} 
-                  initial="hidden" 
+                  variants={contentVariants}
+                  initial="hidden"
                   animate="visible"
                   exit="hidden"
                   className="min-h-[16rem] flex flex-col justify-between"
@@ -95,36 +108,44 @@ const OrderCancellationModal = ({ isOpen, onClose, onConfirm, orderId ,setIsOpen
                         <AlertTriangle className="h-6 w-6 text-yellow-600" />
                       </div>
                     </div>
+                {isCancel ?       <h2 className="text-2xl font-bold text-center mb-4">Cancel Order?</h2> :       <h2 className="text-2xl font-bold text-center mb-4">Return Order?</h2> }
+              
 
-                    <h2 className="text-2xl font-bold text-center mb-4">Cancel Order?</h2>
-                    
-                    <p className="text-center text-gray-600 mb-6">
+                 {isCancel ?<p className="text-center text-gray-600 mb-6">
                       Are you sure you want to cancel order #{orderId}? This action cannot be undone.
-                    </p>
+                    </p> : <p className="text-center text-gray-600 mb-6">
+                      Are you sure you want to Return order #{orderId}? This action cannot be undone.
+                    </p> }   
                   </div>
+                  <Textarea
+                    placeholder="Please provide a reason for cancellation"
+                    value={cancellationReason || returnReason}
+                    onChange={(e) => isCancel ? setCancellationReason(e.target.value) : setReturnReason(e.target.value)}
+                    className="mb-4"
+                  />
 
                   <div className="flex justify-center space-x-4">
                     <Button
                       variant="outline"
-                      onClick={()=>setIsOpen(false)}
+                      onClick={() => setIsOpen(false)}
                       className="w-full"
                     >
-                      No, Keep Order
+                      {isCancel ? '  No, Keep Order' : 'No Keep Product'}
                     </Button>
                     <Button
                       variant="destructive"
                       onClick={handleConfirm}
                       className="w-full"
                     >
-                      Yes, Cancel Order
+                      {isCancel ? 'Yes, Cancel Order' : 'Yes return Product' }
                     </Button>
                   </div>
                 </motion.div>
               ) : (
-                <motion.div 
+                <motion.div
                   key="cancelled"
-                  variants={contentVariants} 
-                  initial="hidden" 
+                  variants={contentVariants}
+                  initial="hidden"
                   animate="visible"
                   exit="hidden"
                   className="min-h-[16rem] flex flex-col justify-between"
@@ -136,16 +157,24 @@ const OrderCancellationModal = ({ isOpen, onClose, onConfirm, orderId ,setIsOpen
                       </div>
                     </div>
 
-                    <h2 className="text-2xl font-bold text-center mb-4">Order Cancelled</h2>
+     
                     
-                    <p className="text-center text-gray-600 mb-6">
+                    {isCancel ? <h2 className="text-2xl font-bold text-center mb-4">Order Cancelled</h2>  :  <h2 className="text-2xl font-bold text-center mb-4">Return Request Sended</h2>
+                    }
+
+                    {isCancel ?  <p className="text-center text-gray-600 mb-6">
                       Your order #{orderId} has been successfully cancelled.
-                    </p>
+                      
+                    </p> :  <p className="text-center text-gray-600 mb-6">
+                      Your order #{orderId} has been successfully cancelled.
+                      
+                    </p> }
+                   
                   </div>
 
                   <div className="flex justify-center">
                     <Button
-                      onClick={()=>setIsOpen(false)}
+                      onClick={() => setIsOpen(false)}
                       className="w-full"
                     >
                       Close

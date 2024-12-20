@@ -42,6 +42,7 @@ user_route.post('/createOrder/:userId/:variantId', auth.authToken, orderControll
 user_route.get('/orderDetails/:userId', auth.authToken, orderController.showOrders)
 user_route.patch('/cancelOrder/:orderId', auth.authToken, orderController.cancelOrder)
 user_route.post('/confirmPayment/:userId',auth.authToken,orderController.verifyPayment)
+user_route.patch('/returnProduct/:orderId/:orderItemId',auth.authToken,orderController.returnOrderProduct)
 
 user_route.get('/brands', auth.authToken, brandController.showBrand)
 user_route.get('/categories', auth.authToken, categoryController.showCategory)

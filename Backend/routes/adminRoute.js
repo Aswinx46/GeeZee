@@ -30,5 +30,7 @@ admin_route.patch('/editBrandName/:brandId', auth.adminAuth, brandController.cha
 
 admin_route.get('/showOrders', auth.adminAuth, OrderController.showAllOrders)
 admin_route.patch('/changeOrderStatus/:orderId', auth.adminAuth, OrderController.changeOrderStatus)
+admin_route.get('/getReturnProducts',auth.adminAuth,OrderController.getReturnProducts)
+admin_route.patch('/confirmReturn/:orderId',auth.adminAuth,OrderController.confirmOrder)
 
 module.exports = admin_route

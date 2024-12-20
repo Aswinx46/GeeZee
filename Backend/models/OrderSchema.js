@@ -48,6 +48,14 @@ const orderSchema=new mongoose.Schema({
                 of: String, // Assuming attributes are key-value pairs
                 required: false // Optional if no attributes
             },
+            returnOrder:{
+                type:String,
+                enum:['Pending','Accepted','Rejected']
+            },
+            returnReason:{
+                type:String,
+                required:false
+            }
         },
     }],
     totalPrice:{
@@ -106,18 +114,10 @@ const orderSchema=new mongoose.Schema({
         default:40
     },
     
-    returnReason:{
-        type:String,
-        required:false
-    },
+  
     CancellationReason:{
         type:String,
-        default:'none',
-        required:false
-    },
-    returnReason:{
-        type:String,
-        default:'none',
+       
         required:false
     },
     deliveryDate:{

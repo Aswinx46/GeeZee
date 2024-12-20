@@ -7,6 +7,9 @@ import OrderCancellationModal from '@/extraAddonComponents/OrderCancellation';
 const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
   console.log('this is the sended item',item)
   const[orderCancelPop,setOrderCancelPop]=useState(false)
+  const[cancel,setCancel]=useState(false)
+  const[isReturn,setIsReturn]=useState(false)
+  const[orderItemId,setOrderItemId]=useState()
   console.log('this  is the order details from the parent',orderDetails)
   const[orderId,setOrderId]=useState()
   const order = {
@@ -47,13 +50,26 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
 
   const handleCancelOrder=async () => {
     try {
+      setCancel(true)
       setOrderCancelPop(true)
+      console.log('this is the orderDetails',orderDetails)
       console.log(orderDetails.orderObjectId)
+      // console.log('this is the order id',orderDetails.orderObjectId)
+      // console.log('this is the orderItem id',orderDetails.orderItemId)
       setOrderId(orderDetails.orderObjectId)
+      setOrderItemId(orderDetails.orderItemId)
      
     } catch (error) {
       console.log('error while canceling the order',error)
     }
+  }
+
+  const handleReturnOrder=async()=>{
+    setIsReturn(true)
+    setOrderCancelPop(true)
+    setOrderId(orderDetails.orderObjectId)
+      setOrderItemId(orderDetails.orderItemId)
+     
   }
 
 
@@ -154,7 +170,7 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
               </div>
             </motion.div>
 
-            {orderDetails.status=='Cancelled' ? '' : 
+            {orderDetails.status=='Cancelled' ||  orderDetails.status=='Delivered'? '' : 
                   <Button
                   className="mt-6 w-full bg-black text-white hover:bg-gray-800"
                   onClick={handleCancelOrder}
@@ -162,6 +178,14 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
               Cancel Order
             </Button>
             }
+               {orderDetails.status=='Delivered' &&  orderDetails.variant?.returnOrder!='Pending'?
+                  <Button
+                  className="mt-6 w-full bg-black text-white hover:bg-gray-800"
+                  onClick={handleReturnOrder}
+                  >
+              Return Product
+            </Button>:''
+              }
 
             <Button
               className="mt-6 w-full bg-black text-white hover:bg-gray-800"
@@ -170,7 +194,7 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
               Close
             </Button>
           </motion.div>
-          {orderCancelPop && <OrderCancellationModal isOpen={orderCancelPop}  orderId={orderId} setIsOpen={setOrderCancelPop}/>}
+          {orderCancelPop && <OrderCancellationModal isOpen={orderCancelPop}  isCancel={cancel} isReturnreturn={isReturn} orderItemId={orderItemId}  orderId={orderId} setIsOpen={setOrderCancelPop}/>}
         </motion.div>
       )}
     </AnimatePresence>

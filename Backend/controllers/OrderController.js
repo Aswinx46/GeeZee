@@ -87,7 +87,7 @@ const createOrder = async (req, res) => {
         const orderItems = cartItems.map((item) => ({
             productId: item.id,
             quantity: item.quantity,
-            price: item.variants[0].price,
+            price: item.variants[0].price, 
             variant: item.variants[0]
             // variantId:changeVariant
         }))
@@ -202,6 +202,8 @@ const showOrders = async (req, res) => {
 
 const cancelOrder = async (req, res) => {
     const { orderId } = req.params
+    const{reason}=req.body
+    console.log(reason)
     console.log('this is canceling order id', orderId)
     try {
 
@@ -222,7 +224,7 @@ const cancelOrder = async (req, res) => {
 
 
         // const order=await Cart.findByIdAndDelete(mongoose.Types.ObjectId(orderId))
-        const order = await Order.findByIdAndUpdate(orderId, { status: 'Cancelled' }, { new: true })
+        const order = await Order.findByIdAndUpdate(orderId, { status: 'Cancelled' ,CancellationReason:reason}, { new: true })
         if (!order) return res.status(400).json({ message: 'no order to update' })
         return res.status(200).json({ message: "Order Cancelled" })
     } catch (error) {
@@ -234,7 +236,7 @@ const cancelOrder = async (req, res) => {
 const showAllOrders = async (req, res) => {
 
     try {
-        const orders = await Order.find().populate('address').populate('userId', 'lastName firstName email phoneNo').populate('orderItems.productId', 'productImg title')
+        const orders = await Order.find().populate('orderItems.productId', 'productImg title').populate('address').populate('userId', 'lastName firstName email phoneNo')
         if (!orders) return res.status(400).json({ message: 'no order found' })
         return res.status(200).json({ message: "order details fetched", orders })
     } catch (error) {
@@ -260,11 +262,70 @@ const changeOrderStatus = async (req, res) => {
     }
 }
 
+const returnOrderProduct=async (req,res) => {
+    try {
+        const {orderId}=req.params
+        const {orderItemId}=req.params
+        const{returnReason}=req.body
+        // console.log('this is order id',orderId)
+        // console.log('this is orderItemId',orderItemId)
+        // console.log('this is the return reason',returnReason)
+        const selectedOrder=await Order.findById(orderId)
+        // console.log('this is the selcted order',selectedOrder)
+        const selectedVariant=selectedOrder.orderItems.find((item)=>item._id.toString() == orderItemId.toString())
+        console.log('this is the selected varient',selectedVariant)
+        selectedVariant.variant.returnOrder='Pending'
+        selectedVariant.variant.returnReason=returnReason
+        
+        console.log('this is selctedORder',selectedVariant)
+        await selectedOrder.save()
+
+        return res.status(200).json({message:"Return request Sended"})
+    } catch (error) {
+        console.log('error while returning the product',error)
+        return res.status(500).json({message:"error while returning the product",error})
+    }
+}
+
+const getReturnProducts=async(req,res)=>{
+    try {
+        const orders=await Order.find({'orderItems.variant.returnOrder':'Pending'},{ userId: 1, _id: 1 ,orderItems:1,
+            orderId:1,paymentMethod:1,invoiceDate:1}).populate('orderItems.productId', 'title productImg price').populate('address').populate('userId','firstName lastName email phoneNo');
+        console.log(orders)
+        return res.status(200).json({message:'data fetched',orders})
+    } catch (error) {
+        console.log('error while fetching return order produtcs',error)
+        res.status(500).json({message:"error while fetching return order products"})
+    }
+}
+
+const confirmOrder=async(req,res)=>{
+    try {
+        const {orderId}=req.params
+        console.log(orderId)
+        // const update=await Order.findByIdAndUpdate(orderId,{'orderItems.variant.returnOrder' : 'Accepted'},{new:true})
+        const update = await Order.findOneAndUpdate(
+            { _id: orderId, 'orderItems.variant.returnOrder': 'Pending'},
+            { $set: { 'orderItems.$.variant.returnOrder': 'Accepted' } },
+            { new: true }
+          );
+
+        if(!update) return res.status(400).json({message:"no order found"})
+            return res.status(200).json({message:"order Updated"})
+    } catch (error) {
+     console.log('error while confirming the return order',error)
+     return res.status(500).json({message:"error while accepting return order",error})   
+    }
+}
+
 module.exports = {
     createOrder,
     showOrders,
     cancelOrder,
     showAllOrders,
     changeOrderStatus,
-    verifyPayment
+    verifyPayment,
+    returnOrderProduct,
+    getReturnProducts,
+    confirmOrder
 }
