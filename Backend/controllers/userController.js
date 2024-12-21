@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
 const mongoose = require('mongoose')
 require('dotenv').config()
+const Wallet = require('../models/WalletSchema.js')
 
 function genarateOtp() {
     return Math.floor(100000 + Math.random() * 900000).toString()
@@ -97,6 +98,10 @@ const otpVerification = async (req, res) => {
                 isAdmin: 0
             })
             await user.save()
+            const wallet = new Wallet({
+                userId: user._id,
+            })
+            await wallet.save()
             console.log(user)
             return res.json({ message: "user created" })
         } else {
@@ -105,6 +110,7 @@ const otpVerification = async (req, res) => {
 
     } catch (error) {
         console.log(error)
+        return res.status(500).json({message:'error while creaing account'})
     }
 }
 
@@ -148,9 +154,14 @@ const googleSave = async (req, res) => {
 
         })
         await newUser.save()
+        const wallet = new Wallet({
+            userId: newUser._id,
+        })
+        await wallet.save()
         return res.status(201).json({ message: "the user created" })
     } catch (error) {
         console.log('google user is not saved', error)
+        return res.status(500).json({ message: 'error while creating google account' })
     }
 }
 

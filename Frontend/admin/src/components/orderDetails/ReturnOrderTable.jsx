@@ -179,8 +179,8 @@ const OrderDetailsModal = ({ order, onClose }) => {
             toast.success(response.data.message)
             window.location.reload();
         } catch (error) {
-            console.error('Error confirming return:', error);
-            toast.error('error while accepting return product')
+            console.log('Error confirming return:', error);
+            toast.error(error.response.data.message)
         }
     };
 

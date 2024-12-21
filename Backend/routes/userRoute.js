@@ -8,7 +8,7 @@ const cartController = require('../controllers/cartController')
 const addressController = require('../controllers/AddressController')
 const orderController = require('../controllers/OrderController')
 const brandController = require('../controllers/BrandController')
-
+const WalletController=require('../controllers/WalletController')
 
 
 user_route.post('/signup', userController.signup)
@@ -18,7 +18,7 @@ user_route.post('/googleAuthenticate', userController.googleSave)
 user_route.post('/login', userController.login)
 user_route.post('/refreshToken', userController.refreshToken)
 user_route.patch('/changePassword/:userId', auth.authToken, userController.changePassword)
-user_route.put('/changeUserInfo/:userId',auth.authToken,userController.changeInformation)
+user_route.put('/changeUserInfo/:userId', auth.authToken, userController.changeInformation)
 
 
 user_route.get('/products', productController.showProductListed)
@@ -41,12 +41,12 @@ user_route.put('/editAddress', auth.authToken, addressController.editAddress)
 user_route.post('/createOrder/:userId/:variantId', auth.authToken, orderController.createOrder)
 user_route.get('/orderDetails/:userId', auth.authToken, orderController.showOrders)
 user_route.patch('/cancelOrder/:orderId', auth.authToken, orderController.cancelOrder)
-user_route.post('/confirmPayment/:userId',auth.authToken,orderController.verifyPayment)
-user_route.patch('/returnProduct/:orderId/:orderItemId',auth.authToken,orderController.returnOrderProduct)
+user_route.post('/confirmPayment/:userId', auth.authToken, orderController.verifyPayment)
+user_route.patch('/returnProduct/:orderId/:orderItemId', auth.authToken, orderController.returnOrderProduct)
 
 user_route.get('/brands', auth.authToken, brandController.showBrand)
 user_route.get('/categories', auth.authToken, categoryController.showCategory)
-
-
 user_route.get('/category', categoryController.showCategory)
+
+user_route.get('/getWalletDetails/:userId',auth.authToken,WalletController.getWalletDetails)
 module.exports = user_route

@@ -1,16 +1,31 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PlusCircle, SendHorizontal, ScanLine, ChevronRight } from 'lucide-react';
-
+import axios from '../../axios/userAxios'
+import { useSelector } from 'react-redux';
 const Wallet = () => {
+
+  const user = useSelector(state => state.user.user)
   const [balance, setBalance] = useState(1234.56);
   const [transactions, setTransactions] = useState([
     { id: 1, description: 'Coffee Shop', amount: -4.50, date: '2023-06-15' },
     { id: 2, description: 'Salary Deposit', amount: 2000, date: '2023-06-14' },
     { id: 3, description: 'Grocery Store', amount: -65.30, date: '2023-06-13' },
   ]);
-
+  const [wallet, setWallet] = useState({})
   const [isLoading, setIsLoading] = useState(false);
+  const[totalAmount,setTotalAmount]=useState(0)
+  useEffect(() => {
+    const fetchData = async () => {
+      const walletDetails = await axios.get(`/getWalletDetails/${user._id}`)
+      console.log(walletDetails.data.wallet)
+      setWallet(walletDetails.data.wallet)
+      const totalAmount=walletDetails.data.wallet.transactions.reduce((acc,transaction)=>acc+transaction.amount,0)
+      console.log(totalAmount)
+      setTotalAmount(totalAmount)
+    }
+    fetchData()
+  }, [])
 
   const handleAddMoney = () => {
     setIsLoading(true);
@@ -54,7 +69,7 @@ const Wallet = () => {
             animate={{ y: 0, opacity: 1 }}
             className="text-3xl font-bold"
           >
-            ${balance.toFixed(2)}
+            ₹{totalAmount.toFixed(2)}
           </motion.h2>
         </motion.div>
 
@@ -88,24 +103,34 @@ const Wallet = () => {
         >
           <h3 className="text-lg font-semibold mb-4">Recent Transactions</h3>
           <AnimatePresence>
-            {transactions.map((transaction, index) => (
-              <motion.div
-                key={transaction.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ delay: index * 0.1 }}
-                className="flex justify-between items-center border-b border-gray-200 py-3"
-              >
-                <div>
-                  <p className="font-medium">{transaction.description}</p>
-                  <p className="text-sm text-gray-500">{transaction.date}</p>
-                </div>
-                <p className={`font-semibold ${transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  ${Math.abs(transaction.amount).toFixed(2)}
-                </p>
-              </motion.div>
-            ))}
+            {wallet?.transactions?.length == 0 ? <motion.h3
+              className="text-center text-lg font-bold text-gray-700 mt-5"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+            >
+              No Transaction
+            </motion.h3> :
+
+              wallet?.transactions?.map((transaction, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="flex justify-between items-center border-b border-gray-200 py-3"
+                >
+                  <div>
+                    <p className="font-medium">{transaction.description}</p>
+                    <p className="text-sm text-gray-500">{transaction.date}</p>
+                  </div>
+                  <p className={`font-semibold ${transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    ${Math.abs(transaction.amount).toFixed(2)}
+                  </p>
+                </motion.div>
+              ))
+            }
           </AnimatePresence>
         </motion.div>
 

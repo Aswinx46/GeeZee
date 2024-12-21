@@ -51,12 +51,14 @@ const OrderCancellationModal = ({ isOpen, onClose, onConfirm, orderId,isReturn,o
     {
       console.log('this is inside canecl')
       const response = await axios.patch(`/cancelOrder/${orderId}`,{reason:cancellationReason})
+      console.log(response)
     }else{
       console.log('this is inside return')
       console.log(returnReason)
       console.log(orderId)
       console.log(orderItemId,'this is the item id')
-      const respones= await axios.patch(`returnProduct/${orderId}/${orderItemId}`,{returnReason})
+      const response= await axios.patch(`returnProduct/${orderId}/${orderItemId}`,{returnReason})
+      console.log(response)
     }
     setIsCancelled(true);
     

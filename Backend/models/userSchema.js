@@ -49,7 +49,7 @@ const userSchema= new mongoose.Schema({
     cart:[{
         type:Schema.Types.ObjectId,
         ref:"cart"
-    }]
+    }],
 })
 
 module.exports=mongoose.model('user',userSchema)

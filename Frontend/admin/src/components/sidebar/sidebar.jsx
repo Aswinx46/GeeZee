@@ -22,6 +22,8 @@ const Sidebar = () => {
     { icon: FaList, text: 'Categories', href: '/categoryManagement' },
     { icon: FaIndustry , text: 'Brand', href: '/BrandManagement' },
     { icon: FaArrowCircleLeft , text: 'Return Orders', href: '/returnOrderDetails' },
+    { icon: FaArrowCircleLeft , text: 'Coupon', href: '/addCoupon' },
+
   ];
   const navigate=useNavigate()
   const handleLogout=()=>{

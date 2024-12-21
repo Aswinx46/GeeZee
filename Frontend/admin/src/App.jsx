@@ -19,6 +19,7 @@ import BrandManagement from './components/BrandManagement/BrandManagement';
 import OrderDetails from './components/orderDetails/SpecificOrderDetail';
 import OrderTable from './components/orderDetails/OrderTable';
 import ReturnedOrdersTable from './components/orderDetails/ReturnOrderTable';
+import CouponCreationForm from './components/CouponManagement/CouponCreation';
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
   
@@ -46,6 +47,8 @@ function App() {
           <Route path='/BrandManagement' element={<ProtectedRoute> <BrandManagement /></ProtectedRoute>} />
           <Route path='/orderDetails' element={<ProtectedRoute> <OrderTable /></ProtectedRoute>} />
           <Route path='/returnOrderDetails' element={<ProtectedRoute> <ReturnedOrdersTable /></ProtectedRoute>} />
+          <Route path='/addCoupon' element={<ProtectedRoute> <CouponCreationForm /></ProtectedRoute>} />
+
         </Routes>
       </LayoutWrapper>
     </BrowserRouter>

@@ -6,6 +6,8 @@ const product = require('../models/productSchema')
 const Cart = require('../models/CartSchema')
 const mongoose = require('mongoose')
 const Razorpay = require('razorpay')
+const { v4: uuidv4 } = require('uuid')
+const Wallet=require('../models/WalletSchema')
 require('dotenv').config()
 const crypto = require('crypto');
 const productBlockCheckingFunction = async (productId, brandId, categoryId) => {
@@ -61,7 +63,7 @@ const createOrder = async (req, res) => {
             }
             console.log('this is the all variants', allVariants)
         }
-        let razorPayIdOrder=null    
+        let razorPayIdOrder = null
         if (paymentMethod === 'Razorpay') {
             const razorpayOptions = {
                 amount: (total + shippingCharge) * 100,
@@ -72,8 +74,8 @@ const createOrder = async (req, res) => {
             const razorpayOrder = await razorpay.orders.create(razorpayOptions)
             console.log('this is  razorpay order', razorpayOrder)
             if (!razorpayOrder) return res.status(500).json({ message: "Razorpay payment Failed" })
-                razorPayIdOrder=razorpayOrder.id
-        
+            razorPayIdOrder = razorpayOrder.id
+
             res.status(200).json({
                 message: "Razorpay order created successfully",
                 razorpayOrderId: razorpayOrder.id,
@@ -87,7 +89,7 @@ const createOrder = async (req, res) => {
         const orderItems = cartItems.map((item) => ({
             productId: item.id,
             quantity: item.quantity,
-            price: item.variants[0].price, 
+            price: item.variants[0].price,
             variant: item.variants[0]
             // variantId:changeVariant
         }))
@@ -108,12 +110,12 @@ const createOrder = async (req, res) => {
         console.log('haskjdhf')
 
 
-  
 
 
-       
 
-   
+
+
+
         if (paymentMethod != 'Razorpay') {
             await Cart.updateOne({ userId }, { $set: { items: [] } })
             console.log('this is inside the cod')
@@ -130,13 +132,13 @@ const createOrder = async (req, res) => {
 
 
 const verifyPayment = async (req, res) => {
-    const { paymentId, orderId,signature } = req.body;
-    const{userId}=req.params
-    console.log('this is the payment id',paymentId,'this is the orderid',orderId)
+    const { paymentId, orderId, signature } = req.body;
+    const { userId } = req.params
+    console.log('this is the payment id', paymentId, 'this is the orderid', orderId)
     try {
         // Step 1: Fetch payment details from Razorpay
         const paymentDetails = await razorpay.payments.fetch(paymentId);
-        console.log('this is the ',paymentDetails)
+        console.log('this is the ', paymentDetails)
         if (paymentDetails.status !== 'captured') {
             return res.status(400).json({ message: 'Payment not successful. Please try again.' });
         }
@@ -146,9 +148,9 @@ const verifyPayment = async (req, res) => {
             .createHmac('sha256', process.env.RAZORPAY_SECRET)
             .update(`${orderId}|${paymentId}`)
             .digest('hex');
-        console.log('this isthe genarated signature',generatedSignature)
-        console.log('this is the genarated signature =',generatedSignature)
-        console.log('this is the sended signature',signature)
+        console.log('this isthe genarated signature', generatedSignature)
+        console.log('this is the genarated signature =', generatedSignature)
+        console.log('this is the sended signature', signature)
         if (generatedSignature !== signature) {
             return res.status(400).json({ message: 'Payment verification failed. Possible fraud detected.' });
         }
@@ -202,7 +204,7 @@ const showOrders = async (req, res) => {
 
 const cancelOrder = async (req, res) => {
     const { orderId } = req.params
-    const{reason}=req.body
+    const { reason } = req.body
     console.log(reason)
     console.log('this is canceling order id', orderId)
     try {
@@ -224,7 +226,7 @@ const cancelOrder = async (req, res) => {
 
 
         // const order=await Cart.findByIdAndDelete(mongoose.Types.ObjectId(orderId))
-        const order = await Order.findByIdAndUpdate(orderId, { status: 'Cancelled' ,CancellationReason:reason}, { new: true })
+        const order = await Order.findByIdAndUpdate(orderId, { status: 'Cancelled', CancellationReason: reason }, { new: true })
         if (!order) return res.status(400).json({ message: 'no order to update' })
         return res.status(200).json({ message: "Order Cancelled" })
     } catch (error) {
@@ -262,59 +264,106 @@ const changeOrderStatus = async (req, res) => {
     }
 }
 
-const returnOrderProduct=async (req,res) => {
+const returnOrderProduct = async (req, res) => {
     try {
-        const {orderId}=req.params
-        const {orderItemId}=req.params
-        const{returnReason}=req.body
-        // console.log('this is order id',orderId)
-        // console.log('this is orderItemId',orderItemId)
-        // console.log('this is the return reason',returnReason)
-        const selectedOrder=await Order.findById(orderId)
+        const { orderId } = req.params
+        const { orderItemId } = req.params
+        const { returnReason } = req.body
+
+        const selectedOrder = await Order.findById(orderId)
         // console.log('this is the selcted order',selectedOrder)
-        const selectedVariant=selectedOrder.orderItems.find((item)=>item._id.toString() == orderItemId.toString())
-        console.log('this is the selected varient',selectedVariant)
-        selectedVariant.variant.returnOrder='Pending'
-        selectedVariant.variant.returnReason=returnReason
-        
-        console.log('this is selctedORder',selectedVariant)
+        const selectedVariant = selectedOrder.orderItems.find((item) => item._id.toString() == orderItemId.toString())
+        console.log('this is the selected varient', selectedVariant)
+        selectedVariant.variant.returnOrder = 'Pending'
+        selectedVariant.variant.returnReason = returnReason
+
+        console.log('this is selctedORder', selectedVariant)
         await selectedOrder.save()
 
-        return res.status(200).json({message:"Return request Sended"})
+        return res.status(200).json({ message: "Return request Sended" })
     } catch (error) {
-        console.log('error while returning the product',error)
-        return res.status(500).json({message:"error while returning the product",error})
+        console.log('error while returning the product', error)
+        return res.status(500).json({ message: "error while returning the product", error })
     }
 }
 
-const getReturnProducts=async(req,res)=>{
+const getReturnProducts = async (req, res) => {
     try {
-        const orders=await Order.find({'orderItems.variant.returnOrder':'Pending'},{ userId: 1, _id: 1 ,orderItems:1,
-            orderId:1,paymentMethod:1,invoiceDate:1}).populate('orderItems.productId', 'title productImg price').populate('address').populate('userId','firstName lastName email phoneNo');
-        console.log(orders)
-        return res.status(200).json({message:'data fetched',orders})
+        const orders = await Order.find({ 'orderItems.variant.returnOrder': 'Pending' }, {
+            userId: 1, _id: 1, orderItems: 1,
+            orderId: 1, paymentMethod: 1, invoiceDate: 1
+        }).populate('orderItems.productId', 'title productImg price').populate('address').populate('userId', 'firstName lastName email phoneNo');
+        console.log('this is the orders', orders)
+        const filteredOrders = orders.map((order) => ({
+            ...order.toObject(), // Convert Mongoose document to plain JavaScript object
+            orderItems: order.orderItems.filter(
+                (item) => item.variant.returnOrder === 'Pending'
+            ),
+        }));
+        return res.status(200).json({ message: 'data fetched', orders: filteredOrders })
     } catch (error) {
-        console.log('error while fetching return order produtcs',error)
-        res.status(500).json({message:"error while fetching return order products"})
+        console.log('error while fetching return order produtcs', error)
+        res.status(500).json({ message: "error while fetching return order products" })
     }
 }
 
-const confirmOrder=async(req,res)=>{
+const confirmReturnProduct = async (req, res) => {
     try {
-        const {orderId}=req.params
+        const { orderId } = req.params
         console.log(orderId)
         // const update=await Order.findByIdAndUpdate(orderId,{'orderItems.variant.returnOrder' : 'Accepted'},{new:true})
         const update = await Order.findOneAndUpdate(
-            { _id: orderId, 'orderItems.variant.returnOrder': 'Pending'},
+            { _id: orderId, 'orderItems.variant.returnOrder': 'Pending' },
             { $set: { 'orderItems.$.variant.returnOrder': 'Accepted' } },
             { new: true }
-          );
+        );
+        console.log('this is update',update)
+        if(!update)return res.status(400).json({message:"no order found"})
+        const returnedVariant = update.orderItems.find((item) => item.variant.returnOrder == 'Accepted')
+        console.log('this is the returned varient', returnedVariant)
+        const { productId,variant, quantity } = returnedVariant
+        if (!returnedVariant) {
+            return res.status(400).json({ message: "No matching item found for return" });
+        }
+        const selectedProduct = await Product.findByIdAndUpdate(productId, {
+            $inc: { "variants.$[variantFilter].stock": quantity }, // Increment stock for the matched variant
+        }, {
+            new: true,
+            arrayFilters: [
+                { "variantFilter._id": variant._id }, // Filter for the correct variant
+            ],
+        }
+        )
+        if (!selectedProduct) {
+            return res.status(400).json({ message: "Failed to update variant stock" });
+        }
 
-        if(!update) return res.status(400).json({message:"no order found"})
-            return res.status(200).json({message:"order Updated"})
+        console.log('this is the update', update)
+        const userId=update.userId
+        console.log('this is the user id',userId)
+    const wallet=await Wallet.findOne({userId})
+
+    if(!wallet) return res.status(400).json({message:'no wallet found'})
+            
+        // wallet.transactions.type= `${update.paymentMethod} (Return amount)`
+        // wallet.transactions.transaction_id= () => uuidv4()
+        // wallet.transactions.amount=returnedVariant.quantity * returnedVariant.price
+        // wallet.transactions.description='Product Returned amount'
+
+        const transaction = {
+            type: 'Refund',
+            transaction_id: uuidv4(), // Generate a unique transaction ID
+            amount: returnedVariant.quantity * returnedVariant.price,
+            description: 'Product Returned amount',
+            date: new Date(), // Add a timestamp for the transaction
+        };
+        wallet.transactions.push(transaction)
+        await wallet.save()
+        console.log('this is the wallet',wallet)
+        return res.status(200).json({ message: "order Updated", update,selectedProduct})
     } catch (error) {
-     console.log('error while confirming the return order',error)
-     return res.status(500).json({message:"error while accepting return order",error})   
+        console.log('error while confirming the return order', error)
+        return res.status(500).json({ message: "error while accepting return order", error })
     }
 }
 
@@ -327,5 +376,5 @@ module.exports = {
     verifyPayment,
     returnOrderProduct,
     getReturnProducts,
-    confirmOrder
+    confirmReturnProduct
 }
