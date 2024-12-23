@@ -1,7 +1,7 @@
 const mongoose=require('mongoose')
 const {Schema}=mongoose
 
-const CouponSchema=new mongoose({
+const CouponSchema=new mongoose.Schema({
     name:{
         type:String,
         required:true,
@@ -12,8 +12,16 @@ const CouponSchema=new mongoose({
         default:Date.now,
         required:true
     },
+    CouponType:{
+        type:String,
+        enum:['fixed','percentage']
+    },
     expireOn:{
         type:Date,
+        required:true
+    },
+    description:{
+        type:String,
         required:true
     },
     offerPrice:{

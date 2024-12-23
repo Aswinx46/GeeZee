@@ -22,9 +22,12 @@ const CheckoutPage = () => {
   const [couponCode, setCouponCode] = useState('');
   const [couponApplied, setCouponApplied] = useState(false);
   const [isOpen, setIsOpen] = useState(false)
+  const [showCoupons, setShowCoupons] = useState(false);
   const navigate = useNavigate()
   const [shippingCharge, setShippingCharge] = useState(40)
-
+  const [coupons, setCoupons] = useState([])
+  const [selectedCoupon, setSelectedCoupon] = useState()
+  const [appliedCoupon, setAppliedCoupon] = useState(null)
   useEffect(() => {
     console.log('Razorpay Key:', RAZORPAY_KEY_ID);
     const fetchData = async () => {
@@ -32,6 +35,12 @@ const CheckoutPage = () => {
       const defaultAdd = addresses.data.address.find((address) => address.defaultAddress == true)
       setDefaultAddress(defaultAdd)
 
+      const coupon = await axios.get('/showCoupons')
+      console.log(coupon.data.allCoupons)
+      const notUsedCoupons = coupon.data.allCoupons.filter((coupon) =>
+        !coupon.userId.includes(userId))
+      console.log('this is the not used coupon', notUsedCoupons)
+      setCoupons(notUsedCoupons)
       setMainAddress((prev) => {
         return selectedAddress ? selectedAddress : defaultAdd;
       });
@@ -89,12 +98,16 @@ const CheckoutPage = () => {
       toast.error('Product is blocked by admin remove the product to continue purchase')
       return
     }
+    if(!mainAddress){
+      toast.error('No address Selected')
+      return
+    }
     try {
       // if(paymentMethod === 'Razorpay')
       // {
       //   console.log('this is inside razorpay')
       // }
-      const response = await axios.post(`/createOrder/${userId}/${variantId}`, { mainAddress, cartItems, paymentMethod, total, shippingCharge })
+      const response = await axios.post(`/createOrder/${userId}/${variantId}`, { mainAddress, cartItems, paymentMethod, total, shippingCharge,selectedCoupon })
       console.log('this is the response', response)
       if (paymentMethod == 'Razorpay') {
         console.log('inside razor')
@@ -169,6 +182,20 @@ const CheckoutPage = () => {
     // navigate('/address')
   }
 
+  const handleCouponApply = () => {
+    setCouponApplied(true)
+    const appliedCoupon = coupons.find((coupon) => coupon.name == couponCode)
+    if(!appliedCoupon)
+    if(total<appliedCoupon.minimumPrice) 
+      {
+        toast.error(`minimum total amount is ${appliedCoupon.minimumPrice}`)
+        return
+      }
+    if(!appliedCoupon) toast.error('Invalid Coupon')
+    setAppliedCoupon(appliedCoupon)
+    console.log(appliedCoupon)
+
+  }
 
   const handleSelectAddress = async (address) => {
     toast.success('Address changed')
@@ -179,6 +206,21 @@ const CheckoutPage = () => {
       console.error('Error updating default address:', error);
     }
   };
+
+  const handleCouponSelect = async (id) => {
+    console.log(id)
+    const selectedCoupon = coupons.find((coupon) => coupon._id == id)
+    if(!selectedCoupon) toast.error('No coupon found')
+ 
+    setSelectedCoupon(selectedCoupon)
+    setCouponCode(selectedCoupon.name)
+  }
+
+  const handleClearCoupon = () => {
+    setCouponCode('')
+    setSelectedCoupon('')
+    setAppliedCoupon(null)
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
@@ -357,34 +399,71 @@ const CheckoutPage = () => {
             <div className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Summary</h2>
               <div className="space-y-4">
-                <div className="flex justify-between">
+                <motion.div 
+                  className="flex justify-between items-center text-sm text-gray-600 border-b pb-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                >
                   <span>Subtotal</span>
-                  <span>₹{total}</span>
-                </div>
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  className="flex justify-between text-green-600"
+                  <span className="font-medium">₹{total}</span>
+                </motion.div>
+
+                <motion.div 
+                  className="flex justify-between items-center text-sm text-gray-600 pb-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
                 >
                   <span>Shipping Charge</span>
-                  <span>₹{shippingCharge}</span>
+                  <span className="font-medium">₹{shippingCharge}</span>
                 </motion.div>
-                {couponApplied && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    className="flex justify-between text-green-600"
+
+                {appliedCoupon && (
+                  <motion.div 
+                    className="flex justify-between items-center space-x-2 text-sm border-b pb-4"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
                   >
-                    <span>Discount</span>
-                    <span>-₹20.00</span>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-gray-600">Applied Coupon:</span>
+                      <span className="font-medium text-green-600">{appliedCoupon.name}</span>
+                    </div>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => setAppliedCoupon(null)}
+                      className="text-gray-400 hover:text-red-500 transition-colors"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </motion.button>
                   </motion.div>
                 )}
-                <div className="border-t pt-4">
-                  <div className="flex justify-between font-semibold">
-                    <span>Total</span>
-                    <span>₹{couponApplied ? total - 20 : total + shippingCharge}</span>
-                  </div>
-                </div>
+
+                <motion.div 
+                  className="flex justify-between items-center pt-4 text-lg font-semibold"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <span>Total</span>
+                  {appliedCoupon ? <span className="text-black">₹{total + shippingCharge - appliedCoupon.offerPrice}</span>  : <span className="text-black">₹{total + shippingCharge}</span>}
+
+                </motion.div>
               </div>
             </div>
 
@@ -395,23 +474,91 @@ const CheckoutPage = () => {
               transition={{ delay: 0.2 }}
               className="bg-white rounded-lg shadow-md p-6"
             >
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Have a Coupon?</h2>
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={couponCode}
-                  onChange={(e) => setCouponCode(e.target.value)}
-                  placeholder="Enter coupon code"
-                  className="flex-1 border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black focus:border-black"
-                />
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setCouponApplied(true)}
-                  className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800"
-                >
-                  Apply
-                </motion.button>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Have a Coupon?</h2>
+              <div className="space-y-4">
+                <div className="flex space-x-2">
+                  <input
+                    type="text"
+                    value={couponCode || selectedCoupon?.name || ''}
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    placeholder="Enter coupon code"
+                    className="flex-1 border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black focus:border-black"
+                  />
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => handleClearCoupon()}
+                    className="px-2 py-1 text-gray-500 hover:text-black transition duration-200"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => handleCouponApply()}
+                    className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800"
+                  >
+                    Apply
+                  </motion.button>
+                </div>
+
+                <div className="mt-2">
+                  <motion.button
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
+                    onClick={() => setShowCoupons(!showCoupons)}
+                    className="text-sm text-gray-600 flex items-center"
+                  >
+                    {showCoupons ? 'Hide Available Coupons' : 'Show Available Coupons'}
+                    <ChevronDown
+                      className={`ml-1 h-4 w-4 transform transition-transform duration-200 ${showCoupons ? 'rotate-180' : ''
+                        }`}
+                    />
+                  </motion.button>
+
+                  <AnimatePresence>
+                    {showCoupons && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="mt-2 space-y-2 overflow-hidden"
+                      >
+                        {coupons.map((coupon, index) => (
+                          <motion.div
+                            key={coupon?._id}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="p-3 border rounded-md bg-gray-50 hover:bg-gray-100 transition-colors"
+                          >
+                            <div onClick={() => handleCouponSelect(coupon._id)} className="flex justify-between items-center cursor-pointer">
+                              <div>
+                                <p className="font-semibold text-gray-800">{coupon?.name}</p>
+                                <p className="text-sm text-gray-500">Min. Purchase: {coupon?.minimumPrice}</p>
+                              </div>
+                              <div className="text-green-600 font-bold">{coupon?.offerPrice}</div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
             </motion.div>
 
@@ -476,9 +623,9 @@ const CheckoutPage = () => {
             </motion.button>
           </motion.div>
         </div>
-      </div>
-      {isOpen && userId && <AddressModal isOpen={isOpen} setIsOpen={setIsOpen} userId={userId} />}
-    </div>
+      </div >
+  { isOpen && userId && <AddressModal isOpen={isOpen} setIsOpen={setIsOpen} userId={userId} />}
+    </div >
   );
 };
 

@@ -91,10 +91,10 @@ const orderSchema = new mongoose.Schema({
         default: Date.now,
         required: true
     },
-    couponApplied: {
-        type: Boolean,
-        default: false
-    },
+    // couponApplied: {
+    //     type: Boolean,
+    //     default: false
+    // },
     paymentMethod: {
         type: String,
         enum: ['Credit card', 'Debit Card', 'Net Banking', 'UPI', 'Cash on Delivery', 'Razorpay'],

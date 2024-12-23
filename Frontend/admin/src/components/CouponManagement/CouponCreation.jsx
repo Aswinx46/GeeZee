@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Ticket, Percent, DollarSign, FileText, Hash, Calendar, Users } from 'lucide-react';
-import { toast } from 'sonner';
+import { Ticket, Percent, DollarSign, FileText, Hash, Calendar, Users, ArrowLeft } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-
+import { useNavigate } from 'react-router-dom';
+import axios from '../../../axios/adminAxios'
 const CouponCreationForm = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     couponCode: '',
     couponType: '',
@@ -16,6 +18,7 @@ const CouponCreationForm = () => {
     description: '',
     limit: '',
     expireDate: '',
+    minimumPrice: '',
   });
 
   const [errors, setErrors] = useState({
@@ -23,6 +26,7 @@ const CouponCreationForm = () => {
     discountValue: '',
     limit: '',
     expireDate: '',
+    minimumPrice: '',
   });
 
   const validateForm = () => {
@@ -51,6 +55,15 @@ const CouponCreationForm = () => {
     // Usage limit validation
     if (formData.limit && parseInt(formData.limit) <= 0) {
       tempErrors.limit = 'Usage limit must be greater than 0';
+      isValid = false;
+    }
+
+    // Minimum price validation
+    if (!formData.minimumPrice) {
+      tempErrors.minimumPrice = 'Minimum price is required';
+      isValid = false;
+    } else if (parseFloat(formData.minimumPrice) <= 0) {
+      tempErrors.minimumPrice = 'Minimum price must be greater than 0';
       isValid = false;
     }
 
@@ -88,35 +101,40 @@ const CouponCreationForm = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (validateForm()) {
       console.log('Coupon creation data:', formData);
-      toast.success(`Coupon ${formData.couponCode} has been created successfully.`, {
-        description: 'The new coupon is now active and ready to use.',
-      });
-      // Reset form after submission
-      setFormData({
-        couponCode: '',
-        couponType: '',
-        discountValue: '',
-        description: '',
-        limit: '',
-        expireDate: '',
-      });
-      setErrors({});
+      try {
+        const response = await axios.post('/createCoupon', { formData })
+        toast.success(`Coupon ${response.data.newCoupon.couponCode} has been created successfully.`);
+        // Reset form after submission
+        setFormData({
+          couponCode: '',
+          couponType: '',
+          discountValue: '',
+          description: '',
+          limit: '',
+          expireDate: '',
+          minimumPrice: '',
+        });
+        setErrors({});
+      } catch (error) {
+        console.log('error while creating the coupon',error)
+     
+        toast.error(error.response.data.message)
+      }
+
     } else {
-      toast.error('Please fix the errors in the form', {
-        description: 'Some fields need your attention.',
-      });
+      toast.error('Please fix the errors in the form');
     }
   };
 
   const formVariants = {
     hidden: { opacity: 0, y: 50 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       transition: {
         type: "spring",
@@ -138,6 +156,14 @@ const CouponCreationForm = () => {
       animate="visible"
       variants={formVariants}
     >
+      <Button
+        variant="ghost"
+        className="mb-4"
+        onClick={() => navigate(-1)}
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Back
+      </Button>
       <h2 className="text-2xl font-bold mb-6 flex items-center justify-center">
         <Ticket className="mr-2" />
         Create New Coupon
@@ -206,7 +232,7 @@ const CouponCreationForm = () => {
             />
           </motion.div>
         </div>
-        <div>
+        {/* <div>
           <Label htmlFor="limit">Usage Limit</Label>
           <motion.div variants={inputVariants} whileFocus="focus" initial="blur" animate="blur">
             <Input
@@ -219,6 +245,22 @@ const CouponCreationForm = () => {
               icon={<Users className="text-gray-400" />}
             />
             {errors.limit && <p className="text-red-500 text-sm mt-1">{errors.limit}</p>}
+          </motion.div>
+        </div> */}
+        <div>
+          <Label htmlFor="minimumPrice">Minimum Price</Label>
+          <motion.div variants={inputVariants} whileFocus="focus" initial="blur" animate="blur">
+            <Input
+              id="minimumPrice"
+              name="minimumPrice"
+              type="number"
+              value={formData.minimumPrice}
+              onChange={handleChange}
+              required
+              className={`w-full ${errors.minimumPrice ? 'border-red-500' : ''}`}
+              icon={<DollarSign className="text-gray-400" />}
+            />
+            {errors.minimumPrice && <p className="text-red-500 text-sm mt-1">{errors.minimumPrice}</p>}
           </motion.div>
         </div>
         <div>

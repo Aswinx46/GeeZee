@@ -22,7 +22,7 @@ const Sidebar = () => {
     { icon: FaList, text: 'Categories', href: '/categoryManagement' },
     { icon: FaIndustry , text: 'Brand', href: '/BrandManagement' },
     { icon: FaArrowCircleLeft , text: 'Return Orders', href: '/returnOrderDetails' },
-    { icon: FaArrowCircleLeft , text: 'Coupon', href: '/addCoupon' },
+    { icon: FaArrowCircleLeft , text: 'Coupon', href: '/couponList' },
 
   ];
   const navigate=useNavigate()

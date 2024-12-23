@@ -9,7 +9,7 @@ const addressController = require('../controllers/AddressController')
 const orderController = require('../controllers/OrderController')
 const brandController = require('../controllers/BrandController')
 const WalletController=require('../controllers/WalletController')
-
+const couponConrtoller=require('../controllers/CouponController')
 
 user_route.post('/signup', userController.signup)
 user_route.post('/otpVerification', userController.otpVerification)
@@ -47,6 +47,8 @@ user_route.patch('/returnProduct/:orderId/:orderItemId', auth.authToken, orderCo
 user_route.get('/brands', auth.authToken, brandController.showBrand)
 user_route.get('/categories', auth.authToken, categoryController.showCategory)
 user_route.get('/category', categoryController.showCategory)
+
+user_route.get('/showCoupons',auth.authToken,couponConrtoller.showCouponInUserSide)
 
 user_route.get('/getWalletDetails/:userId',auth.authToken,WalletController.getWalletDetails)
 module.exports = user_route

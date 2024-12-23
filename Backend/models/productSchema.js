@@ -28,6 +28,11 @@ const ProductSchema=new mongoose.Schema({
         type:[String],
         required:true
     },
+    productOffer:{
+        type:Number,
+        default:0,
+        required:false
+    },
     status:{
         type:String,
         enum:['active','inactive'],

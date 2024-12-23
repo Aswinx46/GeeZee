@@ -17,7 +17,12 @@ const categorySchema=new mongoose.Schema({
     products:[{
         type:Schema.Types.ObjectId,
         ref:"product"
-    }]
+    }],
+    categoryOffer:{
+        type:Number,
+        default:0,
+        required:false
+    }
 })
 
 
