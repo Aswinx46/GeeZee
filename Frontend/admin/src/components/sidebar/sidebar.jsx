@@ -15,7 +15,8 @@ import { Button } from "@/components/ui/button"
 
 const Sidebar = () => {
   const menuItems = [
-    { icon: FaHome, text: 'Dashboard', href: '/dashboard' },
+    // { icon: FaHome, text: 'Dashboard', href: '/dashboard' },
+    { icon: FaHome, text: 'Dashboard', href: '/salesReport' },
     { icon: FaBox, text: 'Products', href: '/showProduct' },
     { icon: FaShoppingCart, text: 'Orders', href: '/orderDetails' },
     { icon: FaUsers, text: 'Customers', href: '/users' },
