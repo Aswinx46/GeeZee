@@ -212,10 +212,10 @@ const showOrders = async (req, res) => {
 }
 
 const cancelOrder = async (req, res) => {
-    const { orderId } = req.params
+    const { orderId ,userId} = req.params
     const { reason } = req.body
     console.log(reason)
-    console.log('this is canceling order id', orderId)
+    console.log('this is canceling user id', userId)
     try {
 
         const selectedOrder = await Order.findById(orderId, 'orderItems')
@@ -225,7 +225,7 @@ const cancelOrder = async (req, res) => {
             quantity: items.quantity,
             productId: items.productId
         }))
-
+        console.log('this is the items')
         for (const item of details) {
             await Product.findOneAndUpdate(
                 { _id: item.productId, "variants._id": item.variantId },
@@ -233,6 +233,23 @@ const cancelOrder = async (req, res) => {
             );
         }
 
+        // const wallet = await Wallet.findOne({ userId })
+
+        // if (!wallet) return res.status(400).json({ message: 'no wallet found' })
+
+
+
+        // const transaction = {
+        //     type: 'Refund',
+        //     transaction_id: uuidv4(), // Generate a unique transaction ID
+        //     amount: returnedVariant.quantity * returnedVariant.price,
+        //     description: 'Product Returned amount',
+        //     date: new Date(), // Add a timestamp for the transaction
+        // };
+        // wallet.transactions.push(transaction)
+        // wallet.balance += returnedVariant.quantity * returnedVariant.price
+        // await wallet.save()
+        // console.log('this is the wallet', wallet)
 
         // const order=await Cart.findByIdAndDelete(mongoose.Types.ObjectId(orderId))
         const order = await Order.findByIdAndUpdate(orderId, { status: 'Cancelled', CancellationReason: reason }, { new: true })

@@ -114,7 +114,7 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
                     <img src={orderDetails.productId.productImg[0]} alt={orderDetails.productId.title} className="w-20 h-20 object-cover rounded-md mr-4" />
                     <div>
                       <h3 className="font-medium">{orderDetails.productId.title}</h3>
-                      <h3 className="font-medium">{Object.entries(item.variant.selectedAttributes).map((key)=><h1>{key.join(' : ')}</h1>)}</h3>
+                      <h3 className="font-medium">{Object.entries(item?.variant?.selectedAttributes).map((key)=><h1>{key.join(' : ')}</h1>)}</h3>
                       <p className="text-gray-500">Quantity: {orderDetails.quantity}</p>
                     </div>
                   </div>

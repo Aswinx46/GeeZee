@@ -40,7 +40,7 @@ function App() {
       <LayoutWrapper>
         <Routes>
           <Route path='/' element={  <AdminLoginPage />  } />
-          <Route path='/dashboard' element={ <ProtectedRoute> <AdminDashboard /> </ProtectedRoute> } />
+          <Route path='/dashboard' element={ <ProtectedRoute> <SalesReport /> </ProtectedRoute> } />
           <Route path='/users' element={ <ProtectedRoute> <UserList /> </ProtectedRoute> } />
           <Route path='/categoryManagement' element={ <ProtectedRoute> <CategoryManagement /> </ProtectedRoute>} />
           <Route path='/addProduct' element={<ProtectedRoute><AddProduct /></ProtectedRoute>} />

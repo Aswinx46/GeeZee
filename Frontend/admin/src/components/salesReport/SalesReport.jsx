@@ -11,24 +11,58 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import axios from '../../../axios/adminAxios'
 import { toast } from 'react-toastify'
 const SalesReport = () => {
-  const [dateRange, setDateRange] = useState('custom')
+  const [dateRange, setDateRange] = useState('month')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
-  const[update,setUpdate]=useState(false)
-  const[salesReport,setSalesreport]=useState([])
+  const [update, setUpdate] = useState(false)
+  const [salesReport, setSalesreport] = useState([])
+  const [chartData, setChartData] = useState([])
+
+
+  useEffect(() => {
+    const fetchData = async (req, res) => {
+      try {
+        const response = await axios.get('/salesReport', {
+          params: {
+            dateRange: 'month'
+          }
+        })
+        setSalesreport(response.data.salesReport)
+
+        const formatedData = response.data.salesReport?.map((report) => ({
+          name: report.monthName || report.createdOn.split('T')[0],
+          totalAmount: report.totalOrderAmount,
+          orderCount: report.totalSalesCount
+        }))
+        setChartData(formatedData)
+      } catch (error) {
+        console.log('error while fetching sales report initially', error)
+      }
+    }
+    fetchData()
+  }, [])
 
   useEffect(() => {
     if (dateRange !== 'custom') {
       setStartDate('');
       setEndDate('');
     }
+
+
+    const formatedData = salesReport?.map((report) => ({
+      name: report.monthName || report.createdOn.split('T')[0],
+      totalAmount: report.totalOrderAmount,
+      orderCount: report.totalSalesCount
+    }))
+    setChartData(formatedData)
   }, [dateRange]);
+
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
+    visible: {
       opacity: 1,
-      transition: { 
+      transition: {
         when: "beforeChildren",
         staggerChildren: 0.1,
       },
@@ -40,21 +74,24 @@ const SalesReport = () => {
     visible: { y: 0, opacity: 1 },
   }
 
-  const handleGenarateReport=async()=>{
+  const handleGenarateReport = async () => {
     console.log(startDate)
     console.log(endDate)
     console.log(dateRange)
+
     try {
-        const response=await axios.get('/salesReport',{params:{
-            startDate,endDate,dateRange
-        }})
-        console.log(response.data.salesReport)
-        setSalesreport(response.data.salesReport)
+      const response = await axios.get('/salesReport', {
+        params: {
+          startDate, endDate, dateRange
+        }
+      })
+      console.log(response.data.salesReport)
+      setSalesreport(response.data.salesReport)
     } catch (error) {
-        console.log('error while fetching sales report',error)
-        toast.error(error.data.response.message)
+      console.log('error while fetching sales report', error)
+      toast.error(error.data.response.message)
     }
-  
+
   }
   return (
     <motion.div
@@ -76,8 +113,9 @@ const SalesReport = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="day">1 Day</SelectItem>
-              <SelectItem value="week">1 Week</SelectItem>  
+              <SelectItem value="week">1 Week</SelectItem>
               <SelectItem value="month">1 Month</SelectItem>
+              <SelectItem value="year">This Year</SelectItem>
               <SelectItem value="custom">Custom Range</SelectItem>
             </SelectContent>
           </Select>
@@ -85,7 +123,7 @@ const SalesReport = () => {
 
         <AnimatePresence>
           {dateRange === 'custom' && (
-            <motion.div 
+            <motion.div
               className="grid gap-4 md:grid-cols-2"
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
@@ -177,7 +215,7 @@ const SalesReport = () => {
         </Card>
       </motion.div>
 
-      <motion.div 
+      <motion.div
         variants={itemVariants}
         className="w-full"
       >
@@ -194,38 +232,32 @@ const SalesReport = () => {
             >
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
-                  data={[
-                    { date: 'Jan', sales: 4000, orders: 240 },
-                    { date: 'Feb', sales: 3000, orders: 198 },
-                    { date: 'Mar', sales: 5000, orders: 300 },
-                    { date: 'Apr', sales: 2780, orders: 180 },
-                    { date: 'May', sales: 6890, orders: 390 },
-                    { date: 'Jun', sales: 2390, orders: 167 },
-                  ]}
+                  data={chartData}
                   margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
+                  <XAxis dataKey="name" />
                   <YAxis yAxisId="left" />
                   <YAxis yAxisId="right" orientation="right" />
-                  <Tooltip />
+                  <Tooltip formatter={(value, name) => {
+                    if (name === 'Total Amount') return [`₹${value}`, 'Total Sales'];
+                    return [value, 'Orders'];
+                  }} />
                   <Legend />
                   <Line
                     yAxisId="left"
                     type="monotone"
-                    dataKey="sales"
+                    dataKey="totalAmount"
+                    name="Total Amount"
                     stroke="#8884d8"
-                    strokeWidth={2}
-                    dot={{ r: 4 }}
                     activeDot={{ r: 8 }}
                   />
                   <Line
                     yAxisId="right"
                     type="monotone"
-                    dataKey="orders"
+                    dataKey="orderCount"
+                    name="Orders"
                     stroke="#82ca9d"
-                    strokeWidth={2}
-                    dot={{ r: 4 }}
                     activeDot={{ r: 8 }}
                   />
                 </LineChart>
@@ -252,13 +284,13 @@ const SalesReport = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {[...Array(5)].map((_, index) => (
+                {salesReport.map((report, index) => (
                   <TableRow key={index}>
-                    <TableCell>{new Date().toLocaleDateString()}</TableCell>
-                    <TableCell>{Math.floor(Math.random() * 100)}</TableCell>
-                    <TableCell>${(Math.random() * 10000).toFixed(2)}</TableCell>
-                    <TableCell>-${(Math.random() * 1000).toFixed(2)}</TableCell>
-                    <TableCell>${(Math.random() * 9000).toFixed(2)}</TableCell>
+                    <TableCell>{report.createdOn[index].split('T')[0]}</TableCell>
+                    <TableCell>{report.totalSalesCount}</TableCell>
+                    <TableCell>${report.totalOrderAmount}</TableCell>
+                    <TableCell>-${report.totalDiscount}</TableCell>
+                    <TableCell>${report.totalFinalAmount}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

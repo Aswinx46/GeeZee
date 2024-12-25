@@ -4,10 +4,12 @@ import { X, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button"
 import axios from '../axios/userAxios'
 import { Textarea } from "@/components/ui/textarea"
+import { useSelector } from 'react-redux';
 const OrderCancellationModal = ({ isOpen, onClose, onConfirm, orderId,isReturn,orderItemId, isCancel, setIsOpen }) => {
   const [isCancelled, setIsCancelled] = useState(false);
   const [cancellationReason, setCancellationReason] = useState('');
   const[returnReason,setReturnReason]=useState('')
+  const user=useSelector(state=>state.user.user)
   // const[returnOrCancel,setReturnOrCancel]=useState()
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.8 },
@@ -50,7 +52,7 @@ const OrderCancellationModal = ({ isOpen, onClose, onConfirm, orderId,isReturn,o
     if(isCancel)
     {
       console.log('this is inside canecl')
-      const response = await axios.patch(`/cancelOrder/${orderId}`,{reason:cancellationReason})
+      const response = await axios.patch(`/cancelOrder/${orderId}/${user._id}`,{reason:cancellationReason})
       console.log(response)
     }else{
       console.log('this is inside return')
