@@ -212,20 +212,34 @@ const showOrders = async (req, res) => {
 }
 
 const cancelOrder = async (req, res) => {
-    const { orderId ,userId} = req.params
-    const { reason } = req.body
-    console.log(reason)
+    const { orderId, userId } = req.params
+    const { reason, paymentMethod } = req.body
+    console.log(paymentMethod)
     console.log('this is canceling user id', userId)
     try {
 
         const selectedOrder = await Order.findById(orderId, 'orderItems')
         console.log(selectedOrder)
-        const details = selectedOrder.orderItems.map((items) => ({
-            variantId: items.variant._id,
-            quantity: items.quantity,
-            productId: items.productId
-        }))
-        console.log('this is the items')
+        // const details = selectedOrder.orderItems.map((items) => ({
+        //     variantId: items.variant._id,
+        //     quantity: items.quantity,
+        //     productId: items.productId,
+        //     totalPrice: ...totalPrice +(items.quantity * items.price)
+        // }))
+
+
+        const details = selectedOrder.orderItems.map((items) => {
+          
+            return {
+                variantId: items.variant._id,
+                quantity: items.quantity,
+                productId: items.productId,
+                totalPrice:  items.quantity * items.price, // Use item total for this particular item
+            };
+        });
+
+
+        console.log('this is totalPrice', details[0].totalPrice)
         for (const item of details) {
             await Product.findOneAndUpdate(
                 { _id: item.productId, "variants._id": item.variantId },
@@ -233,25 +247,29 @@ const cancelOrder = async (req, res) => {
             );
         }
 
-        // const wallet = await Wallet.findOne({ userId })
+        if (paymentMethod == 'Razorpay') {
+            const wallet = await Wallet.findOne({ userId })
 
-        // if (!wallet) return res.status(400).json({ message: 'no wallet found' })
+            if (!wallet) return res.status(400).json({ message: 'no wallet found' })
+
+                const totalRefundAmount = details.reduce((sum, item) => sum + item.totalPrice, 0);
 
 
+            const transaction = {
+                type: 'Refund',
+                transaction_id: uuidv4(), // Generate a unique transaction ID
+                amount: totalRefundAmount,
+                description: 'Product Returned amount',
+                date: new Date(), // Add a timestamp for the transaction
+            };
+            wallet.transactions.push(transaction)
+            wallet.balance += totalRefundAmount
+            await wallet.save()
+            console.log('this is the wallet', wallet)
+        }
 
-        // const transaction = {
-        //     type: 'Refund',
-        //     transaction_id: uuidv4(), // Generate a unique transaction ID
-        //     amount: returnedVariant.quantity * returnedVariant.price,
-        //     description: 'Product Returned amount',
-        //     date: new Date(), // Add a timestamp for the transaction
-        // };
-        // wallet.transactions.push(transaction)
-        // wallet.balance += returnedVariant.quantity * returnedVariant.price
-        // await wallet.save()
-        // console.log('this is the wallet', wallet)
 
-        // const order=await Cart.findByIdAndDelete(mongoose.Types.ObjectId(orderId))
+        // const Cartorder=await Cart.findByIdAndDelete(mongoose.Types.ObjectId(orderId))
         const order = await Order.findByIdAndUpdate(orderId, { status: 'Cancelled', CancellationReason: reason }, { new: true })
         if (!order) return res.status(400).json({ message: 'no order to update' })
         return res.status(200).json({ message: "Order Cancelled" })

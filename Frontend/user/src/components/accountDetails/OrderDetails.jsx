@@ -194,7 +194,7 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
               Close
             </Button>
           </motion.div>
-          {orderCancelPop && <OrderCancellationModal isOpen={orderCancelPop}  isCancel={cancel} isReturnreturn={isReturn} orderItemId={orderItemId}  orderId={orderId} setIsOpen={setOrderCancelPop}/>}
+          {orderCancelPop && <OrderCancellationModal isOpen={orderCancelPop}  isCancel={cancel} paymentMethod={orderDetails.paymentMethod} isReturnreturn={isReturn} orderItemId={orderItemId}  orderId={orderId} setIsOpen={setOrderCancelPop}/>}
         </motion.div>
       )}
     </AnimatePresence>
