@@ -51,6 +51,7 @@ user_route.get('/category', categoryController.showCategory)
 
 user_route.post('/addProductWishlist/:userId',auth.authToken,WishlistController.addProductWishlist)
 user_route.get('/getWishlist/:userId',auth.authToken,WishlistController.showWishlist)
+user_route.patch('/removeFromWishlist/:userId',auth.authToken,WishlistController.removeItemFromWishlist)
 
 user_route.get('/showCoupons',auth.authToken,couponConrtoller.showCouponInUserSide)
 

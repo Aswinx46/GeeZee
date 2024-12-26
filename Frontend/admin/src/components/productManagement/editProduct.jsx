@@ -10,6 +10,7 @@ import cloudAxios from 'axios'
 import { MutatingDots } from 'react-loader-spinner'
 import { toast } from 'react-toastify';
 import EditVariant from './editVariant'
+import OrderManagement from './OrderManagement'
 const EditProduct = () => {
     const [categories, setCategories] = useState([]);
     const [imageUrl, setImageUrl] = useState([]);
@@ -21,6 +22,10 @@ const EditProduct = () => {
     const [zoom, setZoom] = useState(1);
     const [rotation, setRotation] = useState(0);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+    const [isVariantModalOpen, setIsVariantModalOpen] = useState(false);
+    const[OpenOffer,setOpenOffer]=useState(false)
+    
+
  
     const [product, setProduct] = useState(store.getState().product.product)
     const [oldUrl, setOldUrl] = useState([])
@@ -190,7 +195,9 @@ const EditProduct = () => {
 
     
 
-
+    const handleAddOffer=()=>{
+        setOpenOffer(true)
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -562,6 +569,16 @@ const EditProduct = () => {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             type="button"
+                            onClick={handleAddOffer}
+                            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-all duration-200 ease-in-out"
+                        >
+                            <FaSave className="mr-2" />
+                            Add Offer
+                        </motion.button>
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            type="button"
                             className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-all duration-200 ease-in-out"
                         >
                             <FaTimes className="mr-2" />
@@ -670,6 +687,7 @@ const EditProduct = () => {
                             </button>
                         </div>
                     </div>
+                    <OrderManagement isOpen={OpenOffer} setIsOpen={setOpenOffer}    />
                 </motion.div>
             )}
         </motion.div>

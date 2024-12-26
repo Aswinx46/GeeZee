@@ -58,10 +58,16 @@ const addProductWishlist=async (req,res) => {
         try {
             const{userId}=req.params
             const{item}=req.body
-            console.log(item)
+            // console.log('this is the item',item)
             const wishilst=await Wishlist.findOne({userId})
             if(!wishilst) return res.status(400).json({message:"no wishlist found"})
+                const updatedWishlist=wishilst.product.filter((prod)=>prod.productId.toString() !== item.productId._id.toString())
+            console.log('this is the updated wishlist',updatedWishlist)
+            // console.log('this is the id',item.productId._id)
 
+                wishilst.product=updatedWishlist
+                await wishilst.save()
+                return res.status(200).json({message:'item removed from wishlist'})
         } catch (error) {
             console.log('error while removing item from wishlist',error);
             return res.status(500).json({message:"error while removing item from wishlist",error})

@@ -37,6 +37,7 @@ const Wishlist = () => {
     try {
       const response=await axios.patch(`removeFromWishlist/${userId}`,{item})
       console.log(response)
+      toast.success(response.data.message)
       setUpdate(!update)
     } catch (error) {
       console.log('error while removing item from the wishlist',error)
