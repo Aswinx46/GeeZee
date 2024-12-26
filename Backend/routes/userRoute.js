@@ -10,6 +10,7 @@ const orderController = require('../controllers/OrderController')
 const brandController = require('../controllers/BrandController')
 const WalletController=require('../controllers/WalletController')
 const couponConrtoller=require('../controllers/CouponController')
+const WishlistController=require('../controllers/WishlistController')
 
 user_route.post('/signup', userController.signup)
 user_route.post('/otpVerification', userController.otpVerification)
@@ -47,6 +48,9 @@ user_route.patch('/returnProduct/:orderId/:orderItemId', auth.authToken, orderCo
 user_route.get('/brands', auth.authToken, brandController.showBrand)
 user_route.get('/categories', auth.authToken, categoryController.showCategory)
 user_route.get('/category', categoryController.showCategory)
+
+user_route.post('/addProductWishlist/:userId',auth.authToken,WishlistController.addProductWishlist)
+user_route.get('/getWishlist/:userId',auth.authToken,WishlistController.showWishlist)
 
 user_route.get('/showCoupons',auth.authToken,couponConrtoller.showCouponInUserSide)
 

@@ -1,39 +1,69 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShoppingCart, Heart } from 'lucide-react';
+import axios from '../../axios/userAxios'
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const Wishlist = () => {
-  const [wishlistItems, setWishlistItems] = useState([
-    {
-      id: 1,
-      name: 'Wireless Headphones',
-      image: '/placeholder.svg?height=120&width=120',
-      inStock: true,
-      price: 129.99,
-    },
-    {
-      id: 2,
-      name: 'Smart Watch',
-      image: '/placeholder.svg?height=120&width=120',
-      inStock: false,
-      price: 199.99,
-    },
-    {
-      id: 3,
-      name: 'Bluetooth Speaker',
-      image: '/placeholder.svg?height=120&width=120',
-      inStock: true,
-      price: 79.99,
-    },
-  ]);
 
-  const removeFromWishlist = (id) => {
-    setWishlistItems(wishlistItems.filter(item => item.id !== id));
+  const user = useSelector(state => state.user.user)
+  const [wishlist, setWishlist] = useState([])
+  const [update,setUpdate]=useState(false) 
+  const userId = user._id
+  const navigate = useNavigate()
+  useEffect(() => {
+
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`/getWishlist/${user._id}`)
+        console.log(response.data.wishilst.product)
+        const neededDetails = response.data.wishilst.product.map((product) => {
+          return { ...product, variants: product.productId.variants[0] }
+        })
+        console.log(neededDetails)
+        setWishlist(neededDetails)
+      } catch (error) {
+        console.log('error while fetching the data', error)
+      }
+    }
+    fetchData()
+  }, [update])
+
+
+  const removeFromWishlist = async(item) => {
+    console.log(item)
+    try {
+      const response=await axios.patch(`removeFromWishlist/${userId}`,{item})
+      console.log(response)
+      setUpdate(!update)
+    } catch (error) {
+      console.log('error while removing item from the wishlist',error)
+      toast.error('error while removing item from the wishlist')
+    }
   };
 
-  const addToCart = (item) => {
-    console.log(`Added ${item.name} to cart`);
-    // Implement your add to cart logic here
+  const handleAddToCart = async (item) => {
+
+    console.log(item.productId._id)
+    try {
+      console.log('this is inside the try catcvh')
+
+
+      const selectedVariantId = item.productId.variants[0]._id
+      console.log(selectedVariantId)
+      const quantity = 1
+      const uploadToCart = await axios.post('/cart', { userId: userId, productId: item.productId._id, selectedVariantId: selectedVariantId, quantity })
+      console.log(uploadToCart.data)
+      toast.success(uploadToCart.data.message)
+    } catch (error) {
+      console.log(error)
+      console.log('error in adding to the cart')
+
+      toast.error(error.response.data.message)
+    }
+
   };
 
   return (
@@ -49,9 +79,9 @@ const Wishlist = () => {
           <Heart className="text-white" size={24} />
         </div>
         <AnimatePresence>
-          {wishlistItems.map((item) => (
+          {wishlist.map((item) => (
             <motion.div
-              key={item.id}
+              key={item.productId?._id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
@@ -60,24 +90,24 @@ const Wishlist = () => {
             >
               <div className="flex items-center p-4">
                 <img
-                  src={item.image}
+                  src={item.productId?.productImg[0]}
                   alt={item.name}
                   className="w-24 h-24 object-cover rounded-md mr-6"
                 />
                 <div className="flex-grow">
-                  <h2 className="text-xl font-semibold text-black mb-1">{item.name}</h2>
-                  <p className="text-gray-600 text-lg">${item.price.toFixed(2)}</p>
-                  <p className={`text-sm mt-1 ${item.inStock ? 'text-green-600' : 'text-red-600'}`}>
-                    {item.inStock ? 'In Stock' : 'Out of Stock'}
+                  <h2 className="text-xl font-semibold text-black mb-1">{item.productId.title}</h2>
+                  <p className="text-gray-600 text-lg">₹{item.productId?.variants[0]?.price.toFixed(2)}</p>
+                  <p className={`text-sm mt-1 ${item.productId?.variants[0]?.stock ? 'text-green-600' : 'text-red-600'}`}>
+                    {item.productId?.variants[0]?.stock ? 'In Stock' : 'Out of Stock'}
                   </p>
                 </div>
                 <div className="flex flex-col items-end space-y-2">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => addToCart(item)}
-                    className={`bg-black text-white px-4 py-2 rounded-full flex items-center space-x-2 ${!item.inStock && 'opacity-50 cursor-not-allowed'}`}
-                    disabled={!item.inStock}
+                    onClick={() => handleAddToCart(item)}
+                    className={`bg-black text-white px-4 py-2 rounded-full flex items-center space-x-2 ${!item.productId.variants[0].stock && 'opacity-50 cursor-not-allowed'}`}
+                    disabled={!item.productId.variants[0].stock}
                   >
                     <ShoppingCart size={18} />
                     <span className="hidden sm:inline">Add to Cart</span>
@@ -85,7 +115,7 @@ const Wishlist = () => {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => removeFromWishlist(item.id)}
+                    onClick={() => removeFromWishlist(item)}
                     className="text-gray-400 hover:text-red-600 transition-colors"
                   >
                     <X size={24} />
@@ -95,7 +125,7 @@ const Wishlist = () => {
             </motion.div>
           ))}
         </AnimatePresence>
-        {wishlistItems.length === 0 && (
+        {wishlist.length === 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

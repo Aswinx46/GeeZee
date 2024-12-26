@@ -3,19 +3,35 @@ import { motion } from 'framer-motion';
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, ShoppingCart, Eye } from 'lucide-react';
-import FilterModal from './Filter';
-
+import { Star, ShoppingCart, Eye, Heart } from 'lucide-react';
+import axios from '../../axios/userAxios'
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 const ProductCard = ({ product, selectedProduct, setSelectedProduct }) => {
   const [isHovered, setIsHovered] = useState(false);
+
+
+  const user=useSelector(state=>state.user.user)
+  const userId=user._id
+
+  const handleWishlilst=async()=>{
+    console.log(product)
+    console.log(userId)
+    console.log('this isthe wishlist')
+    try {
+      const response=await axios.post(`addProductWishlist/${userId}`,{product},)
+      toast.success(response.data.message)
+    } catch (error) {
+      console.log('error while adding product in the wishlist',error)
+      toast.error(error.response.data.message)
+    }
+  }
 
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
     sible: { opacity: 1, y: 0 },
     hover: { y: -10 }
   };
-
-
 
   const imageVariants = {
     hover: { scale: 1.1 }
@@ -30,8 +46,6 @@ const ProductCard = ({ product, selectedProduct, setSelectedProduct }) => {
     hover: { scale: 1.1 },
     tap: { scale: 0.9 }
   };
-
-
 
   return (
     <motion.div
@@ -60,6 +74,15 @@ const ProductCard = ({ product, selectedProduct, setSelectedProduct }) => {
               className="p-3 rounded-full bg-[#39FF14] text-black"
             >
               <ShoppingCart size={20} />
+            </motion.button>
+            <motion.button
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
+              onClick={()=>handleWishlilst()}
+              className="p-3 rounded-full bg-[#39FF14] text-black"
+            >
+              <Heart size={20} />
             </motion.button>
             <motion.button
               variants={buttonVariants}
