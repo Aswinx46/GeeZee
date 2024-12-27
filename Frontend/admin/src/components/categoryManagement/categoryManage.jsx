@@ -16,13 +16,18 @@ const StaticCategoryManagement = () => {
     const[selectedId,setSelectedId]=useState(null)
     const [OpenOffer, setOpenOffer] = useState(false)
     const[selectedCateogryId,setSelectedCategoryId]=useState()
-
+    const[offerCategories,setOfferCategories]=useState([])
+    const[selectedOffer,setSelectedOffer]=useState({})
+    const[update,setUpdate]=useState(false)
     useEffect(()=>{
         const fetchCategory=async () => {
           try {
             const category=await axios.get('/category')
             
             setCategories(category.data.category)
+            const offerCategories=category.data.category.filter((category)=>category.categoryOffer)
+            setOfferCategories(offerCategories)
+            console.log(offerCategories,'this is the truth one')
             console.log('category added in the state')
           } catch (error) {
             console.log(error)
@@ -31,7 +36,7 @@ const StaticCategoryManagement = () => {
             
         }
         fetchCategory()
-    },[fetch])
+    },[fetch,update])
 
 
 
@@ -106,11 +111,32 @@ const StaticCategoryManagement = () => {
     }
 
    const handleAddOfferCateogry=(category)=>{
+     setOpenOffer(true)
     setSelectedCategoryId(category._id)
       console.log(category)
-      setOpenOffer(true)
 
    }
+
+   const handleListOffer = async (id) => {
+    try {
+      const response = await axios.patch(`/changeListOfferCategory/${id}`);
+      console.log(response);
+      toast.success(response.data.message);
+      setUpdate(!update)
+   
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
+  };
+
+  const handleEditCategoryOffer=(category)=>{
+    console.log(category)
+    setSelectedOffer(category.categoryOffer)
+    setSelectedCategoryId(category._id)
+    setOpenOffer(true)
+  }
+
 
   return (
     <div className="min-h-screen bg-white p-8">
@@ -209,7 +235,80 @@ const StaticCategoryManagement = () => {
               ))}
             </tbody>
           </table>
+          <OfferModal OpenOffer={OpenOffer} setUpdate={setUpdate} setOpenOffer={setOpenOffer} categoryId={selectedCateogryId} existingProductOffer={selectedOffer}/>
         </motion.div>
+
+        {/* Category Offers Section */}
+        {offerCategories.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-lg shadow-lg mb-8 overflow-hidden border border-gray-200"
+          >
+            <div className="bg-black text-white py-4 px-6">
+              <h2 className="text-xl font-semibold">Category Offers</h2>
+            </div>
+            <div className="p-6">
+              <div className="grid gap-6">
+                {offerCategories.map((category) => (
+                  <div key={category._id} className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-semibold text-gray-800">{category.categoryName}</h3>
+                      <div className="flex space-x-3">
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleEditCategoryOffer(category)}
+                          className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
+                          Edit Offer
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleListOffer(category.categoryOffer._id)}
+                          className={`inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white ${
+                            category.categoryOffer?.isListed 
+                              ? 'bg-red-600 hover:bg-red-700' 
+                              : 'bg-green-600 hover:bg-green-700'
+                          } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50`}
+                        >
+                          {category.categoryOffer?.isListed ? 'Block' : 'Unblock'}
+                        </motion.button>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-gray-600">Offer Type:</span>
+                        <p className="font-medium capitalize">{category.categoryOffer?.offerType}</p>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">Offer Value:</span>
+                        <p className="font-medium">
+                          {category.categoryOffer?.offerType === 'percentage'
+                            ? `${category.categoryOffer?.offerValue}%`
+                            : `₹${category.categoryOffer?.offerValue}`}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">Start Date:</span>
+                        <p className="font-medium">
+                          {new Date(category.categoryOffer?.validFrom).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">End Date:</span>
+                        <p className="font-medium">
+                          {new Date(category.categoryOffer?.validUntil).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* Add New Category Form */}
         <motion.div 
@@ -284,7 +383,7 @@ const StaticCategoryManagement = () => {
                 </motion.button>
               </div>
             </div>
-            <OfferModal OpenOffer={OpenOffer} setOpenOffer={setOpenOffer} categoryId={selectedCateogryId}/>
+          
           </motion.div>
         </motion.div>
       )}

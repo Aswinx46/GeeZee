@@ -739,7 +739,7 @@ const EditProduct = () => {
             )}
             {isOpen && <EditVariant isOpen={isOpen} Varient={varients} index={index} setVarient={setVarients} setIsOpen={setIsOpen} />}
 
-            {OpenOffer && <OrderManagement OpenOffer={OpenOffer} setOpenOffer={setOpenOffer} productId={productId} existingProductOffer={existingProductOffer} />}
+            {OpenOffer && <OrderManagement OpenOffer={OpenOffer} update={update} setOpenOffer={setOpenOffer} productId={productId} existingProductOffer={existingProductOffer} />}
 
             {cropModalOpen && currentImage && (
                 <motion.div

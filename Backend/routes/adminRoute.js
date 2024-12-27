@@ -42,5 +42,7 @@ admin_route.patch('/changeStatusOfCoupon/:couponId',auth.adminAuth,couponConrtol
 admin_route.get('/salesReport',auth.adminAuth,salesReportController.salesReport)
 admin_route.post('/addOffer/:productId',auth.adminAuth,offerController.addOffer)
 admin_route.patch('/changeStatusOrder/:offerId',auth.adminAuth,offerController.changeStatusOfOffer)
+admin_route.post('/addOfferCategory/:categoryId',auth.adminAuth,offerController.addCategoryOffer)
+admin_route.patch('/changeListOfferCategory/:offerId',auth.adminAuth,offerController.changeStatusOfCategoryOffer)
 
 module.exports = admin_route

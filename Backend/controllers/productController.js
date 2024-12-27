@@ -43,7 +43,8 @@ const addProduct = async (req, res) => {
 const showProduct = async (req, res) => {
 
     try {
-        const products = await Product.find().populate('categoryId', 'categoryName').populate('productOffer')
+        const products = await Product.find().populate('categoryId').populate('productOffer')
+        console.log(products)
         return res.status(200).json({ message: 'products fetched', products })
     } catch (error) {
         console.log('error while fetching the products',error)
@@ -124,11 +125,19 @@ const showProductListed = async (req, res) => {
         const products = await Product.find({ status: 'active', availableQuantity: { $gt: 0 } }).populate({
             path: 'categoryId',
             match: { status: 'active' },
-            select: '_id categoryName status'
+            // select: '_id categoryName status'
+            populate: {
+                path: 'categoryOffer', 
+                match: { validUntil: { $gte: new Date() }, isListed: true },
+                select: 'offerType offerValue validFrom validUntil',}
         }).populate({
             path: 'brand',
             match: { status: 'active' },
             select: '_id name status'
+        }).populate({
+            path: 'productOffer',
+            match: { validUntil: { $gte: new Date() }, isListed: true },
+            select: 'offerType offerValue validFrom validUntil'
         })
         console.log('this is products', products)
         console.log(products)

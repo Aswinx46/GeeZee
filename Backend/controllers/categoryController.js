@@ -18,7 +18,7 @@ const addCategory = async (req, res) => {
 }
 const showCategory = async (req, res) => {
     try {
-        const category = await Category.find()
+        const category = await Category.find().populate('categoryOffer')
         if (!category) return res.status(400).json({ message: "no category found" })
         res.status(200).json({ message: "category list fetched", category })
     } catch (error) {

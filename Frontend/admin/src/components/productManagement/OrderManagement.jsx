@@ -8,13 +8,16 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from 'react-toastify';
 import axios from '../../../axios/adminAxios'
-const OfferModal = ({ OpenOffer, setOpenOffer, onClose, onSubmit,productId, type,existingProductOffer,categoryId }) => {
+const OfferModal = ({ OpenOffer, setOpenOffer, onClose, onSubmit,productId, update,setUpdate, type,existingProductOffer,categoryId }) => {
   const [offerType, setOfferType] = useState('percentage');
   const [offerValue, setOfferValue] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [errors, setErrors] = useState({});
-  
+
+  console.log('this is the existingoffer',existingProductOffer)
+  console.log('this is the category id',categoryId)
+
   const validateForm = () => {
     const newErrors = {};
     
@@ -65,15 +68,20 @@ const OfferModal = ({ OpenOffer, setOpenOffer, onClose, onSubmit,productId, type
       console.log(offerType, offerValue, startDate, endDate,productId);
       try {
         if(productId)
-        {
+        {console.log('this is inside the product');
+        
           const response=await axios.post(`/addOffer/${productId}`,{offerType, offerValue, startDate, endDate})
           console.log(response.data)
-          toast.success('Offer added successfully!');
+          toast.success(response.data.message);
           setOpenOffer(false);
 
         }else if(categoryId)
-        {
+        {console.log('this is inside teh category')
+          console.log(offerType, offerValue, startDate, endDate)
           const response=await axios.post(`/addOfferCategory/${categoryId}`,{offerType, offerValue, startDate, endDate})
+          toast.success(response.data.message);
+          setOpenOffer(false);
+          setUpdate(!update)
         }
       } catch (error) {
         console.log('error while updating offer in the backend',error)
