@@ -23,23 +23,25 @@ const EditProduct = () => {
     const [rotation, setRotation] = useState(0);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
     const [isVariantModalOpen, setIsVariantModalOpen] = useState(false);
-    const[OpenOffer,setOpenOffer]=useState(false)
-    
+    const [OpenOffer, setOpenOffer] = useState(false)
+    const[selectedOffer,setSelectedOffer]=useState({})
 
- 
+
     const [product, setProduct] = useState(store.getState().product.product)
     const [oldUrl, setOldUrl] = useState([])
     const [success, setSuccess] = useState(false)
     const [errors, setErrors] = useState({});
-    const [brands,setBrands]=useState([])
-    const[selectedBrand,setSelectedBrand]=useState({})
-    const[modalOpen,setModalOpen]=useState(false)
-    const[varients,setVarients]=useState([])
-    const[isOpen,setIsOpen]=useState(false)
-    const[attributes,setAttributes]=useState([])
-    const[editingVariant,setEditingVariant]=useState()
+    const [brands, setBrands] = useState([])
+    const [selectedBrand, setSelectedBrand] = useState({})
+    const [modalOpen, setModalOpen] = useState(false)
+    const [varients, setVarients] = useState([])
+    const [isOpen, setIsOpen] = useState(false)
+    const [attributes, setAttributes] = useState([])
+    const [editingVariant, setEditingVariant] = useState()
     const navigate = useNavigate()
-    const[index,setIndex]=useState()
+    const [index, setIndex] = useState()
+    const [productId, setProductId] = useState()
+    const [existingProductOffer, setExistingProductOffer] = useState({})
 
     useEffect(() => {
         const fetchCategory = async () => {
@@ -47,15 +49,17 @@ const EditProduct = () => {
             const sendedProduct = store.getState().product.product
             setVarients(sendedProduct.variants)
             const response = await axios.get('/brands');
-            console.log( 'this is the brands from the backend', response.data.brands)
-            const selectedBrand=response.data.brands.find((brand)=>brand._id==sendedProduct.brand)
+            console.log('this is the brands from the backend', response.data.brands)
+            const selectedBrand = response.data.brands.find((brand) => brand._id == sendedProduct.brand)
             console.log('this is the selected brand name', selectedBrand)
             setSelectedBrand([selectedBrand])
-            setProduct(prev => ({...prev, brand: selectedBrand.name}))  
-            const brand=response.data.brands.filter((bran)=>bran.name!==selectedBrand.name)
-            console.log('this is after brand filter',brand)
+            setProduct(prev => ({ ...prev, brand: selectedBrand.name }))
+            setProductId(product?._id)
+
+            const brand = response.data.brands.filter((bran) => bran.name !== selectedBrand.name)
+            console.log('this is after brand filter', brand)
             console.log(selectedBrand)
-            console.log('this is the brands without selected one',brand)
+            console.log('this is the brands without selected one', brand)
 
             setBrands(brand);
 
@@ -65,12 +69,13 @@ const EditProduct = () => {
             const cat = category.data.category.filter((cat) => cat.categoryName != sendedProduct.categoryId.categoryName)
             console.log(cat)
 
-           
+
 
             setOldUrl(sendedProduct.productImg)
             setCategories(cat);
             setSuccess(false)
             console.log(sendedProduct)
+            setExistingProductOffer(sendedProduct.productOffer)
             if (sendedProduct.productImg && sendedProduct.productImg.length > 0) setImageUrl(sendedProduct.productImg)
         };
         fetchCategory();
@@ -173,7 +178,7 @@ const EditProduct = () => {
             const spec = e.target.value.split('>');
             setProduct((p) => ({ ...p, spec }))
         } else if (name === 'subHead') {
-            
+
             const subHead = e.target.value.split('>')
             setProduct((p) => ({ ...p, subHead }))
         } else if (name === 'subHeadDescription') {
@@ -186,24 +191,35 @@ const EditProduct = () => {
         }
     }
 
-    const handleEditVariant=(index)=>{
+    const handleEditVariant = (index) => {
         console.log('modal opened')
         setIndex(index)
         console.log(isOpen)
         setIsOpen(true)
     }
 
-    
 
-    const handleAddOffer=()=>{
+
+    const handleAddOffer = () => {
         setOpenOffer(true)
+        console.log(OpenOffer)
+    }
+    const handleListOffer=async()=>{
+        try {
+            
+            const response=await axios.patch(`/changeStatusOrder/${existingProductOffer._id}`)
+            toast.success(response.data.message)
+        } catch (error) {
+            console.log('error while changing the status of offer',error)
+            toast.error('error while changing the status of offer')
+        }
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        console.log('this is the variant from the parent',varients)
+        console.log('this is the variant from the parent', varients)
         // Validate all fields
-        console.log('this is the product',product)
+        console.log('this is the product', product)
         const newErrors = {};
         if (!product.title?.trim()) {
             newErrors.title = 'Title is required';
@@ -223,7 +239,7 @@ const EditProduct = () => {
         if (product.spec.length <= 0) {
             newErrors.spec = 'Specifications are required';
         }
-  
+
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
@@ -231,7 +247,7 @@ const EditProduct = () => {
             return;
         }
 
-        console.log('this is the product after edit',product)
+        console.log('this is the product after edit', product)
 
         setErrors({});
         setSuccess(true)
@@ -268,13 +284,13 @@ const EditProduct = () => {
             console.log(product)
             if (urls.length > 0) {
                 console.log('jhfoasjdf;jaso')
-                const response = await axios.put(`/editProduct/${product._id}`, { product, urls: [...oldUrl, ...urls] ,variants:varients })
+                const response = await axios.put(`/editProduct/${product._id}`, { product, urls: [...oldUrl, ...urls], variants: varients })
                 console.log(product)
                 console.log(response)
                 setSuccess(true)
                 navigate('/showProduct')
             } else {
-                const response = await axios.put(`/editProduct/${product._id}`, { product, urls: [...oldUrl, ...urls] ,variants:varients})
+                const response = await axios.put(`/editProduct/${product._id}`, { product, urls: [...oldUrl, ...urls], variants: varients })
                 setSuccess(true)
                 navigate('/showProduct')
             }
@@ -284,6 +300,15 @@ const EditProduct = () => {
             setSuccess(false)
         }
 
+    }
+
+    const handleDeleteOffer=async()=>{
+        try {
+            
+        } catch (error) {
+            console.log('error while deleting the error',error)
+            toast.error('error while deleting the error')
+        }
     }
 
     return (
@@ -336,7 +361,7 @@ const EditProduct = () => {
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-all duration-200 ease-in-out"
 
                             >
-                                <option value={product.categoryId?.categoryName }> {product.categoryId?.categoryName || "Select a category"}</option>
+                                <option value={product.categoryId?.categoryName}> {product.categoryId?.categoryName || "Select a category"}</option>
 
                                 {categories.map((category, index) => (
                                     <option key={index} value={category.categoryName}>{category.categoryName}</option>
@@ -563,18 +588,21 @@ const EditProduct = () => {
                             transition={{ delay: 1 }}
                             className="flex justify-start"
                         >
-                         
+
                         </motion.div>
+                       {!existingProductOffer && 
                         <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            type="button"
-                            onClick={handleAddOffer}
-                            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-all duration-200 ease-in-out"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        type="button"
+                        onClick={handleAddOffer}
+                        className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-all duration-200 ease-in-out"
                         >
                             <FaSave className="mr-2" />
                             Add Offer
                         </motion.button>
+                        } 
+
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
@@ -593,14 +621,75 @@ const EditProduct = () => {
                             <FaSave className="mr-2" />
                             Save Changes
                         </motion.button>
-                        
+
                     </div>
-                    
+
                 </motion.form>
                 {/* {success && <MutatingDots className='items-center' visible={true} height="100" width="100" color="black" secondaryColor="yellow" radius="12.5" ariaLabel="mutating-dots-loading" wrapperClass="" wrapperStyle={{}}/>} */}
-          
-                            
 
+
+                {existingProductOffer && Object.keys(existingProductOffer).length > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5 }}
+                        className="mt-8 bg-white shadow-lg rounded-lg overflow-hidden"
+                    >
+                        <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                            <h3 className="text-lg font-semibold text-gray-800">Current Product Offer</h3>
+                            <div className="flex space-x-2">
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    type="button"
+                                    onClick={() => setOpenOffer(true)}
+                                    className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                >
+                                    Edit Offer
+                                </motion.button>
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    type="button"
+                                    onClick={handleListOffer}
+                                    className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                >
+                                  {existingProductOffer.isListed ? 'Block' : 'Unblock'}
+                                </motion.button>
+                            </div>
+                        </div>
+                        <div className="p-6">
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="bg-gray-50 p-4 rounded-lg">
+                                    <span className="block text-sm font-medium text-gray-500 mb-1">Offer Type</span>
+                                    <p className="text-lg font-semibold text-gray-900 capitalize">
+                                        {existingProductOffer.offerType}
+                                    </p>
+                                </div>
+                                <div className="bg-gray-50 p-4 rounded-lg">
+                                    <span className="block text-sm font-medium text-gray-500 mb-1">Offer Value</span>
+                                    <p className="text-lg font-semibold text-gray-900">
+                                        {existingProductOffer.offerType === 'percentage'
+                                            ? `${existingProductOffer.offerValue}%`
+                                            : `₹${existingProductOffer.offerValue}`}
+                                    </p>
+                                </div>
+                                <div className="bg-gray-50 p-4 rounded-lg">
+                                    <span className="block text-sm font-medium text-gray-500 mb-1">Start Date</span>
+                                    <p className="text-lg font-semibold text-gray-900">
+                                        {(existingProductOffer.validFrom).split('T')[0]}
+                                    </p>
+                                </div>
+                                <div className="bg-gray-50 p-4 rounded-lg">
+                                    <span className="block text-sm font-medium text-gray-500 mb-1">End Date</span>
+                                    <p className="text-lg font-semibold text-gray-900">
+                                        {(existingProductOffer.validUntil).split('T')[0]}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
             </div>
             {varients.length > 0 && (
                 <div className="space-y-4">
@@ -648,9 +737,9 @@ const EditProduct = () => {
                     </table>
                 </div>
             )}
-            {isOpen && <EditVariant isOpen={isOpen} Varient={varients} index={index} setVarient={setVarients} setIsOpen={setIsOpen}/>}
+            {isOpen && <EditVariant isOpen={isOpen} Varient={varients} index={index} setVarient={setVarients} setIsOpen={setIsOpen} />}
 
-
+            {OpenOffer && <OrderManagement OpenOffer={OpenOffer} setOpenOffer={setOpenOffer} productId={productId} existingProductOffer={existingProductOffer} />}
 
             {cropModalOpen && currentImage && (
                 <motion.div
@@ -687,7 +776,6 @@ const EditProduct = () => {
                             </button>
                         </div>
                     </div>
-                    <OrderManagement isOpen={OpenOffer} setIsOpen={setOpenOffer}    />
                 </motion.div>
             )}
         </motion.div>

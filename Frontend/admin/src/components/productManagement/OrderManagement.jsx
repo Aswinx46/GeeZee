@@ -6,19 +6,83 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-
-
-
-const OfferModal = ({ isOpen, onClose, onSubmit, type }) => {
+import { toast } from 'react-toastify';
+import axios from '../../../axios/adminAxios'
+const OfferModal = ({ OpenOffer, setOpenOffer, onClose, onSubmit,productId, type,existingProductOffer,categoryId }) => {
   const [offerType, setOfferType] = useState('percentage');
   const [offerValue, setOfferValue] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-    console.log('this is inside the moda;')
-  const handleSubmit = (e) => {
+  const [errors, setErrors] = useState({});
+  
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // Validate offer value
+    if (!offerValue) {
+      newErrors.offerValue = 'Offer value is required';
+    } else {
+      const value = parseFloat(offerValue);
+      if (offerType === 'percentage') {
+        if (value <= 0 || value > 100) {
+          newErrors.offerValue = 'Percentage must be between 0 and 100';
+        }
+      } else {
+        if (value <= 0) {
+          newErrors.offerValue = 'Amount must be greater than 0';
+        }
+      }
+    }
+
+    
+    if (!startDate) {
+      newErrors.startDate = 'Start date is required';
+    }
+    if (!endDate) {
+      newErrors.endDate = 'End date is required';
+    }
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (start < today) {
+        newErrors.startDate = 'Start date cannot be in the past';
+      }
+      if (end <= start) {
+        newErrors.endDate = 'End date must be after start date';
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    onSubmit({ offerType, offerValue, startDate, endDate });
-    onClose();
+    if (validateForm()) {
+      console.log(offerType, offerValue, startDate, endDate,productId);
+      try {
+        if(productId)
+        {
+          const response=await axios.post(`/addOffer/${productId}`,{offerType, offerValue, startDate, endDate})
+          console.log(response.data)
+          toast.success('Offer added successfully!');
+          setOpenOffer(false);
+
+        }else if(categoryId)
+        {
+          const response=await axios.post(`/addOfferCategory/${categoryId}`,{offerType, offerValue, startDate, endDate})
+        }
+      } catch (error) {
+        console.log('error while updating offer in the backend',error)
+        toast.error('error while updating offer in the backend')
+      }
+   
+    } else {
+      toast.error('Please fix the errors in the form');
+    }
   };
 
   const modalVariants = {
@@ -50,7 +114,7 @@ const OfferModal = ({ isOpen, onClose, onSubmit, type }) => {
 
   return (
     <AnimatePresence>
-      {isOpen && (
+      {OpenOffer && (
         <motion.div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
           variants={backdropVariants}
@@ -67,7 +131,7 @@ const OfferModal = ({ isOpen, onClose, onSubmit, type }) => {
           >
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">Add Offer to {type}</h2>
-              <Button variant="ghost" size="icon" onClick={onClose}>
+              <Button variant="ghost" size="icon" onClick={()=>setOpenOffer(false)}>
                 <X className="h-4 w-4" />
               </Button>
             </div>
@@ -77,7 +141,7 @@ const OfferModal = ({ isOpen, onClose, onSubmit, type }) => {
                 <Label htmlFor="offerType">Offer Type</Label>
                 <RadioGroup
                   id="offerType"
-                  value={offerType}
+                  value={offerType || existingProductOffer?.offerType}
                   onValueChange={setOfferType}
                   className="flex space-x-4"
                 >
@@ -98,15 +162,18 @@ const OfferModal = ({ isOpen, onClose, onSubmit, type }) => {
                   <Input
                     id="offerValue"
                     type="number"
-                    value={offerValue}
+                    value={offerValue || existingProductOffer?.offerValue}
                     onChange={(e) => setOfferValue(e.target.value)}
                     placeholder={offerType === 'percentage' ? 'Enter percentage' : 'Enter amount'}
-                    className="pl-8"
+                    className={`pl-8 ${errors.offerValue ? 'border-red-500' : ''}`}
                   />
                   <span className="absolute left-2 top-1/2 transform -translate-y-1/2">
                     {offerType === 'percentage' ? <Percent className="h-4 w-4" /> : '$'}
                   </span>
                 </div>
+                {errors.offerValue && (
+                  <p className="text-red-500 text-sm mt-1">{errors.offerValue}</p>
+                )}
               </div>
 
               <div>
@@ -115,12 +182,15 @@ const OfferModal = ({ isOpen, onClose, onSubmit, type }) => {
                   <Input
                     id="startDate"
                     type="date"
-                    value={startDate}
+                    value={startDate || existingProductOffer?.validFrom}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="pl-8"
+                    className={`pl-8 ${errors.startDate ? 'border-red-500' : ''}`}
                   />
                   <Calendar className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4" />
                 </div>
+                {errors.startDate && (
+                  <p className="text-red-500 text-sm mt-1">{errors.startDate}</p>
+                )}
               </div>
 
               <div>
@@ -129,12 +199,15 @@ const OfferModal = ({ isOpen, onClose, onSubmit, type }) => {
                   <Input
                     id="endDate"
                     type="date"
-                    value={endDate}
+                    value={endDate || existingProductOffer?.validUntil}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="pl-8"
+                    className={`pl-8 ${errors.endDate ? 'border-red-500' : ''}`}
                   />
                   <Calendar className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4" />
                 </div>
+                {errors.endDate && (
+                  <p className="text-red-500 text-sm mt-1">{errors.endDate}</p>
+                )}
               </div>
 
               <Button type="submit" className="w-full">
@@ -149,4 +222,3 @@ const OfferModal = ({ isOpen, onClose, onSubmit, type }) => {
 };
 
 export default OfferModal;
-

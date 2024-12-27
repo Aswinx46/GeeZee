@@ -8,6 +8,7 @@ const OrderController = require('../controllers/OrderController')
 const brandController = require('../controllers/BrandController')
 const couponConrtoller=require('../controllers/CouponController')
 const salesReportController=require('../controllers/SalesReportController')
+const offerController=require('../controllers/OfferController')
 admin_route.post('/login', adminController.login)
 admin_route.get('/usersList', auth.adminAuth, adminController.fetchUser)
 admin_route.patch('/userEdit/:id', auth.adminAuth, adminController.editUser)
@@ -39,5 +40,7 @@ admin_route.get('/getCoupon',auth.adminAuth,couponConrtoller.showCoupon)
 admin_route.patch('/changeStatusOfCoupon/:couponId',auth.adminAuth,couponConrtoller.changeStatusOfCoupon)
 
 admin_route.get('/salesReport',auth.adminAuth,salesReportController.salesReport)
+admin_route.post('/addOffer/:productId',auth.adminAuth,offerController.addOffer)
+admin_route.patch('/changeStatusOrder/:offerId',auth.adminAuth,offerController.changeStatusOfOffer)
 
 module.exports = admin_route

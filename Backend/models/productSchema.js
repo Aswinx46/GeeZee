@@ -29,9 +29,9 @@ const ProductSchema=new mongoose.Schema({
         required:true
     },
     productOffer:{
-        type:Number,
-        default:0,
-        required:false
+        type:Schema.Types.ObjectId,
+        ref:'offer',
+        default:null
     },
     status:{
         type:String,

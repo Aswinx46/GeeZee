@@ -4,7 +4,8 @@ import axios from '../../../axios/adminAxios'
 import { toast } from 'react-toastify';
 import { Button } from "@/components/ui/button"
 import { motion } from 'framer-motion';
-
+import { FaSave, FaTimes, FaUpload, FaImage } from 'react-icons/fa';
+import OfferModal from '../productManagement/OrderManagement';
 const StaticCategoryManagement = () => {
 
     const [newCategory,setNewCategory]=useState('')
@@ -13,6 +14,8 @@ const StaticCategoryManagement = () => {
     const [isEditOpen, setIsEditOpen] = useState(false)
     const[editNameCategory,setEditNameCategory]=useState('')
     const[selectedId,setSelectedId]=useState(null)
+    const [OpenOffer, setOpenOffer] = useState(false)
+    const[selectedCateogryId,setSelectedCategoryId]=useState()
 
     useEffect(()=>{
         const fetchCategory=async () => {
@@ -102,7 +105,12 @@ const StaticCategoryManagement = () => {
       }
     }
 
-   
+   const handleAddOfferCateogry=(category)=>{
+    setSelectedCategoryId(category._id)
+      console.log(category)
+      setOpenOffer(true)
+
+   }
 
   return (
     <div className="min-h-screen bg-white p-8">
@@ -127,6 +135,7 @@ const StaticCategoryManagement = () => {
                 <th className="py-3 px-6 text-left">S.No</th>
                 <th className="py-3 px-6 text-left">Category Name</th>
                 <th className="py-3 px-6 text-center">List / Unlist</th>
+                <th className="py-3 px-6 text-center">Add Offer</th>
                 <th className="py-3 px-6 text-center">Actions</th>
               </tr>
             </thead>
@@ -155,9 +164,25 @@ const StaticCategoryManagement = () => {
                       >
                         {category.status}
                       </Button>
+                    
+                    </div>
+                  </td>
+                  <td className="py-4 px-6 text-center">
+                    <div className="flex justify-center">
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        type="button"
+                        onClick={()=>handleAddOfferCateogry(category)}
+                        className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-all duration-200 ease-in-out"
+                      >
+                        <FaSave className="mr-2" />
+                        Add Offer
+                      </motion.button>
                     </div>
                   </td>
                   <td className="py-4 px-6">
+                    
                     <div className="flex justify-center space-x-3">
                       <motion.button 
                         whileHover={{ scale: 1.1 }}
@@ -259,6 +284,7 @@ const StaticCategoryManagement = () => {
                 </motion.button>
               </div>
             </div>
+            <OfferModal OpenOffer={OpenOffer} setOpenOffer={setOpenOffer} categoryId={selectedCateogryId}/>
           </motion.div>
         </motion.div>
       )}
@@ -267,5 +293,3 @@ const StaticCategoryManagement = () => {
 };
 
 export default StaticCategoryManagement;
-
-

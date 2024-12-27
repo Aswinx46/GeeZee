@@ -43,10 +43,10 @@ const addProduct = async (req, res) => {
 const showProduct = async (req, res) => {
 
     try {
-        const products = await Product.find().populate('categoryId', 'categoryName')
+        const products = await Product.find().populate('categoryId', 'categoryName').populate('productOffer')
         return res.status(200).json({ message: 'products fetched', products })
     } catch (error) {
-        console.log('error while fetching the products')
+        console.log('error while fetching the products',error)
         return res.status(500).json({ message: "error while fetching the products" })
     }
 }
