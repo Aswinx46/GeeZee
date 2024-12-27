@@ -41,6 +41,7 @@ const EditProduct = () => {
     const navigate = useNavigate()
     const [index, setIndex] = useState()
     const [productId, setProductId] = useState()
+    const[update,setUpdate]=useState(false)
     const [existingProductOffer, setExistingProductOffer] = useState({})
 
     useEffect(() => {

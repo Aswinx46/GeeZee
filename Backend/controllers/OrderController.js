@@ -27,11 +27,14 @@ const createOrder = async (req, res) => {
     const { userId, variantId } = req.params
 
     const { mainAddress, cartItems, paymentMethod, total, shippingCharge, selectedCoupon } = req.body
-    // console.log(paymentMethod)
-    // console.log('this isthe cartItems', cartItems)
-    // console.log('this isthe variants', cartItems.variants)
-    // console.log('this is the total', total, 'this is the shippingCharge', shippingCharge)
-    // console.log('this is the final amount', total + shippingCharge)
+    console.log(paymentMethod)
+    const offerPrice=[]
+    const totalOfferPrice=cartItems.reduce((acc,item)=>acc+=item?.offerPrice,0)
+    console.log('this is the total offer price',totalOfferPrice)
+    console.log('this isthe cartItems', cartItems)
+    console.log('this isthe variants', cartItems.variants)
+    console.log('this is the total', total, 'this is the shippingCharge', shippingCharge)
+    console.log('this is the final amount', total + shippingCharge)
 
     try {
         const brandId = cartItems[0].brandId

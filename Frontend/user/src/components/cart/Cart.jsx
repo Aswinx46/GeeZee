@@ -28,38 +28,26 @@ useEffect(()=>{
   const fetchCartItems=async () => {
     const cartItems=await axios.get(`/cartItems/${userId}`)
     const items=cartItems.data.result
-    console.log('this is items',items.length)
+    console.log('this is items',items)
+    const neededItems = items.map((product) => {
+      const variantPrice = product?.variants[0]?.price
+      const categoryOfferPrice = product.categoryId?.categoryOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.categoryId?.categoryOffer?.offerValue / 100 : variantPrice - product.categoryId?.categoryOffer?.offerValue
+      const productOfferPrice = product.productOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.productOffer?.offerValue / 100 : variantPrice - product.productOffer?.offerValue
+      const offerPrice = categoryOfferPrice > productOfferPrice ? categoryOfferPrice : productOfferPrice
+      // console.log(categoryOfferPrice,productOfferPrice,offerPrice)
+      return { ...product, offerPrice }
+  })
+  console.log('this is the needed items',neededItems)
     const count=items.length
     setCount(count)
     // console.log(cartItems.data.result)
-    setCartItems(items)
+    setCartItems(neededItems)
     dispatch(incrementCounter(count))
   }
   fetchCartItems()
 },[update,userId])
 
 const dispatch=useDispatch()
-
-  // const [cartItems, setCartItems] = useState([
-  //   {
-  //     id: 1,
-  //     name: "Razer Basilisk V3 Pro - Black",
-  //     price: 159.99,
-  //     image: "/placeholder.svg?height=80&width=80",
-  //     quantity: 1,
-  //     protection: false,
-  //     protectionPrice: 29.99
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "Razer Wolverine V3 Pro",
-  //     price: 199.99,
-  //     image: "/placeholder.svg?height=80&width=80",
-  //     quantity: 1,
-  //     protection: false,
-  //     protectionPrice: 29.99
-  //   }
-  // ]);
 
   const navigate=useNavigate()
   const updateQuantity = (id, change) => {
@@ -94,7 +82,7 @@ const dispatch=useDispatch()
 
   const calculateSubtotal = () => {
     return cartItems.reduce((total, item) => {
-      const itemTotal = item.variants[0].price * item.quantity;
+      const itemTotal = item.offerPrice ? item.offerPrice * item.quantity :  item.variants[0].price * item.quantity;
    
       // console.log('this is the item in the calculate sub total',itemTotal)
       return total + itemTotal ;
@@ -221,9 +209,10 @@ const dispatch=useDispatch()
                           </div>
                         </div>
                         <div className="text-right text-white">
-                          <p className="text-lg font-bold">
+                          {/* <p className="text-lg font-bold">
                             US${item.variants[0].price}
-                          </p>
+                          </p> */}
+                            {item.offerPrice ? <> <p className="font-bold text-white text-2xl">₹{item.offerPrice }</p> <del className='font-bold text-red-500 text-2xl'> ₹{item.variants[0].price} </del> </> :  <p className="font-bold text-white text-2xl">₹{item.variants[0].price}</p>}    
                         </div>
                       </div>
 

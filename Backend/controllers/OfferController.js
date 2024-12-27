@@ -3,6 +3,8 @@ const Product = require('../models/productSchema')
 const Category=require('../models/categorySchema')
 const category = require('../models/categorySchema')
 
+
+
 const addOffer = async (req, res) => {
     try {
         const { offerType, offerValue, startDate, endDate } = req.body
@@ -26,6 +28,7 @@ const addOffer = async (req, res) => {
             console.log(newOffer)
             existingProductOffer.productOffer = newOffer._id
             existingProductOffer.save()
+       
             return res.status(200).json({ message: "offer added" })
         } else {
             const existingOffer = await Offer.findById(existingProductOffer.productOffer._id)

@@ -28,6 +28,7 @@ const CheckoutPage = () => {
   const [coupons, setCoupons] = useState([])
   const [selectedCoupon, setSelectedCoupon] = useState()
   const [appliedCoupon, setAppliedCoupon] = useState(null)
+  const[discount,setDiscount]=useState()
   useEffect(() => {
     console.log('Razorpay Key:', RAZORPAY_KEY_ID);
     const fetchData = async () => {
@@ -51,9 +52,16 @@ const CheckoutPage = () => {
       setSavedAddresses(savedAddress)
       console.log(savedAddress)
       const cartItems = await axios.get(`/cartItems/${userId}`)
-
-      console.log(cartItems.data.result)
-      setCartItems(cartItems.data.result)
+      const neededItems = cartItems.data.result.map((product) => {
+        const variantPrice = product?.variants[0]?.price
+        const categoryOfferPrice = product.categoryId?.categoryOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.categoryId?.categoryOffer?.offerValue / 100 : variantPrice - product.categoryId?.categoryOffer?.offerValue
+        const productOfferPrice = product.productOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.productOffer?.offerValue / 100 : variantPrice - product.productOffer?.offerValue
+        const offerPrice = categoryOfferPrice > productOfferPrice ? categoryOfferPrice : productOfferPrice
+        // console.log(categoryOfferPrice,productOfferPrice,offerPrice)
+        return { ...product, offerPrice }
+    })
+      console.log('this is the needed items',neededItems)
+      setCartItems(neededItems)
 
 
     }
@@ -75,6 +83,11 @@ const CheckoutPage = () => {
 
   const calculateSubTotal = () => {
     return cartItems.reduce((total, item) => {
+      if(item.offerPrice)
+      {
+        const itemTotal = item.offerPrice * item.quantity
+        return total + itemTotal;
+      }
       const itemTotal = item.variants[0].price * item.quantity
       return total + itemTotal;
     }, 0)
@@ -362,9 +375,10 @@ const CheckoutPage = () => {
                         Quantity: {item.quantity}
                       </p>
                     </div>
-                    <p className="text-lg font-medium text-gray-900">
+                    {/* <p className="text-lg font-medium text-gray-900">
                       ₹{item.variants[0].price}
-                    </p>
+                    </p> */}
+                      {item.offerPrice ? <> <p className="font-bold text-gray-900 text-2xl">₹{item.offerPrice }</p> <del className='font-bold text-red-500 text-2xl'> ₹{item.variants[0].price} </del> </> :  <p className="font-bold text-gray-900 text-2xl">₹{item.variants[0].price}</p>}    
                   </div>
                 ))}
               </motion.div>

@@ -16,8 +16,18 @@ const ProductPage = () => {
         const fetchDetails = async () => {
             try {
                 const productsResponse = await axios.get('/products')
-                setProducts(productsResponse.data.products)
+                // setProducts(productsResponse.data.products)
                 console.log(productsResponse.data.products)
+                const neededItems = productsResponse.data.products.map((product) => {
+                    const variantPrice = product?.variants[0]?.price
+                    const categoryOfferPrice = product.categoryId?.categoryOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.categoryId?.categoryOffer?.offerValue / 100 : variantPrice - product.categoryId?.categoryOffer?.offerValue
+                    const productOfferPrice = product.productOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.productOffer?.offerValue / 100 : variantPrice - product.productOffer?.offerValue
+                    const offerPrice = categoryOfferPrice > productOfferPrice ? categoryOfferPrice : productOfferPrice
+                    // console.log(categoryOfferPrice,productOfferPrice,offerPrice)
+                    return { ...product, offerPrice }
+                })
+                console.log(neededItems)
+                setProducts(neededItems)
                 const categoryResponse = await axios.get('/category')
                 setCategory(categoryResponse.data.category)
             } catch (error) {
@@ -27,13 +37,13 @@ const ProductPage = () => {
         fetchDetails()
     }, [])
 
-    const handleDeal=async(index)=>{
-                const selectedProduct=products.filter((_,i)=>i==index)
-                console.log(selectedProduct)
-               
-                localStorage.setItem("selectedProduct", JSON.stringify(selectedProduct));
-                navigate('/productDetails')
-            }
+    const handleDeal = async (index) => {
+        const selectedProduct = products.filter((_, i) => i == index)
+        console.log(selectedProduct)
+
+        localStorage.setItem("selectedProduct", JSON.stringify(selectedProduct));
+        navigate('/productDetails')
+    }
 
     const nextSlide = () => {
         if (carouselRef.current) {
@@ -136,7 +146,7 @@ const ProductPage = () => {
                                 <FaChevronRight className="text-[#8b5cf6]" />
                             </button>
                         </div>
-                        <div 
+                        <div
                             ref={carouselRef}
                             className="flex overflow-x-hidden"
                             style={{ scrollSnapType: 'x mandatory' }}
@@ -157,7 +167,8 @@ const ProductPage = () => {
                                         </div>
                                         <div className="p-3">
                                             <h3 className="text-sm font-semibold mb-2 line-clamp-2 text-white">{product.title}</h3>
-                                            <p className="text-lg font-bold text-[#8b5cf6] mb-2">₹{product.variants[0].price}</p>
+                                            
+                                        {product.offerPrice ? <> <p className="text-lg font-bold text-[#8b5cf6] mb-2">₹{product.offerPrice }</p> <del className='text-red-600'> ₹{product.variants[0].price} </del> </> :  <p className="text-lg font-bold text-[#8b5cf6] mb-2">₹{product.variants[0].price}</p>}    
                                             <button onClick={() => handleDeal(index)} className="w-full bg-[#8b5cf6] text-white px-3 py-1.5 rounded-full hover:bg-[#7c3aed] transition-all text-sm font-semibold">
                                                 View Deal
                                             </button>
