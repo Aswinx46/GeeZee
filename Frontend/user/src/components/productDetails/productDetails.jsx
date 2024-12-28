@@ -67,10 +67,28 @@ const ProductDetails = () => {
         const productOffer = single.productOffer
         const categoryOffer = single.categoryId?.categoryOffer
         const newVariants = single.variants.map((variant) => {
-          const categoryOfferPrice = categoryOffer?.offerType == 'percentage' ? variant - variant.price * categoryOffer?.offerValue / 100 : variant.price - categoryOffer?.offerValue
-          const productOfferPrice = productOffer?.offerType == 'percentage' ? variant - variant.price * productOffer?.offerValue / 100 : variant.price - productOffer?.offerValue
+          const categoryOfferPrice = categoryOffer?.offerType == 'percentage' ? variant.price - (variant.price * (categoryOffer?.offerValue || 0) / 100) : variant.price - (categoryOffer?.offerValue || 0)
+          const productOfferPrice = productOffer?.offerType == 'percentage' ? variant.price - (variant.price * (productOffer?.offerValue || 0) / 100) : variant.price - (productOffer?.offerValue || 0)
           console.log(categoryOfferPrice, productOfferPrice)
-          return {...variant,offerPrice:categoryOfferPrice>productOfferPrice ? categoryOfferPrice : productOfferPrice}
+          let offerPrice
+          if(categoryOffer?.offerType && productOffer?.offerType )
+          {
+
+             offerPrice =
+            // Number.isNaN(categoryOfferPrice) ? productOfferPrice :
+            // Number.isNaN(productOfferPrice) ? categoryOfferPrice :
+            Math.min(categoryOfferPrice, productOfferPrice);
+            console.log('this is  the offer price',offerPrice)
+          }else if(categoryOffer?.offerType && !productOffer?.offerType )
+          {
+              offerPrice=categoryOfferPrice
+          }else if(!categoryOffer?.offerType && productOffer?.offerType )
+          {
+            offerPrice=productOfferPrice
+          }
+
+
+          return {...variant,offerPrice:offerPrice}
           // const validPrices = [categoryOfferPrice, productOfferPrice].filter(price => !isNaN(price) && price >= 0);
           // const minOfferPrice = validPrices.length > 0 ? Math.min(...validPrices) : variant.price;
           // console.log('this is the minprice', minOfferPrice)
@@ -81,7 +99,7 @@ const ProductDetails = () => {
 
 
         setProduct({ ...single, variants: newVariants });
-      
+
         console.log(single.variants)
       } else {
         console.log('this is the else case')

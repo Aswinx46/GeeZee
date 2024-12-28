@@ -11,6 +11,8 @@ const ProductCard = ({ product, selectedProduct, setSelectedProduct }) => {
   const [isHovered, setIsHovered] = useState(false);
 
 
+
+
   const user=useSelector(state=>state.user.user)
   const userId=user._id
 
@@ -116,9 +118,10 @@ const ProductCard = ({ product, selectedProduct, setSelectedProduct }) => {
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[#39FF14] font-bold text-lg">
+                {/* <p className="text-[#39FF14] font-bold text-lg">
                   ₹{product.variants[0].price}
-                </p>
+                </p> */}
+                    {product.offerPrice ? <> <p className="text-[#39FF14] font-bold text-lg">₹{product.offerPrice }</p> <del className='text-red-600'> ₹{product.variants[0].price} </del> </> :  <p className="text-[#39FF14] font-bold text-lg">₹{product.variants[0].price}</p>}    
                 {product.discount > 0 && (
                   <p className="text-sm text-gray-400 line-through">
                     ₹{Math.round(product.variants[0].price * (1 + product.discount / 100))}

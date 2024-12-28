@@ -20,7 +20,22 @@ const BestSeller = () => {
     const fetchData = async () => {
       const response = await axios.get('/products')
       console.log(response.data.products)
-      setProducts(response.data.products)
+
+      const neededItems = response.data.products.map((product) => {
+        const variantPrice = product?.variants[0]?.price
+        const categoryOfferPrice = product.categoryId?.categoryOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.categoryId?.categoryOffer?.offerValue / 100 : variantPrice - product.categoryId?.categoryOffer?.offerValue
+        const productOfferPrice = product.productOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.productOffer?.offerValue / 100 : variantPrice - product.productOffer?.offerValue
+        // const offerPrice = categoryOfferPrice > productOfferPrice ? categoryOfferPrice : productOfferPrice
+        console.log('this is catprice',categoryOfferPrice,'this is pro price',productOfferPrice)
+        const offerPrice =
+          Number.isNaN(categoryOfferPrice) ? productOfferPrice :
+            Number.isNaN(productOfferPrice) ? categoryOfferPrice :
+              Math.max(categoryOfferPrice, productOfferPrice);
+        // console.log(categoryOfferPrice,productOfferPrice,offerPrice)
+        return { ...product, offerPrice }
+      })
+      console.log('this is the needed items', neededItems)
+      setProducts(neededItems)
     }
     fetchData()
   }, [])
@@ -220,9 +235,10 @@ const BestSeller = () => {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2 }}
                   >
-                    <p className="text-[#39FF14] text-2xl font-bold">
+                    {/* <p className="text-[#39FF14] text-2xl font-bold">
                       ₹{selectedProduct.variants[0].price}
-                    </p>
+                    </p> */}
+                    {selectedProduct.offerPrice ? <> <p className="text-lg font-bold text-[#8b5cf6] mb-2">₹{selectedProduct.offerPrice}</p> <del className='text-red-600'> ₹{selectedProduct.variants[0].price} </del> </> : <p className="text-lg font-bold text-[#8b5cf6] mb-2">₹{selectedProduct.variants[0].price}</p>}
                     {selectedProduct.discount > 0 && (
                       <Badge className="bg-[#39FF14] text-black">
                         {selectedProduct.discount}% OFF
