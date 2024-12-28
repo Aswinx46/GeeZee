@@ -22,6 +22,8 @@ const OrderDetailsSuccess = ({ orderDetails }) => {
     price,
   } = orderDetails;
 
+  console.log(orderDetails.name)
+
   const containerVariants = {
     hidden: { opacity: 0, y: 50 },
     visible: {

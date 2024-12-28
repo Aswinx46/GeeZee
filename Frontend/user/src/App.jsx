@@ -31,6 +31,8 @@ import CheckOutSuccess from './components/checkoutPage/CheckOutSuccess'
 import OrderDetailsTable from './components/orderDetails/orderTable';
 import BestSellers from './components/bestSeller/ProductCard';
 import OTPVerification from './components/accountDetails/ChangeEmailOtpVerification';
+import UserBlockedNotice from './extraAddonComponents/UserBlockedNotice';
+import NotFoundPage from './extraAddonComponents/NotFoundPage';
 function App() {
 
 
@@ -65,6 +67,8 @@ function App() {
         <Route path="/orderDetailsTable" element={<OrderDetailsTable />}></Route>
         <Route path="/bestSeller" element={<BestSellers />}></Route>
         <Route path="/emailOtpVerification" element={<OTPVerification />}></Route>
+        <Route path="/userBlockNotice" element={<UserBlockedNotice />}></Route>
+        <Route path="*" element={<NotFoundPage />} />
 
 
       </Routes>

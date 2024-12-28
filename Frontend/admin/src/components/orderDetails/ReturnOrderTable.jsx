@@ -22,7 +22,7 @@ const ReturnedOrdersTable = () => {
         const fetchData = async () => {
             try {
                 const response = await axios.get('/getReturnProducts')
-                console.log(response.data.orders)
+                console.log('ashjdfjadks',response.data.orders)
 
                 const neededItems = response.data.orders.flatMap((order) =>
                     order.orderItems.map((item) => ({
@@ -110,7 +110,7 @@ const ReturnedOrdersTable = () => {
 
                                     <TableCell>{order.orderId}</TableCell>
                                     <TableCell>{order.invoiceDate.split('T')[0]}</TableCell>
-                                    <TableCell>₹{order.orderItems[0].quantity * order.orderItems[0].price}</TableCell>
+                                    <TableCell>₹{returnedOrders[i].finalAmount}</TableCell>
                                     <TableCell>
                                         <span
                                             className={`px-2 py-1 rounded-full text-xs ${order.orderItems[0].variant.returnOrder === 'Pending'
@@ -202,7 +202,9 @@ const OrderDetailsModal = ({ order, onClose }) => {
                 <p><strong>Product:</strong> {order.orderItems[0].productId.title}</p>
                 <p><strong>Order ID:</strong> {order.orderId}</p>
                 <p><strong>Date:</strong> {order.invoiceDate.split("T")[0]}</p>
-                <p><strong>Total:</strong> ₹{order.orderItems[0].quantity * order.orderItems[0].price}</p>
+                <p><strong>Discount:</strong> ₹{order.discount}</p>
+                <p><strong>shippingCost:</strong> ₹{order.shippingCost}</p>
+                <p><strong>Total:</strong> ₹{order.finalAmount}</p>
                 <p><strong>Status:</strong> {order.orderItems[0].variant.returnOrder}</p>
                 <div className="flex justify-between items-center mt-4">
                     <Button onClick={onClose} variant="outline">Close</Button>

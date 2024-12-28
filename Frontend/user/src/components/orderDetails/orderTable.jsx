@@ -112,7 +112,7 @@ const OrderDetails = () => {
                 <TableCell onClick={() => handleProductDetail(item)} className="font-medium"><img className={`h-15 w-20 object-cover rounded-md shadow-sm hover:scale-105 transition-transform duration-200 ${item.status === 'Cancelled' ? 'grayscale' : ''}`} src={item.productId.productImg[0]} alt={item.productId.title} /></TableCell>
                 <TableCell onClick={() => handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'line-through text-gray-500' : ''}`}>{item.quantity}</TableCell>
                 <TableCell onClick={() => handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'line-through text-gray-500' : ''}`}>₹{item.price}</TableCell>
-                <TableCell onClick={() => handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'line-through text-gray-500' : ''}`}>₹{(item.quantity * item.price)}</TableCell>
+                <TableCell onClick={() => handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'line-through text-gray-500' : ''}`}>₹{item.finalAmount}</TableCell>
                 <TableCell onClick={() => handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'text-red-500 font-medium' : ''}`}>{item.status}</TableCell>
                 <TableCell onClick={() => handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'text-gray-500' : ''}`}>{item.orderId}</TableCell>
                 <TableCell onClick={() => handleProductDetail(item)} className={`text-right ${item.variant.returnOrder === 'Pending' ? 'text-red-500' : ''}`}>{item.variant.returnOrder}</TableCell>

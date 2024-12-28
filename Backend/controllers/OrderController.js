@@ -214,6 +214,13 @@ const showOrders = async (req, res) => {
     }
 }
 
+     // const details = selectedOrder.orderItems.map((items) => ({
+        //     variantId: items.variant._id,
+        //     quantity: items.quantity,
+        //     productId: items.productId,
+        //     totalPrice: ...totalPrice +(items.quantity * items.price)
+        // }))
+
 const cancelOrder = async (req, res) => {
     const { orderId, userId } = req.params
     const { reason, paymentMethod } = req.body
@@ -221,14 +228,9 @@ const cancelOrder = async (req, res) => {
     console.log('this is canceling user id', userId)
     try {
 
-        const selectedOrder = await Order.findById(orderId, 'orderItems')
+        const selectedOrder = await Order.findById(orderId, 'orderItems finalAmount shippingCost discount')
         console.log(selectedOrder)
-        // const details = selectedOrder.orderItems.map((items) => ({
-        //     variantId: items.variant._id,
-        //     quantity: items.quantity,
-        //     productId: items.productId,
-        //     totalPrice: ...totalPrice +(items.quantity * items.price)
-        // }))
+   
 
 
         const details = selectedOrder.orderItems.map((items) => {
@@ -261,12 +263,12 @@ const cancelOrder = async (req, res) => {
             const transaction = {
                 type: 'Refund',
                 transaction_id: uuidv4(), // Generate a unique transaction ID
-                amount: totalRefundAmount,
+                amount: selectedOrder.finalAmount - (selectedOrder.shippingCost + selectedOrder.discount),
                 description: 'Product Returned amount',
                 date: new Date(), // Add a timestamp for the transaction
             };
             wallet.transactions.push(transaction)
-            wallet.balance += totalRefundAmount
+            wallet.balance += selectedOrder.finalAmount - (selectedOrder.shippingCost + selectedOrder.discount)
             await wallet.save()
             console.log('this is the wallet', wallet)
         }
@@ -339,7 +341,7 @@ const getReturnProducts = async (req, res) => {
     try {
         const orders = await Order.find({ 'orderItems.variant.returnOrder': 'Pending' }, {
             userId: 1, _id: 1, orderItems: 1,
-            orderId: 1, paymentMethod: 1, invoiceDate: 1
+            orderId: 1, paymentMethod: 1, invoiceDate: 1,finalAmount:1,totalPrice:1,shippingCost:1,discount:1
         }).populate('orderItems.productId', 'title productImg price').populate('address').populate('userId', 'firstName lastName email phoneNo');
         console.log('this is the orders', orders)
         const filteredOrders = orders.map((order) => ({
@@ -398,12 +400,12 @@ const confirmReturnProduct = async (req, res) => {
         const transaction = {
             type: 'Refund',
             transaction_id: uuidv4(), // Generate a unique transaction ID
-            amount: returnedVariant.quantity * returnedVariant.price,
+            amount: update.finalAmount - (update.shippingCost + update.discount),
             description: 'Product Returned amount',
             date: new Date(), // Add a timestamp for the transaction
         };
         wallet.transactions.push(transaction)
-        wallet.balance += returnedVariant.quantity * returnedVariant.price
+        wallet.balance += update.finalAmount - (update.shippingCost + update.discount)
         await wallet.save()
         console.log('this is the wallet', wallet)
         return res.status(200).json({ message: "order Updated", update, selectedProduct })
