@@ -141,7 +141,7 @@ const dispatch=useDispatch()
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          Your cart total is US${total.toFixed(2)}
+          Your cart total is ₹{total.toFixed(2)}
         </motion.h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -244,7 +244,7 @@ const dispatch=useDispatch()
                 <div className="space-y-4">
                   <div className="flex justify-between text-white">
                     <span>Subtotal</span>
-                    <span>US${calculateSubtotal().toFixed(2)}</span>
+                    <span>₹{calculateSubtotal().toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-white">
                     <span>Shipping</span>
@@ -257,7 +257,7 @@ const dispatch=useDispatch()
                   <Separator className="bg-zinc-800" />
                   <div className="flex justify-between text-lg font-bold text-white">
                     <span>Total</span>
-                    <span>US${total.toFixed(2)}</span>
+                    <span>₹{total.toFixed(2)}</span>
                   </div>
                   <Button 
                   onClick={handleCheckOut}

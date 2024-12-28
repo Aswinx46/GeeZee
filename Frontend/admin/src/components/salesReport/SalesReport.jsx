@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import axios from '../../../axios/adminAxios'
 import { toast } from 'react-toastify'
+import { CSVLink, CSVDownload } from "react-csv";
 const SalesReport = () => {
   const [dateRange, setDateRange] = useState('month')
   const [startDate, setStartDate] = useState('')
@@ -28,6 +29,7 @@ const SalesReport = () => {
           }
         })
         setSalesreport(response.data.salesReport)
+        console.log(response.data.salesReport)
 
         const formatedData = response.data.salesReport?.map((report) => ({
           name: report.monthName || report.createdOn.split('T')[0],
@@ -93,6 +95,19 @@ const SalesReport = () => {
     }
 
   }
+
+  
+  const csvData = [["Month/Year", "Total Sales",'totalDiscount','totalFinalAmount','totalOrderAmount']];
+
+  salesReport.forEach((item) => {
+    csvData.push([item.monthName, item.totalSalesCount,item.totalDiscount,item.totalFinalAmount,item.totalOrderAmount]);
+  });
+
+
+  const handleDownloadReport=()=>{
+ 
+    
+  }
   return (
     <motion.div
       className="container mx-auto p-6 space-y-8"
@@ -154,6 +169,10 @@ const SalesReport = () => {
 
       <motion.div variants={itemVariants}>
         <Button onClick={handleGenarateReport} >Generate Report</Button>
+      </motion.div>
+      <motion.div variants={itemVariants}>
+        <Button onClick={handleDownloadReport} >   <CSVLink  data={csvData}>Download Report</CSVLink></Button>
+      
       </motion.div>
 
       <motion.div className="grid gap-6 md:grid-cols-4" variants={itemVariants}>

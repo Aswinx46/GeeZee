@@ -60,35 +60,28 @@ const ProductDetails = () => {
         const produc = productSelected ? JSON.parse(productSelected) : [];
         console.log(produc)
         const single = produc[0];
-        console.log('this is single',single)
+        console.log('this is single', single)
+
+
+
+        const productOffer = single.productOffer
+        const categoryOffer = single.categoryId?.categoryOffer
+        const newVariants = single.variants.map((variant) => {
+          const categoryOfferPrice = categoryOffer?.offerType == 'percentage' ? variant - variant.price * categoryOffer?.offerValue / 100 : variant.price - categoryOffer?.offerValue
+          const productOfferPrice = productOffer?.offerType == 'percentage' ? variant - variant.price * productOffer?.offerValue / 100 : variant.price - productOffer?.offerValue
+          console.log(categoryOfferPrice, productOfferPrice)
+          // return {...variant,offerPrice:categoryOfferPrice>productOfferPrice ? categoryOfferPrice : productOfferPrice}
+          const validPrices = [categoryOfferPrice, productOfferPrice].filter(price => !isNaN(price) && price >= 0);
+          const minOfferPrice = validPrices.length > 0 ? Math.min(...validPrices) : variant.price;
+          console.log('this is the minprice', minOfferPrice)
+          return { ...variant, offerPrice: minOfferPrice };
+        })
+
+        console.log('this is the needed', newVariants)
+
+
+        setProduct({ ...single, variants: newVariants });
       
-
-      //   const neededItems = productsResponse.data.products.map((product) => {
-      //     const variantPrice = product?.variants[0]?.price
-      //     const categoryOfferPrice = product.categoryId?.categoryOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.categoryId?.categoryOffer?.offerValue / 100 : variantPrice - product.categoryId?.categoryOffer?.offerValue
-      //     const productOfferPrice = product.productOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.productOffer?.offerValue / 100 : variantPrice - product.productOffer?.offerValue
-      //     const offerPrice = categoryOfferPrice > productOfferPrice ? categoryOfferPrice : productOfferPrice
-      //     // console.log(categoryOfferPrice,productOfferPrice,offerPrice)
-      //     return { ...product, offerPrice }
-      // })
-  const productOffer=single.productOffer
-  const categoryOffer=single.categoryId?.categoryOffer
-      const newVariants=single.variants.map((variant)=>{
-        const categoryOfferPrice=categoryOffer?.offerType == 'percentage' ? variant- variant.price * categoryOffer?.offerValue / 100 : variant.price - categoryOffer?.offerValue
-        const productOfferPrice=productOffer?.offerType == 'percentage' ?  variant- variant.price * productOffer?.offerValue / 100  : variant.price - productOffer?.offerValue
-        console.log(categoryOfferPrice , productOfferPrice)
-        // return {...variant,offerPrice:categoryOfferPrice>productOfferPrice ? categoryOfferPrice : productOfferPrice}
-        const validPrices = [categoryOfferPrice, productOfferPrice].filter(price => !isNaN(price) && price >= 0);
-        const minOfferPrice = validPrices.length > 0 ? Math.min(...validPrices) : variant.price;
-      console.log('this is the minprice',minOfferPrice)
-        return { ...variant, offerPrice: minOfferPrice };
-      })
-
-      console.log('this is the needed',newVariants)
-
-
-        setProduct({...single,variants:newVariants});
-        console.log("re fetching")
         console.log(single.variants)
       } else {
         console.log('this is the else case')
@@ -310,7 +303,7 @@ const ProductDetails = () => {
               className="text-gray-300 mb-8"
             >
               {/* {<span className='font-bold text-white text-2xl' >  PRICE {product?.variants[index]?.price}  </span>} <del className='font-bold text-red-500 text-2xl' >10000</del> */}
-              {product.offerPrice ? <> <p className="font-bold text-white text-2xl">₹{product.variants[index].offerPrice }</p> <del className='font-bold text-red-500 text-2xl'> ₹{product.variants[index].price} </del> </> :  <p className="font-bold text-white text-2xl">₹{product.variants[index].price}</p>}    
+              {product.offerPrice ? <> <p className="font-bold text-white text-2xl">₹{product.variants[index].offerPrice}</p> <del className='font-bold text-red-500 text-2xl'> ₹{product.variants[index].price} </del> </> : <p className="font-bold text-white text-2xl">₹{product.variants[index].price}</p>}
             </motion.p>
 
             <VariantSelector sendVariant={product.variants} receiveIndex={receiveIndex} id={product._id} setProducts={setProduct} />
