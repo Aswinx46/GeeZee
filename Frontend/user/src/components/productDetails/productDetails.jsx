@@ -70,11 +70,11 @@ const ProductDetails = () => {
           const categoryOfferPrice = categoryOffer?.offerType == 'percentage' ? variant - variant.price * categoryOffer?.offerValue / 100 : variant.price - categoryOffer?.offerValue
           const productOfferPrice = productOffer?.offerType == 'percentage' ? variant - variant.price * productOffer?.offerValue / 100 : variant.price - productOffer?.offerValue
           console.log(categoryOfferPrice, productOfferPrice)
-          // return {...variant,offerPrice:categoryOfferPrice>productOfferPrice ? categoryOfferPrice : productOfferPrice}
-          const validPrices = [categoryOfferPrice, productOfferPrice].filter(price => !isNaN(price) && price >= 0);
-          const minOfferPrice = validPrices.length > 0 ? Math.min(...validPrices) : variant.price;
-          console.log('this is the minprice', minOfferPrice)
-          return { ...variant, offerPrice: minOfferPrice };
+          return {...variant,offerPrice:categoryOfferPrice>productOfferPrice ? categoryOfferPrice : productOfferPrice}
+          // const validPrices = [categoryOfferPrice, productOfferPrice].filter(price => !isNaN(price) && price >= 0);
+          // const minOfferPrice = validPrices.length > 0 ? Math.min(...validPrices) : variant.price;
+          // console.log('this is the minprice', minOfferPrice)
+          // return { ...variant, offerPrice: minOfferPrice };
         })
 
         console.log('this is the needed', newVariants)
@@ -303,7 +303,7 @@ const ProductDetails = () => {
               className="text-gray-300 mb-8"
             >
               {/* {<span className='font-bold text-white text-2xl' >  PRICE {product?.variants[index]?.price}  </span>} <del className='font-bold text-red-500 text-2xl' >10000</del> */}
-              {product.offerPrice ? <> <p className="font-bold text-white text-2xl">₹{product.variants[index].offerPrice}</p> <del className='font-bold text-red-500 text-2xl'> ₹{product.variants[index].price} </del> </> : <p className="font-bold text-white text-2xl">₹{product.variants[index].price}</p>}
+              {product.variants[index].offerPrice ? <> <p className="font-bold text-white text-2xl">₹{product.variants[index].offerPrice}</p> <del className='font-bold text-red-500 text-2xl'> ₹{product.variants[index].price} </del> </> : <p className="font-bold text-white text-2xl">₹{product.variants[index].price}</p>}
             </motion.p>
 
             <VariantSelector sendVariant={product.variants} receiveIndex={receiveIndex} id={product._id} setProducts={setProduct} />
