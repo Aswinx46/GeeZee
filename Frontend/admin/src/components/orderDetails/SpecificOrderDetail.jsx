@@ -135,6 +135,7 @@ const SpecificOrderDetail = ({ isOpen, onClose, setIsOpen, order: initialOrder,o
                   <Calendar className="mr-2 text-gray-500" />
                   <span>Date: {orderDetails.invoiceDate.split('T')[0]}</span>
                 </div>
+                  <span>Cancellation reason: {orderDetails.CancellationReason}</span>
               </CardContent>
             </Card>
           </motion.div>

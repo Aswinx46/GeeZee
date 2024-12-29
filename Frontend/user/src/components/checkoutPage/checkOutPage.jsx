@@ -111,6 +111,7 @@ const CheckoutPage = () => {
       toast.error('Product is blocked by admin remove the product to continue purchase')
       return
     }
+    console.log('this is the main address',mainAddress)
     if(!mainAddress){
       toast.error('No address Selected')
       return
@@ -125,6 +126,7 @@ const CheckoutPage = () => {
       if (paymentMethod == 'Razorpay') {
         console.log('inside razor')
         const { razorpayOrderId, amount, currency } = response.data;
+       
         const options = {
           key: RAZORPAY_KEY_ID, // Replace with your Razorpay key
           amount,

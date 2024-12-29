@@ -14,13 +14,18 @@ const ProductCard = ({ product, selectedProduct, setSelectedProduct }) => {
 
 
   const user=useSelector(state=>state.user.user)
-  const userId=user._id
+  const userId=user?._id
 
   const handleWishlilst=async()=>{
     console.log(product)
     console.log(userId)
     console.log('this isthe wishlist')
     try {
+      if(!userId)
+      {
+        toast.error('Please login to add product to wishlist')
+        return
+      }
       const response=await axios.post(`addProductWishlist/${userId}`,{product},)
       toast.success(response.data.message)
     } catch (error) {

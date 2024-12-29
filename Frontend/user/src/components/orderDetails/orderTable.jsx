@@ -31,7 +31,7 @@ const OrderDetails = () => {
         order.orderItems.map((item) => ({
           ...item, status: order.status, invoiceDate: order.invoiceDate, address: order.address, paymentMethod: order.paymentMethod,
           totalPrice: order.totalPrice, shippingCost: order.shippingCost, finalAmount: order.finalAmount, orderId: order.orderId, orderObjectId: order._id,
-          variants: order.orderItems[0].variant.selectedAttributes, orderItemId: item._id
+          variants: order.orderItems[0].variant.selectedAttributes, orderItemId: item._id,paymentStatus:order.paymentStatus,razorPayOrderId:order.razorpayOrderId
         })))
       setParticularOrderDetails(combinedItems[0])
       console.log('this is the combined items', combinedItems)
@@ -46,11 +46,11 @@ const OrderDetails = () => {
     visible: { opacity: 1, y: 0 },
   }
 
-  const items = [
-    { id: 1, name: 'Wireless Mouse', quantity: 1, price: 29.99 },
-    { id: 2, name: 'Mechanical Keyboard', quantity: 1, price: 69.99 },
-    { id: 3, name: 'USB-C Hub', quantity: 2, price: 14.99 },
-  ]
+  // const items = [
+  //   { id: 1, name: 'Wireless Mouse', quantity: 1, price: 29.99 },
+  //   { id: 2, name: 'Mechanical Keyboard', quantity: 1, price: 69.99 },
+  //   { id: 3, name: 'USB-C Hub', quantity: 2, price: 14.99 },
+  // ]
 
 
   const containerVariants = {
@@ -101,19 +101,21 @@ const OrderDetails = () => {
               <TableHead className="text-right">Price</TableHead>
               <TableHead className="text-right">Total</TableHead>
               <TableHead className="text-right">Status</TableHead>
+              <TableHead className="text-right">Payment</TableHead>
               <TableHead className="text-right">orderId</TableHead>
               {orderDetails[0]?.orderItems[0]?.variant.returnOrder ? <TableHead className="text-right">Return Order status</TableHead> : ''}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {allOrderItems.map((item) => (
-              <TableRow key={item._id} className={`${item.status === 'Cancelled' ? 'bg-red-50 opacity-70' : ''}`}>
+            {allOrderItems.map((item,i) => (
+              <TableRow key={i} className={`${item.status === 'Cancelled' ? 'bg-red-50 opacity-70' : ''}`}>
                 <TableCell onClick={() => handleProductDetail(item)} className={`font-medium ${item.status === 'Cancelled' ? 'line-through text-gray-500' : ''}`}>{item.productId.title}<br /> {Object.entries(item.variant.selectedAttributes).map((key) => <h1>{key.join(' : ')}</h1>)}  </TableCell>
                 <TableCell onClick={() => handleProductDetail(item)} className="font-medium"><img className={`h-15 w-20 object-cover rounded-md shadow-sm hover:scale-105 transition-transform duration-200 ${item.status === 'Cancelled' ? 'grayscale' : ''}`} src={item.productId.productImg[0]} alt={item.productId.title} /></TableCell>
                 <TableCell onClick={() => handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'line-through text-gray-500' : ''}`}>{item.quantity}</TableCell>
                 <TableCell onClick={() => handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'line-through text-gray-500' : ''}`}>₹{item.price}</TableCell>
                 <TableCell onClick={() => handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'line-through text-gray-500' : ''}`}>₹{item.finalAmount}</TableCell>
-                <TableCell onClick={() => handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'text-red-500 font-medium' : ''}`}>{item.status}</TableCell>
+                <TableCell onClick={() => handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'text-red-500 font-medium' : ''}`}>{item.status} </TableCell>
+                <TableCell onClick={() => handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'text-red-500 font-medium' : ''}`}>{item.paymentStatus} </TableCell>
                 <TableCell onClick={() => handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'text-gray-500' : ''}`}>{item.orderId}</TableCell>
                 <TableCell onClick={() => handleProductDetail(item)} className={`text-right ${item.variant.returnOrder === 'Pending' ? 'text-red-500' : ''}`}>{item.variant.returnOrder}</TableCell>
               </TableRow>

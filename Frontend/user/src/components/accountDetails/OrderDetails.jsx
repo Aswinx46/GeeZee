@@ -4,14 +4,21 @@ import { Truck, CreditCard, Package, X } from 'lucide-react';
 import { Button } from "@/components/ui/button"
 import axios from '../../axios/userAxios'
 import OrderCancellationModal from '@/extraAddonComponents/OrderCancellation';
+import { useNavigate } from 'react-router-dom';
+import { RAZORPAY_KEY_ID } from '@/config/razorPayKey';
+import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
 const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
   console.log('this is the sended item',item)
+  const user=useSelector(state=>state.user.user)
+  const userId=user._id
   const[orderCancelPop,setOrderCancelPop]=useState(false)
   const[cancel,setCancel]=useState(false)
   const[isReturn,setIsReturn]=useState(false)
   const[orderItemId,setOrderItemId]=useState()
   console.log('this  is the order details from the parent',orderDetails)
   const[orderId,setOrderId]=useState()
+  const navigate=useNavigate()
   const order = {
     id: '#ORD12345',
     status: 'Shipped',
@@ -70,6 +77,65 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
     setOrderId(orderDetails.orderObjectId)
       setOrderItemId(orderDetails.orderItemId)
      
+  }
+
+  const handleRepayment=()=>{
+    // const { razorpayOrderId, amount, currency } = response.data;
+    const razorpayOrderId=orderDetails.razorPayOrderId
+    const amount=orderDetails.finalAmount
+    const currency='INR'
+    console.log('this is the razorpayOrderId',razorpayOrderId)
+    console.log('this is the currency',currency)
+    console.log("this si the amount",amount)
+    if(orderDetails.paymentStatus=='Awaiting Payment')
+    {
+      const options = {
+        key: RAZORPAY_KEY_ID, // Replace with your Razorpay key
+        amount,
+        currency,
+        name: 'GeeZee',
+        description: 'Order Payment',
+        order_id: razorpayOrderId,
+        handler: async (response) => {
+          console.log('Payment Success:', response);
+          toast.success('Payment Successful');
+          navigate("/checkoutSuccess");
+          // Optionally send payment confirmation to the backend
+  
+          await axios.post(`/confirmPayment/${userId}`, {
+            paymentId: response.razorpay_payment_id,
+            orderId: razorpayOrderId,
+            signature: response.razorpay_signature
+          });
+          // toast.success("Payment Successful");
+          console.log('this is after the confirm payment route ')
+  
+        },
+        prefill: {
+          name: orderDetails.address.name,
+          email: orderDetails.address.email,
+          contact: orderDetails.address.phone,
+        },
+        theme: {
+          color: '#3399cc',
+        }, method: {
+          netbanking: true,
+          card: true,
+          upi: true, // Enables UPI
+          wallet: true,
+        },
+      };
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+  
+      razorpay.on('payment.failed', (response) => {
+        console.error('Payment Failed:', response);
+        toast.error('Payment Failed. Please try again.');
+      });
+     
+    }else{
+      navigate('/checkoutSuccess')
+    }
   }
 
 
@@ -169,6 +235,15 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
                 <span>₹{orderDetails.finalAmount}</span>
               </div>
             </motion.div>
+
+            {orderDetails.paymentStatus=='Awaiting Payment' ?
+                  <Button
+                  className="mt-6 w-full bg-black text-white hover:bg-gray-800"
+                  onClick={handleRepayment}
+                  >
+                    Retry Payment
+            </Button>
+            : ''}
 
             {orderDetails.status=='Cancelled' ||  orderDetails.status=='Delivered'? '' : 
                   <Button

@@ -56,24 +56,20 @@ const createOrder = async (req, res) => {
 
 
 
-        for (item of cartItems) {
-            // console.log("--------------------------------------------------------------")
-            // console.log('this is the items', item)
-
-            const allVariants = await Product.findById(item.id, 'variants')
-            const changeVariant = allVariants.variants.find(
-                (variant) => variant._id.toString() === item.variants[0]._id
-            );
-            if (changeVariant) {
-                changeVariant.stock -= item.quantity
-                // console.log('this is the final stock ', changeVariant.stock)
-                if (changeVariant.stock < 0) {
-                    return res.status(400).json({ message: "Out of Stock" })
+            const insufficientStock = [];
+            for (const item of cartItems) {
+                const product = await Product.findById(item.id, "variants");
+                const variant = product.variants.find((v) => v._id.toString() === item.variants[0]._id);
+                if (!variant || variant.stock < item.quantity) {
+                    insufficientStock.push(item.id);
                 }
-                await allVariants.save()
             }
-            // console.log('this is the all variants', allVariants)
-        }
+            if (insufficientStock.length > 0) {
+                return res.status(400).json({ message: "out of stock", insufficientStock });
+            }
+
+
+    
         let razorPayIdOrder = null
         if (paymentMethod === 'Razorpay') {
             const razorpayOptions = {
@@ -121,7 +117,24 @@ const createOrder = async (req, res) => {
         await order.save()
 
 
+        for (item of cartItems) {
+            // console.log("--------------------------------------------------------------")
+            // console.log('this is the items', item)
 
+            const allVariants = await Product.findById(item.id, 'variants')
+            const changeVariant = allVariants.variants.find(
+                (variant) => variant._id.toString() === item.variants[0]._id
+            );
+            if (changeVariant) {
+                changeVariant.stock -= item.quantity
+                // console.log('this is the final stock ', changeVariant.stock)
+                if (changeVariant.stock < 0) {
+                    return res.status(400).json({ message: "Out of Stock" })
+                }
+                await allVariants.save()
+            }
+            // console.log('this is the all variants', allVariants)
+        }
 
 
 
@@ -144,6 +157,7 @@ const createOrder = async (req, res) => {
 
 
 const verifyPayment = async (req, res) => {
+    console.log('this is inside the verify payment')
     const { paymentId, orderId, signature } = req.body;
     const { userId } = req.params
     console.log('this is the payment id', paymentId, 'this is the orderid', orderId)
