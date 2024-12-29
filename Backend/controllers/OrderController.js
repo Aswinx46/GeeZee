@@ -28,9 +28,9 @@ const createOrder = async (req, res) => {
 
     const { mainAddress, cartItems, paymentMethod, total, shippingCharge, selectedCoupon } = req.body
     console.log(paymentMethod)
-    const offerPrice=[]
-    const totalOfferPrice=cartItems.reduce((acc,item)=>acc+=item?.offerPrice,0)
-    console.log('this is the total offer price',totalOfferPrice)
+    const offerPrice = []
+    const totalOfferPrice = cartItems.reduce((acc, item) => acc += item?.offerPrice, 0)
+    console.log('this is the total offer price', totalOfferPrice)
     console.log('this isthe cartItems', cartItems)
     console.log('this isthe variants', cartItems.variants)
     console.log('this is the total', total, 'this is the shippingCharge', shippingCharge)
@@ -56,20 +56,20 @@ const createOrder = async (req, res) => {
 
 
 
-            const insufficientStock = [];
-            for (const item of cartItems) {
-                const product = await Product.findById(item.id, "variants");
-                const variant = product.variants.find((v) => v._id.toString() === item.variants[0]._id);
-                if (!variant || variant.stock < item.quantity) {
-                    insufficientStock.push(item.id);
-                }
+        const insufficientStock = [];
+        for (const item of cartItems) {
+            const product = await Product.findById(item.id, "variants");
+            const variant = product.variants.find((v) => v._id.toString() === item.variants[0]._id);
+            if (!variant || variant.stock < item.quantity) {
+                insufficientStock.push(item.id);
             }
-            if (insufficientStock.length > 0) {
-                return res.status(400).json({ message: "out of stock", insufficientStock });
-            }
+        }
+        if (insufficientStock.length > 0) {
+            return res.status(400).json({ message: "out of stock", insufficientStock });
+        }
 
 
-    
+
         let razorPayIdOrder = null
         if (paymentMethod === 'Razorpay') {
             const razorpayOptions = {
@@ -121,8 +121,8 @@ const createOrder = async (req, res) => {
             // console.log("--------------------------------------------------------------")
             // console.log('this is the items', item)
 
-            const allVariants = await Product.findById(item.id, 'variants')
-            const changeVariant = allVariants.variants.find(
+            const product = await Product.findById(item.id, 'variants categoryId brand salesCount')
+            const changeVariant = product.variants.find(
                 (variant) => variant._id.toString() === item.variants[0]._id
             );
             if (changeVariant) {
@@ -131,8 +131,13 @@ const createOrder = async (req, res) => {
                 if (changeVariant.stock < 0) {
                     return res.status(400).json({ message: "Out of Stock" })
                 }
-                await allVariants.save()
+                product.salesCount = (product.salesCount || 0) + item.quantity
+                await product.save()
             }
+            await Category.updateOne({ _id: product.categoryId }, { $inc: { salesCount: item.quantity } })
+
+            await Brand.updateOne({ _id: product.brand }, { $inc: { salesCount: item.quantity } })
+
             // console.log('this is the all variants', allVariants)
         }
 
@@ -228,12 +233,12 @@ const showOrders = async (req, res) => {
     }
 }
 
-     // const details = selectedOrder.orderItems.map((items) => ({
-        //     variantId: items.variant._id,
-        //     quantity: items.quantity,
-        //     productId: items.productId,
-        //     totalPrice: ...totalPrice +(items.quantity * items.price)
-        // }))
+// const details = selectedOrder.orderItems.map((items) => ({
+//     variantId: items.variant._id,
+//     quantity: items.quantity,
+//     productId: items.productId,
+//     totalPrice: ...totalPrice +(items.quantity * items.price)
+// }))
 
 const cancelOrder = async (req, res) => {
     const { orderId, userId } = req.params
@@ -244,16 +249,16 @@ const cancelOrder = async (req, res) => {
 
         const selectedOrder = await Order.findById(orderId, 'orderItems finalAmount shippingCost discount')
         console.log(selectedOrder)
-   
+
 
 
         const details = selectedOrder.orderItems.map((items) => {
-          
+
             return {
                 variantId: items.variant._id,
                 quantity: items.quantity,
                 productId: items.productId,
-                totalPrice:  items.quantity * items.price, // Use item total for this particular item
+                totalPrice: items.quantity * items.price, // Use item total for this particular item
             };
         });
 
@@ -264,6 +269,13 @@ const cancelOrder = async (req, res) => {
                 { _id: item.productId, "variants._id": item.variantId },
                 { $inc: { "variants.$.stock": item.quantity } }
             );
+            await Product.findByIdAndUpdate(item.productId, { $inc: { salesCount: -item.quantity } });
+
+            const product = await Product.findById(item.productId, 'categoryId brand');
+
+            await Category.findByIdAndUpdate(product.categoryId, { $inc: { salesCount: -item.quantity } });
+
+            await Brand.findByIdAndUpdate(product.brand, { $inc: { salesCount: -item.quantity } });
         }
 
         if (paymentMethod == 'Razorpay') {
@@ -271,7 +283,7 @@ const cancelOrder = async (req, res) => {
 
             if (!wallet) return res.status(400).json({ message: 'no wallet found' })
 
-                const totalRefundAmount = details.reduce((sum, item) => sum + item.totalPrice, 0);
+            const totalRefundAmount = details.reduce((sum, item) => sum + item.totalPrice, 0);
 
 
             const transaction = {
@@ -355,7 +367,7 @@ const getReturnProducts = async (req, res) => {
     try {
         const orders = await Order.find({ 'orderItems.variant.returnOrder': 'Pending' }, {
             userId: 1, _id: 1, orderItems: 1,
-            orderId: 1, paymentMethod: 1, invoiceDate: 1,finalAmount:1,totalPrice:1,shippingCost:1,discount:1
+            orderId: 1, paymentMethod: 1, invoiceDate: 1, finalAmount: 1, totalPrice: 1, shippingCost: 1, discount: 1
         }).populate('orderItems.productId', 'title productImg price').populate('address').populate('userId', 'firstName lastName email phoneNo');
         console.log('this is the orders', orders)
         const filteredOrders = orders.map((order) => ({
@@ -402,6 +414,14 @@ const confirmReturnProduct = async (req, res) => {
             return res.status(400).json({ message: "Failed to update variant stock" });
         }
 
+        await Product.findByIdAndUpdate(productId,{$inc:{salesCount : -quantity}})
+
+        const product = await Product.findById(productId, 'categoryId brand');
+
+        await Category.findByIdAndUpdate(product.categoryId, { $inc: { salesCount: -quantity } });
+
+        await Brand.findByIdAndUpdate(product.brand, { $inc: { salesCount: -quantity } });
+
         console.log('this is the update', update)
         const userId = update.userId
         console.log('this is the user id', userId)
@@ -429,6 +449,22 @@ const confirmReturnProduct = async (req, res) => {
     }
 }
 
+const trendingItems=async (req,res) => {
+    try {
+        const topTenProduct=await Product.find({}).sort({salesCount : -1}).limit(10)
+        const topTenCategory=await Category.find({}).sort({salesCount : -1}).limit(10)
+        const topTenBrand=await Brand.find({}).sort({salesCount:-1}).limit(10)
+        console.log(topTenProduct,topTenCategory,topTenBrand)
+        if(topTenProduct && topTenCategory && topTenBrand )
+        {
+            return res.status(200).json({message:'trending data fetched',topTenProduct,topTenCategory,topTenBrand})
+        }
+    } catch (error) {
+        console.log('error while fetching the trending data',error)
+        return res.status(500).json({message:"error while fetching the trending data"})
+    }
+}
+
 module.exports = {
     createOrder,
     showOrders,
@@ -438,5 +474,6 @@ module.exports = {
     verifyPayment,
     returnOrderProduct,
     getReturnProducts,
-    confirmReturnProduct
+    confirmReturnProduct,
+    trendingItems
 }

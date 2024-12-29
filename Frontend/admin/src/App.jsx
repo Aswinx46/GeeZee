@@ -22,6 +22,7 @@ import ReturnedOrdersTable from './components/orderDetails/ReturnOrderTable';
 import CouponCreationForm from './components/CouponManagement/CouponCreation';
 import CouponListing from './components/CouponManagement/CouponListing'
 import SalesReport from './components/salesReport/SalesReport';
+import Top10 from './components/Trending/Top10'
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
   
@@ -52,6 +53,8 @@ function App() {
           <Route path='/addCoupon' element={<ProtectedRoute> <CouponCreationForm /></ProtectedRoute>} />
           <Route path='/couponList' element={<ProtectedRoute> <CouponListing /></ProtectedRoute>} />
           <Route path='/salesReport' element={<ProtectedRoute> <SalesReport /></ProtectedRoute>} />
+          <Route path='/trending' element={<ProtectedRoute> <Top10 /></ProtectedRoute>} />
+
 
         </Routes>
       </LayoutWrapper>

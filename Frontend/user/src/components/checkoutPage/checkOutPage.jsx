@@ -28,7 +28,9 @@ const CheckoutPage = () => {
   const [coupons, setCoupons] = useState([])
   const [selectedCoupon, setSelectedCoupon] = useState()
   const [appliedCoupon, setAppliedCoupon] = useState(null)
-  const[discount,setDiscount]=useState()
+  const [finalAmount, setFinalAmount] = useState()
+  const [discount, setDiscount] = useState()
+  const [total, setTotal] = useState()
   useEffect(() => {
     console.log('Razorpay Key:', RAZORPAY_KEY_ID);
     const fetchData = async () => {
@@ -59,10 +61,26 @@ const CheckoutPage = () => {
         const offerPrice = categoryOfferPrice > productOfferPrice ? categoryOfferPrice : productOfferPrice
         // console.log(categoryOfferPrice,productOfferPrice,offerPrice)
         return { ...product, offerPrice }
-    })
-      console.log('this is the needed items',neededItems)
+      })
+      console.log('this is the needed items', neededItems)
       setCartItems(neededItems)
 
+      const calculateSubTotal = () => {
+        return neededItems.reduce((total, item) => {
+          if (item.offerPrice) {
+            const itemTotal = item.offerPrice * item.quantity
+            return total + itemTotal;
+          }
+          const itemTotal = item.variants[0].price * item.quantity
+          return total + itemTotal;
+        }, 0)
+      }
+
+      const total = await calculateSubTotal()
+      setTotal(total)
+      console.log('this is the total', total)
+      const finalAmount = total - shippingCharge
+      setFinalAmount(finalAmount)
 
     }
     fetchData()
@@ -81,19 +99,6 @@ const CheckoutPage = () => {
 
 
 
-  const calculateSubTotal = () => {
-    return cartItems.reduce((total, item) => {
-      if(item.offerPrice)
-      {
-        const itemTotal = item.offerPrice * item.quantity
-        return total + itemTotal;
-      }
-      const itemTotal = item.variants[0].price * item.quantity
-      return total + itemTotal;
-    }, 0)
-  }
-
-  const total = calculateSubTotal()
 
 
   const handlePlaceOrder = async (e) => {
@@ -111,8 +116,8 @@ const CheckoutPage = () => {
       toast.error('Product is blocked by admin remove the product to continue purchase')
       return
     }
-    console.log('this is the main address',mainAddress)
-    if(!mainAddress){
+    console.log('this is the main address', mainAddress)
+    if (!mainAddress) {
       toast.error('No address Selected')
       return
     }
@@ -121,12 +126,12 @@ const CheckoutPage = () => {
       // {
       //   console.log('this is inside razorpay')
       // }
-      const response = await axios.post(`/createOrder/${userId}/${variantId}`, { mainAddress, cartItems, paymentMethod, total, shippingCharge,selectedCoupon })
+      const response = await axios.post(`/createOrder/${userId}/${variantId}`, { mainAddress, cartItems, paymentMethod, total, shippingCharge, selectedCoupon })
       console.log('this is the response', response)
       if (paymentMethod == 'Razorpay') {
         console.log('inside razor')
         const { razorpayOrderId, amount, currency } = response.data;
-       
+
         const options = {
           key: RAZORPAY_KEY_ID, // Replace with your Razorpay key
           amount,
@@ -179,6 +184,7 @@ const CheckoutPage = () => {
 
     } catch (error) {
       console.log('error while creating order', error)
+      console.log(error)
       // toast.error('error while creating order')
       setUpdate(!update)
       toast.error(error.response.data.message)
@@ -200,15 +206,17 @@ const CheckoutPage = () => {
   const handleCouponApply = () => {
     setCouponApplied(true)
     const appliedCoupon = coupons.find((coupon) => coupon.name == couponCode)
-    if(!appliedCoupon)
-    if(total<appliedCoupon.minimumPrice) 
-      {
+    if (!appliedCoupon)
+      if (total < appliedCoupon.minimumPrice) {
         toast.error(`minimum total amount is ${appliedCoupon.minimumPrice}`)
         return
       }
-    if(!appliedCoupon) toast.error('Invalid Coupon')
+    if (!appliedCoupon) toast.error('Invalid Coupon')
     setAppliedCoupon(appliedCoupon)
     console.log(appliedCoupon)
+    const tota = total + shippingCharge - appliedCoupon.offerPrice
+    setFinalAmount(tota)
+
 
   }
 
@@ -225,8 +233,8 @@ const CheckoutPage = () => {
   const handleCouponSelect = async (id) => {
     console.log(id)
     const selectedCoupon = coupons.find((coupon) => coupon._id == id)
-    if(!selectedCoupon) toast.error('No coupon found')
- 
+    if (!selectedCoupon) toast.error('No coupon found')
+
     setSelectedCoupon(selectedCoupon)
     setCouponCode(selectedCoupon.name)
   }
@@ -380,7 +388,7 @@ const CheckoutPage = () => {
                     {/* <p className="text-lg font-medium text-gray-900">
                       ₹{item.variants[0].price}
                     </p> */}
-                      {item.offerPrice ? <> <p className="font-bold text-gray-900 text-2xl">₹{item.offerPrice }</p> <del className='font-bold text-red-500 text-2xl'> ₹{item.variants[0].price} </del> </> :  <p className="font-bold text-gray-900 text-2xl">₹{item.variants[0].price}</p>}    
+                    {item.offerPrice ? <> <p className="font-bold text-gray-900 text-2xl">₹{item.offerPrice}</p> <del className='font-bold text-red-500 text-2xl'> ₹{item.variants[0].price} </del> </> : <p className="font-bold text-gray-900 text-2xl">₹{item.variants[0].price}</p>}
                   </div>
                 ))}
               </motion.div>
@@ -415,7 +423,7 @@ const CheckoutPage = () => {
             <div className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Summary</h2>
               <div className="space-y-4">
-                <motion.div 
+                <motion.div
                   className="flex justify-between items-center text-sm text-gray-600 border-b pb-4"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -425,7 +433,7 @@ const CheckoutPage = () => {
                   <span className="font-medium">₹{total}</span>
                 </motion.div>
 
-                <motion.div 
+                <motion.div
                   className="flex justify-between items-center text-sm text-gray-600 pb-4"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -436,7 +444,7 @@ const CheckoutPage = () => {
                 </motion.div>
 
                 {appliedCoupon && (
-                  <motion.div 
+                  <motion.div
                     className="flex justify-between items-center space-x-2 text-sm border-b pb-4"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -470,14 +478,14 @@ const CheckoutPage = () => {
                   </motion.div>
                 )}
 
-                <motion.div 
+                <motion.div
                   className="flex justify-between items-center pt-4 text-lg font-semibold"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
                 >
                   <span>Total</span>
-                  {appliedCoupon ? <span className="text-black">₹{total + shippingCharge - appliedCoupon.offerPrice}</span>  : <span className="text-black">₹{total + shippingCharge}</span>}
+                  {appliedCoupon ? <span className="text-black">₹{total + shippingCharge - appliedCoupon.offerPrice}</span> : <span className="text-black">₹{total + shippingCharge}</span>}
 
                 </motion.div>
               </div>
@@ -614,14 +622,56 @@ const CheckoutPage = () => {
                   />
                   <span>RazorPay</span>
                 </label>
-                <label className="flex items-center space-x-3">
+                {/* <label className="flex items-center space-x-3">
                   <input
                     type="radio"
-                    checked={paymentMethod === 'Cash on Delivery'}
+                    checked={paymentMethod === 'Cash on Delivery' }
                     onChange={() => setPaymentMethod('Cash on Delivery')}
                     className="form-radio text-black"
                   />
                   <span>Cash on Delivery</span>
+                </label> */}
+                {/* <label className="flex items-center space-x-3 relative">
+                  <input
+                    type="radio"
+                    checked={paymentMethod === 'Cash on Delivery'}
+                    onChange={() => setPaymentMethod('Cash on Delivery')}
+                    disabled={finalAmount > 1000} // Disable if totalAmount > 1000
+                    className="form-radio text-black"
+                  />
+                  <span
+                    className={`${finalAmount > 1000 ? 'cursor-not-allowed text-gray-400' : ''}`}
+                    title={finalAmount > 1000 ? 'COD is not available for purchases over ₹1000' : ''}
+                  >
+                    Cash on Delivery
+                  </span>
+                  {finalAmount > 1000 && (
+                    <div className="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded px-2 py-1 shadow-lg">
+                      COD is not available for purchases over ₹1000
+                    </div>
+                  )}
+                </label> */}
+
+                <label className="flex items-center space-x-3 relative group">
+                  <input
+                    type="radio"
+                    checked={paymentMethod === 'Cash on Delivery'}
+                    onChange={() => setPaymentMethod('Cash on Delivery')}
+                    disabled={finalAmount > 1000} // Disable if totalAmount > 1000
+                    className="form-radio text-black"
+                  />
+                  <span
+                    className={`${finalAmount > 1000 ? 'cursor-not-allowed text-gray-400' : ''}`}
+                  >
+                    Cash on Delivery
+                  </span>
+
+                  {/* Tooltip */}
+                  {finalAmount > 1000 && (
+                    <div className="absolute bottom-full mb-2 left-0 bg-gray-700 text-white text-xs rounded px-2 py-1 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      COD is not available for purchases over ₹1000
+                    </div>
+                  )}
                 </label>
               </div>
             </motion.div>
@@ -640,7 +690,7 @@ const CheckoutPage = () => {
           </motion.div>
         </div>
       </div >
-  { isOpen && userId && <AddressModal isOpen={isOpen} setIsOpen={setIsOpen} userId={userId} />}
+      {isOpen && userId && <AddressModal isOpen={isOpen} setIsOpen={setIsOpen} userId={userId} />}
     </div >
   );
 };

@@ -22,6 +22,10 @@ const categorySchema=new mongoose.Schema({
         type:Schema.Types.ObjectId,
         ref:"offer",
         default:null
+    },
+    salesCount:{
+        type:Number,
+        default:0
     }
 })
 
