@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Truck, CreditCard, Package, X } from 'lucide-react';
 import { Button } from "@/components/ui/button"
@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { RAZORPAY_KEY_ID } from '@/config/razorPayKey';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
+import InvoicePDF from '@/extraAddonComponents/Invoice';
 const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
   console.log('this is the sended item',item)
   const user=useSelector(state=>state.user.user)
@@ -79,6 +80,15 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
      
   }
 
+  const pdfRef=useRef()
+
+  const handleGenaratePdf=()=>{
+    if(pdfRef.current)
+    {
+      pdfRef.current.generatePDF();
+    }
+  }
+
   const handleRepayment=()=>{
     // const { razorpayOrderId, amount, currency } = response.data;
     const razorpayOrderId=orderDetails.razorPayOrderId
@@ -87,6 +97,9 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
     console.log('this is the razorpayOrderId',razorpayOrderId)
     console.log('this is the currency',currency)
     console.log("this si the amount",amount)
+
+   
+
     if(orderDetails.paymentStatus=='Awaiting Payment')
     {
       const options = {
@@ -259,8 +272,17 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
                   onClick={handleReturnOrder}
                   >
               Return Product
-            </Button>:''
+            </Button>
+            :''
               }
+               <Button
+                  className="mt-6 w-full bg-black text-white hover:bg-gray-800"
+                  onClick={handleGenaratePdf}
+                  >
+              Invoice Download
+            </Button>
+
+            <InvoicePDF ref={pdfRef} orderDetails={orderDetails} />
 
             <Button
               className="mt-6 w-full bg-black text-white hover:bg-gray-800"

@@ -7,7 +7,9 @@ import {
   FaUsers, 
   FaList,
   FaIndustry ,
-  FaArrowCircleLeft
+  FaArrowCircleLeft,
+  FaTicketAlt,
+  FaChartLine 
 } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button"
@@ -23,8 +25,8 @@ const Sidebar = () => {
     { icon: FaList, text: 'Categories', href: '/categoryManagement' },
     { icon: FaIndustry , text: 'Brand', href: '/BrandManagement' },
     { icon: FaArrowCircleLeft , text: 'Return Orders', href: '/returnOrderDetails' },
-    { icon: FaArrowCircleLeft , text: 'Coupon', href: '/couponList' },
-    { icon: FaArrowCircleLeft , text: 'Trending', href: '/trending' },
+    { icon: FaTicketAlt , text: 'Coupon', href: '/couponList' },
+    { icon: FaChartLine  , text: 'Trending', href: '/trending' },
   ];
   const navigate=useNavigate()
   const handleLogout=()=>{
