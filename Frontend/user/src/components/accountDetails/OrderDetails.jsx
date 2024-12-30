@@ -58,14 +58,15 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
 
   const handleCancelOrder=async () => {
     try {
+      setOrderId(orderDetails._id)
+      setOrderItemId(orderDetails.orderItemId)
       setCancel(true)
       setOrderCancelPop(true)
       console.log('this is the orderDetails',orderDetails)
-      console.log(orderDetails.orderObjectId)
+      console.log(orderDetails._id,'asidfhksajdhfjkaosdfasfisadjh')
       // console.log('this is the order id',orderDetails.orderObjectId)
       // console.log('this is the orderItem id',orderDetails.orderItemId)
-      setOrderId(orderDetails.orderObjectId)
-      setOrderItemId(orderDetails.orderItemId)
+  
      
     } catch (error) {
       console.log('error while canceling the order',error)
@@ -75,8 +76,9 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
   const handleReturnOrder=async()=>{
     setIsReturn(true)
     setOrderCancelPop(true)
-    setOrderId(orderDetails.orderObjectId)
-      setOrderItemId(orderDetails.orderItemId)
+    console.log(orderDetails)
+    setOrderId(orderDetails._id)
+      setOrderItemId(item._id)
      
   }
 
@@ -91,14 +93,14 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
 
   const handleRepayment=()=>{
     // const { razorpayOrderId, amount, currency } = response.data;
-    const razorpayOrderId=orderDetails.razorPayOrderId
+    const razorpayOrderId=orderDetails.razorpayOrderId
     const amount=orderDetails.finalAmount
     const currency='INR'
     console.log('this is the razorpayOrderId',razorpayOrderId)
     console.log('this is the currency',currency)
     console.log("this si the amount",amount)
 
-   
+    console.log('this is the orderDetails inside the repayment',orderDetails)
 
     if(orderDetails.paymentStatus=='Awaiting Payment')
     {
@@ -190,9 +192,9 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
                   variants={itemVariants}
                 >
                   <div className="flex items-center">
-                    <img src={orderDetails.productId.productImg[0]} alt={orderDetails.productId.title} className="w-20 h-20 object-cover rounded-md mr-4" />
+                    <img src={orderDetails.orderItem.productId.productImg[0]} alt={orderDetails.orderItem.productId.title} className="w-20 h-20 object-cover rounded-md mr-4" />
                     <div>
-                      <h3 className="font-medium">{orderDetails.productId.title}</h3>
+                      <h3 className="font-medium">{orderDetails.orderItem.productId.title}</h3>
                       <h3 className="font-medium">{Object.entries(item?.variant?.selectedAttributes).map((key)=><h1>{key.join(' : ')}</h1>)}</h3>
                       <p className="text-gray-500">Quantity: {orderDetails.quantity}</p>
                     </div>
@@ -266,7 +268,7 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
               Cancel Order
             </Button>
             }
-               {orderDetails.status=='Delivered' &&  orderDetails.variant?.returnOrder!='Pending'?
+               {orderDetails.status=='Delivered' &&  orderDetails.orderItem.variant?.returnOrder!=='Pending' &&  orderDetails.orderItem.variant?.returnOrder!=='Accepted'?
                   <Button
                   className="mt-6 w-full bg-black text-white hover:bg-gray-800"
                   onClick={handleReturnOrder}

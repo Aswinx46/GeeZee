@@ -244,7 +244,7 @@ const cancelOrder = async (req, res) => {
     const { orderId, userId } = req.params
     const { reason, paymentMethod } = req.body
     console.log(paymentMethod)
-    console.log('this is canceling user id', userId)
+    console.log('this is canceling order id', orderId)
     try {
 
         const selectedOrder = await Order.findById(orderId, 'orderItems finalAmount shippingCost discount')
@@ -345,7 +345,9 @@ const returnOrderProduct = async (req, res) => {
         const { orderId } = req.params
         const { orderItemId } = req.params
         const { returnReason } = req.body
-
+        console.log('this is the order id',orderId)
+        console.log('this is the orderitemid',orderItemId)
+      
         const selectedOrder = await Order.findById(orderId)
         // console.log('this is the selcted order',selectedOrder)
         const selectedVariant = selectedOrder.orderItems.find((item) => item._id.toString() == orderItemId.toString())

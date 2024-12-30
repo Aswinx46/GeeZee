@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Package } from 'lucide-react'
+import { Package, ChevronDown, ChevronRight } from 'lucide-react'
 import { useSelector } from 'react-redux'
 import OrderDetailsModal from '../accountDetails/OrderDetails'
 
@@ -17,41 +17,33 @@ const OrderDetails = () => {
   const [selectedItem, setSelectedItem] = useState({})
   const [isOpen, setIsOpen] = useState(false)
   const [orderDetails, setOrderDetails] = useState([])
-  const [allOrderItems, setAllOrderItems] = useState([])
-
+  const [expandedOrders, setExpandedOrders] = useState({})
   const [particularOrderDetails, setParticularOrderDetails] = useState({})
   const user = useSelector((state) => state.user.user)
   const userId = user._id
+
   useEffect(() => {
     const fetchData = async () => {
       const orderDetails = await axios.get(`/orderDetails/${userId}`)
-      console.log('this is the full order details', orderDetails.data.orderDetails)
       setOrderDetails(orderDetails.data.orderDetails)
-      const combinedItems = orderDetails.data.orderDetails.flatMap((order) =>
-        order.orderItems.map((item) => ({
-          ...item, status: order.status, invoiceDate: order.invoiceDate, address: order.address, paymentMethod: order.paymentMethod,
-          totalPrice: order.totalPrice, shippingCost: order.shippingCost, finalAmount: order.finalAmount, orderId: order.orderId, orderObjectId: order._id,
-          variants: order.orderItems[0].variant.selectedAttributes, orderItemId: item._id,paymentStatus:order.paymentStatus,razorPayOrderId:order.razorpayOrderId
-        })))
-      setParticularOrderDetails(combinedItems[0])
-      console.log('this is the combined items', combinedItems)
-      setAllOrderItems(combinedItems)
+      // if (orderDetails.data.orderDetails.length > 0) {
+      //   setParticularOrderDetails(orderDetails.data.orderDetails[0].orderItems[0])
+      // }
     }
     fetchData()
   }, [isOpen])
 
+  const toggleOrderExpansion = (orderId) => {
+    setExpandedOrders(prev => ({
+      ...prev,
+      [orderId]: !prev[orderId]
+    }))
+  }
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
   }
-
-  // const items = [
-  //   { id: 1, name: 'Wireless Mouse', quantity: 1, price: 29.99 },
-  //   { id: 2, name: 'Mechanical Keyboard', quantity: 1, price: 69.99 },
-  //   { id: 3, name: 'USB-C Hub', quantity: 2, price: 14.99 },
-  // ]
-
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -63,15 +55,12 @@ const OrderDetails = () => {
     },
   }
 
-  const handleProductDetail = (item) => {
-    setSelectedItem({ ...item })
-    console.log('this is the clicked item', item)
-    const particularOrderDetail = orderDetails.find((ite) => {
-      return ite.orderItems.find((single) => single._id == item._id)
-    })
-    console.log('this is the particulart', particularOrderDetail)
+  const handleProductDetail = (item, orderDetails) => {
+    console.log('this is the item',item)
+    console.log('this is the order',orderDetails)
+    setSelectedItem({ ...orderDetails, orderItem: item })
+    setParticularOrderDetails(item)
     setIsOpen(true)
-    console.log('this is the item from the state', selectedItem)
   }
 
   return (
@@ -85,42 +74,86 @@ const OrderDetails = () => {
         <h2 className="text-2xl font-semibold text-black flex items-center">
           <Package className="mr-2" /> Order Details
         </h2>
-        <div className="text-right">
-          <p className="text-sm text-gray-600">Order #</p>
-
-        </div>
       </motion.div>
 
       <motion.div variants={itemVariants}>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead >Item</TableHead>
-              <TableHead className="text-right"></TableHead>
-              <TableHead className="text-right">Quantity</TableHead>
-              <TableHead className="text-right">Price</TableHead>
-              <TableHead className="text-right">Total</TableHead>
+              <TableHead></TableHead>
+              <TableHead>Order ID</TableHead>
+              <TableHead className="text-right">Date</TableHead>
+              <TableHead className="text-right">Total Amount</TableHead>
               <TableHead className="text-right">Status</TableHead>
               <TableHead className="text-right">Payment</TableHead>
-              <TableHead className="text-right">orderId</TableHead>
-              {orderDetails[0]?.orderItems[0]?.variant.returnOrder ? <TableHead className="text-right">Return Order status</TableHead> : ''}
+              
             </TableRow>
           </TableHeader>
           <TableBody>
-            {allOrderItems.map((item,i) => (
-              <TableRow key={i} className={`${item.status === 'Cancelled' ? 'bg-red-50 opacity-70' : ''}`}>
-                <TableCell onClick={() => handleProductDetail(item)} className={`font-medium ${item.status === 'Cancelled' ? 'line-through text-gray-500' : ''}`}>{item.productId.title}<br /> {Object.entries(item.variant.selectedAttributes).map((key) => <h1>{key.join(' : ')}</h1>)}  </TableCell>
-                <TableCell onClick={() => handleProductDetail(item)} className="font-medium"><img className={`h-15 w-20 object-cover rounded-md shadow-sm hover:scale-105 transition-transform duration-200 ${item.status === 'Cancelled' ? 'grayscale' : ''}`} src={item.productId.productImg[0]} alt={item.productId.title} /></TableCell>
-                <TableCell onClick={() => handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'line-through text-gray-500' : ''}`}>{item.quantity}</TableCell>
-                <TableCell onClick={() => handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'line-through text-gray-500' : ''}`}>₹{item.price}</TableCell>
-                <TableCell onClick={() => handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'line-through text-gray-500' : ''}`}>₹{item.finalAmount}</TableCell>
-                <TableCell onClick={() => handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'text-red-500 font-medium' : ''}`}>{item.status} </TableCell>
-                <TableCell onClick={() => handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'text-red-500 font-medium' : ''}`}>{item.paymentStatus} </TableCell>
-                <TableCell onClick={() => handleProductDetail(item)} className={`text-right ${item.status === 'Cancelled' ? 'text-gray-500' : ''}`}>{item.orderId}</TableCell>
-                <TableCell onClick={() => handleProductDetail(item)} className={`text-right ${item.variant.returnOrder === 'Pending' ? 'text-red-500' : ''}`}>{item.variant.returnOrder}</TableCell>
-              </TableRow>
+            {orderDetails.map((order) => (
+              <React.Fragment key={order._id}>
+                <TableRow 
+                  className={`cursor-pointer hover:bg-gray-50 ${order.status === 'Cancelled' ? 'bg-red-50 opacity-70' : ''}`}
+                  onClick={() => toggleOrderExpansion(order._id)}
+                >
+                  <TableCell>
+                    {expandedOrders[order._id] ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+                  </TableCell>
+                  <TableCell>{order.orderId}</TableCell>
+                  <TableCell className="text-right">{new Date(order.invoiceDate).toLocaleDateString()}</TableCell>
+                  <TableCell className="text-right">₹{order.finalAmount}</TableCell>
+                  <TableCell className="text-right">{order.status}</TableCell>
+                  <TableCell className="text-right">{order.paymentStatus}</TableCell>
+                </TableRow>
+                {expandedOrders[order._id] && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="p-0">
+                      <div className="bg-gray-50 p-4">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Item</TableHead>
+                              <TableHead>Image</TableHead>
+                              <TableHead className="text-right">Quantity</TableHead>
+                              <TableHead className="text-right">Price</TableHead>
+                              <TableHead className="text-right">Total Price</TableHead>
+                              {order.orderItems[0]?.variant.returnOrder ? <TableHead className="text-right">Return Status</TableHead> : null}
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {order.orderItems.map((item, i) => (
+                              <TableRow key={i} onClick={() => handleProductDetail(item, order)}>
+                                <TableCell className={`font-medium ${item.variant.returnOrder === 'Accepted' ? 'line-through text-gray-500' : ''}`}>
+                                  {item.productId.title}<br />
+                                  {Object.entries(item.variant.selectedAttributes).map((key) => (
+                                    <h1 key={key[0]}>{key.join(' : ')}</h1>
+                                  ))}
+                                </TableCell>
+                                <TableCell>
+                                  <img 
+                                    className={`h-15 w-20 object-cover rounded-md shadow-sm hover:scale-105 transition-transform duration-200 ${item.variant.returnOrder === 'Accepted' ? 'grayscale opacity-50' : ''}`}
+                                    src={item.productId.productImg[0]} 
+                                    alt={item.productId.title} 
+                                  />
+                                </TableCell>
+                                <TableCell className={`text-right ${item.variant.returnOrder === 'Accepted' ? 'line-through text-gray-500' : ''}`}>{item.quantity}</TableCell>
+                                <TableCell className={`text-right ${item.variant.returnOrder === 'Accepted' ? 'line-through text-gray-500' : ''}`}>₹{item.price}</TableCell>
+                                <TableCell className={`text-right ${item.variant.returnOrder === 'Accepted' ? 'line-through text-gray-500' : ''}`}>₹{item.price * item.quantity}</TableCell>
+                                {item.variant.returnOrder ? (
+                                  <TableCell className={`text-right ${item.variant.returnOrder === 'Pending' ? 'text-red-500' : item.variant.returnOrder === 'Accepted' ? 'text-green-500 font-medium' : ''}`}>
+                                    {item.variant.returnOrder === 'Accepted' ? 'Returned' : item.variant.returnOrder}
+                                  </TableCell>
+                                ) : null}
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </React.Fragment>
             ))}
-
           </TableBody>
         </Table>
       </motion.div>

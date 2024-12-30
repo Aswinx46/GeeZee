@@ -48,8 +48,8 @@ const OrderCancellationModal = ({ isOpen, onClose, onConfirm,paymentMethod, orde
   };
 
   const handleConfirm = async () => {
-    console.log(orderId)
-    console.log(paymentMethod)
+    console.log('this is the order id',orderId)
+    console.log('this is the payment method',paymentMethod)
     if(isCancel)
     {
       console.log('this is inside canecl')
