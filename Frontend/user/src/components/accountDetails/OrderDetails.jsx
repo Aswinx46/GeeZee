@@ -9,6 +9,8 @@ import { RAZORPAY_KEY_ID } from '@/config/razorPayKey';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import InvoicePDF from '@/extraAddonComponents/Invoice';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+
 const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
   console.log('this is the sended item',item)
   const user=useSelector(state=>state.user.user)
@@ -38,6 +40,7 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
     },
   };
 
+
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.8 },
     visible: { 
@@ -51,10 +54,12 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
     exit: { opacity: 0, scale: 0.8 },
   };
 
+
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
   };
+
 
   const handleCancelOrder=async () => {
     try {
@@ -73,6 +78,7 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
     }
   }
 
+
   const handleReturnOrder=async()=>{
     setIsReturn(true)
     setOrderCancelPop(true)
@@ -82,17 +88,9 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
      
   }
 
-  const pdfRef=useRef()
-
-  const handleGenaratePdf=()=>{
-    if(pdfRef.current)
-    {
-      pdfRef.current.generatePDF();
-    }
-  }
 
   const handleRepayment=()=>{
-    // const { razorpayOrderId, amount, currency } = response.data;
+
     const razorpayOrderId=orderDetails.razorpayOrderId
     const amount=orderDetails.finalAmount
     const currency='INR'
@@ -116,7 +114,7 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
           toast.success('Payment Successful');
           navigate("/checkoutSuccess");
           // Optionally send payment confirmation to the backend
-  
+
           await axios.post(`/confirmPayment/${userId}`, {
             paymentId: response.razorpay_payment_id,
             orderId: razorpayOrderId,
@@ -124,7 +122,7 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
           });
           // toast.success("Payment Successful");
           console.log('this is after the confirm payment route ')
-  
+
         },
         prefill: {
           name: orderDetails.address.name,
@@ -142,7 +140,7 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
       };
       const razorpay = new window.Razorpay(options);
       razorpay.open();
-  
+
       razorpay.on('payment.failed', (response) => {
         console.error('Payment Failed:', response);
         toast.error('Payment Failed. Please try again.');
@@ -188,6 +186,7 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
              
                 <motion.div 
                  
+
                   className="flex items-center justify-between border-b border-gray-200 py-4"
                   variants={itemVariants}
                 >
@@ -196,10 +195,10 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
                     <div>
                       <h3 className="font-medium">{orderDetails.orderItem.productId.title}</h3>
                       <h3 className="font-medium">{Object.entries(item?.variant?.selectedAttributes).map((key)=><h1>{key.join(' : ')}</h1>)}</h3>
-                      <p className="text-gray-500">Quantity: {orderDetails.quantity}</p>
+                      <p className="text-gray-500">Quantity: {orderDetails.orderItem.quantity}</p>
                     </div>
                   </div>
-                  <p className="font-semibold">₹{orderDetails.price}</p>
+                  <p className="font-semibold">₹{orderDetails.orderItem.price}</p>
                 </motion.div>
             
             </motion.div>
@@ -239,7 +238,11 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
               <h2 className="text-lg font-semibold mb-2">Order Summary</h2>
               <div className="flex justify-between mb-2">
                 <span>Subtotal</span>
-                <span>₹{orderDetails.totalPrice}</span>
+                <span>₹{orderDetails.totalPrice + (orderDetails.discount -orderDetails.shippingCost) }</span>
+              </div>
+              <div className="flex justify-between mb-2">
+                <span>Discount</span>
+                <span>-{orderDetails.discount}</span>
               </div>
               <div className="flex justify-between mb-2">
                 <span>Shipping</span>
@@ -259,7 +262,6 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
                     Retry Payment
             </Button>
             : ''}
-
             {orderDetails.status=='Cancelled' ||  orderDetails.status=='Delivered'? '' : 
                   <Button
                   className="mt-6 w-full bg-black text-white hover:bg-gray-800"
@@ -275,16 +277,30 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
                   >
               Return Product
             </Button>
-            :''
-              }
-               <Button
+            :''}
+            <PDFDownloadLink 
+              document={<InvoicePDF orderDetails={{
+                orderId: orderDetails.orderId,
+                date: orderDetails.invoiceDate,
+                customerName: orderDetails.address.name,
+                orderItems: orderDetails.orderItems || [],
+                finalAmount: orderDetails.finalAmount,
+                shippingCost: orderDetails.shippingCost,
+                address: orderDetails.address,
+                paymentMethod: orderDetails.paymentMethod,
+                status: orderDetails.status
+              }} />}
+              fileName={`invoice-${orderDetails.orderId}.pdf`}
+            >
+              {({ loading }) => (
+                <Button
                   className="mt-6 w-full bg-black text-white hover:bg-gray-800"
-                  onClick={handleGenaratePdf}
-                  >
-              Invoice Download
-            </Button>
-
-            <InvoicePDF ref={pdfRef} orderDetails={orderDetails} />
+                  disabled={loading}
+                >
+                  {loading ? 'Generating Invoice...' : 'Invoice Download'}
+                </Button>
+              )}
+            </PDFDownloadLink>
 
             <Button
               className="mt-6 w-full bg-black text-white hover:bg-gray-800"
@@ -294,6 +310,7 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
             </Button>
           </motion.div>
           {orderCancelPop && <OrderCancellationModal isOpen={orderCancelPop}  isCancel={cancel} paymentMethod={orderDetails.paymentMethod} isReturnreturn={isReturn} orderItemId={orderItemId}  orderId={orderId} setIsOpen={setOrderCancelPop}/>}
+
         </motion.div>
       )}
     </AnimatePresence>
@@ -301,4 +318,3 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
 };
 
 export default OrderDetailsModal;
-
