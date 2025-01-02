@@ -29,13 +29,26 @@ useEffect(()=>{
     const cartItems=await axios.get(`/cartItems/${userId}`)
     const items=cartItems.data.result
     console.log('this is items',items)
-    const neededItems = items.map((product) => {
-      const variantPrice = product?.variants[0]?.price
-      const categoryOfferPrice = product.categoryId?.categoryOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.categoryId?.categoryOffer?.offerValue / 100 : variantPrice - product.categoryId?.categoryOffer?.offerValue
-      const productOfferPrice = product.productOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.productOffer?.offerValue / 100 : variantPrice - product.productOffer?.offerValue
-      const offerPrice = categoryOfferPrice > productOfferPrice ? categoryOfferPrice : productOfferPrice
-      // console.log(categoryOfferPrice,productOfferPrice,offerPrice)
-      return { ...product, offerPrice }
+  //   const neededItems = items.map((product) => {
+  //     const variantPrice = product?.variants[0]?.price
+  //     const categoryOfferPrice = product.categoryId?.categoryOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.categoryId?.categoryOffer?.offerValue / 100 : variantPrice - product.categoryId?.categoryOffer?.offerValue
+  //     const productOfferPrice = product.productOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.productOffer?.offerValue / 100 : variantPrice - product.productOffer?.offerValue
+  //     const offerPrice = categoryOfferPrice > productOfferPrice ? categoryOfferPrice : productOfferPrice
+  //     // console.log(categoryOfferPrice,productOfferPrice,offerPrice)
+  //     return { ...product, offerPrice }
+  // })
+  const neededItems = items.map((product) => {
+    const variantPrice = product?.variants[0]?.price
+    const categoryOfferPrice = product.categoryOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.categoryOffer?.offerValue / 100 : variantPrice - product.categoryOffer?.offerValue
+    const productOfferPrice = product.productOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.productOffer?.offerValue / 100 : variantPrice - product.productOffer?.offerValue
+    // const offerPrice = categoryOfferPrice > productOfferPrice ? categoryOfferPrice : productOfferPrice
+    console.log('this is catprice',categoryOfferPrice,'this is pro price',productOfferPrice)
+    const offerPrice =
+      Number.isNaN(categoryOfferPrice) ? productOfferPrice :
+        Number.isNaN(productOfferPrice) ? categoryOfferPrice :
+          Math.max(categoryOfferPrice, productOfferPrice);
+    // console.log(categoryOfferPrice,productOfferPrice,offerPrice)
+    return { ...product, offerPrice }
   })
   console.log('this is the needed items',neededItems)
     const count=items.length
