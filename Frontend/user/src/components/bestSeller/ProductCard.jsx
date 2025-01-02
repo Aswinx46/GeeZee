@@ -7,7 +7,7 @@ import { ChevronRight, Star, ShoppingCart, Eye } from 'lucide-react';
 import axios from '../../axios/userAxios'
 import ProductCard from './BestSeller';
 import Filter from './Filter'
-
+import Pagination from '@/extraAddonComponents/Pagination';
 
 const BestSeller = () => {
   const [products, setProducts] = useState([]);
@@ -15,10 +15,12 @@ const BestSeller = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [hoveredProduct, setHoveredProduct] = useState(null);
   const [isOpen, setIsOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(5)
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await axios.get('/products')
+      const response = await axios.get(`/products/${currentPage}`)
       console.log(response.data.products)
 
       const neededItems = response.data.products.map((product) => {
@@ -38,7 +40,7 @@ const BestSeller = () => {
       setProducts(neededItems)
     }
     fetchData()
-  }, [])
+  }, [currentPage])
   const navigate = useNavigate()
   const handleItem = (item) => {
     console.log('hasdgfkhjsa')
@@ -120,6 +122,9 @@ const BestSeller = () => {
       }
     }
   };
+  const onPageChange=(page)=>{
+    setCurrentPage(page)
+  }
 
   const filterIconVariants = {
     initial: { rotate: 0 },
@@ -284,7 +289,9 @@ const BestSeller = () => {
               </div>
             </motion.div>
           </motion.div>
+          
         )}
+          <Pagination onPageChange={onPageChange} currentPage={currentPage} totalPages={totalPage}/>
         {isOpen && <Filter isOpen={isOpen} setIsOpen={setIsOpen} {...{ setProducts }} />}
       </AnimatePresence>
     </div>

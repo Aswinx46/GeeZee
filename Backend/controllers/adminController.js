@@ -32,8 +32,13 @@ const login = async (req, res) => {
 }
 const fetchUser = async (req, res) => {
     try {
-        const users = await User.find()
-        console.log(users)
+        const {pageNumber}=req.params
+        const page = parseInt(pageNumber, 10);
+        const limit=5
+        const skip=(page-1) * limit
+        console.log('this is the pagenumber',pageNumber)
+        const users = await User.find().limit(limit).skip(skip)
+       
         res.status(200).json({ message: 'users fetched', users })
     } catch (error) {
         console.log('error while fetching the user', error.message)

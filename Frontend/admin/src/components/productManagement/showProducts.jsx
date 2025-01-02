@@ -7,27 +7,30 @@ import { toast } from 'react-toastify';
 import EditProduct from './editProduct';
 import { useDispatch } from 'react-redux';
 import { addProductSlice } from '@/redux/slices/editProductSlice';
+import Pagination from '../Pagination/Pagination';
 const ProductList = () => {
- 
-  const [products,setProducts]=useState([])
-  const[search,setSearch]=useState('')
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(5)
+  const[changePage,setChangePage]=useState(false)
+  const [products, setProducts] = useState([])
+  const [search, setSearch] = useState('')
 
-  const dispatch=useDispatch()
-  const navigate=useNavigate()
-    useEffect(()=>{
-        const fetchProducts=async()=>{
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  useEffect(() => {
+    const fetchProducts = async () => {
 
-            const products= await axios.get('/products')
-            console.log(products)
-            setProducts(products.data.products)
-       
-        }
-        fetchProducts()
-    },[])
+      const products = await axios.get(`/products/${currentPage}`)
+      console.log(products)
+      setProducts(products.data.products)
+
+    }
+    fetchProducts()
+  }, [,changePage])
   const [activeDropdown, setActiveDropdown] = useState(null);
-  
-  const EditProduct =async(index)=>{
-    const product=products.find((_,ind)=>ind==index)
+
+  const EditProduct = async (index) => {
+    const product = products.find((_, ind) => ind == index)
     console.log(product)
     dispatch(addProductSlice(product))
     navigate('/editProduct')
@@ -36,27 +39,35 @@ const ProductList = () => {
   const filteredProducts = products.filter(
     (product) =>
       product.title?.toLowerCase().includes(search.toLowerCase()) ||
-    product.status?.toLowerCase().includes(search.toLowerCase())
-    
+      product.status?.toLowerCase().includes(search.toLowerCase())
+
   );
- console.log(filteredProducts)
+  console.log(filteredProducts)
+  
+
+  const onPageChange=async(newPage)=>{
+    setCurrentPage(newPage)
+    setChangePage(!changePage)
+    
+    
+  }
 
   return (
     <div className="min-h-screen bg-white p-8">
-      
-      
+
+
 
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Products</h1>
         <div className="flex items-center space-x-4">
           {/* Search Bar */}
-          
+
           <div className="relative">
             <input
               type="text"
               placeholder="Search products..."
-              onChange={(e)=>setSearch(e.target.value)}
+              onChange={(e) => setSearch(e.target.value)}
               className="w-64 bg-white text-gray-900 border border-gray-300 rounded-lg py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-black"
             />
             <FaSearch className="absolute left-3 top-3 text-gray-400" />
@@ -70,7 +81,7 @@ const ProductList = () => {
             <FaPlus className="w-4 h-4" />
             <Link to='/addProduct' className="text-white">
               <span>Add product</span>
-            </Link> 
+            </Link>
           </motion.button>
         </div>
       </div>
@@ -127,7 +138,7 @@ const ProductList = () => {
                 <td className="py-4 px-6">
                   <div className="flex justify-center">
                     <div className="relative">
-                      <button 
+                      <button
                         onClick={() => setActiveDropdown(activeDropdown === product._id ? null : product._id)}
                         className="text-gray-500 hover:text-gray-700 transition-colors"
                       >
@@ -143,7 +154,7 @@ const ProductList = () => {
                             transition={{ duration: 0.1 }}
                             className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 border border-gray-200 z-10"
                           >
-                            <button onClick={()=>EditProduct(index)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left transition-colors">
+                            <button onClick={() => EditProduct(index)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left transition-colors">
                               Edit Product
                             </button>
                             <button className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left transition-colors">
@@ -161,7 +172,7 @@ const ProductList = () => {
         </table>
 
         {/* Pagination */}
-        <div className="flex items-center justify-between px-6 py-4 bg-white border-t border-gray-200">
+        {/* <div className="flex items-center justify-between px-6 py-4 bg-white border-t border-gray-200">
           <div className="text-sm text-gray-600">
             Showing 1 to 5 of 24 entries
           </div>
@@ -176,7 +187,8 @@ const ProductList = () => {
               Next
             </button>
           </div>
-        </div>
+        </div> */}
+        <Pagination  totalPages={totalPage} currentPage={currentPage} onPageChange={onPageChange}/>
       </motion.div>
     </div>
   );

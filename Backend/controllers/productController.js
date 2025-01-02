@@ -43,7 +43,12 @@ const addProduct = async (req, res) => {
 const showProduct = async (req, res) => {
 
     try {
-        const products = await Product.find().populate('categoryId').populate('productOffer')
+        const {pageNumber}=req.params
+        const page = parseInt(pageNumber, 10);
+        const limit=5
+        const skip=(page-1) * limit
+        console.log('this is the pagenumber',pageNumber)
+        const products = await Product.find().populate('categoryId').populate('productOffer').limit(limit).skip(skip)
         console.log(products)
         return res.status(200).json({ message: 'products fetched', products })
     } catch (error) {
@@ -122,6 +127,11 @@ const editProduct = async (req, res) => {
 const showProductListed = async (req, res) => {
 
     try {
+        const {pageNumber}=req.params
+        const page = parseInt(pageNumber, 10);
+        const limit=5
+        const skip=(page-1) * limit
+       
         const products = await Product.find({ status: 'active', availableQuantity: { $gt: 0 } }).populate({
             path: 'categoryId',
             match: { status: 'active' },
@@ -138,7 +148,7 @@ const showProductListed = async (req, res) => {
             path: 'productOffer',
             match: { validUntil: { $gte: new Date() }, isListed: true },
             select: 'offerType offerValue validFrom validUntil'
-        })
+        }).limit(limit).skip(skip)
         console.log('this is products', products)
         console.log(products)
         const activeProducts = products.filter(product => product.categoryId && product.brand?.status == 'active');

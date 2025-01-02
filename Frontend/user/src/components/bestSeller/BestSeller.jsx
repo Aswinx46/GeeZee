@@ -7,6 +7,7 @@ import { Star, ShoppingCart, Eye, Heart } from 'lucide-react';
 import axios from '../../axios/userAxios'
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import Pagination from '@/extraAddonComponents/Pagination';
 const ProductCard = ({ product, selectedProduct, setSelectedProduct }) => {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -53,6 +54,8 @@ const ProductCard = ({ product, selectedProduct, setSelectedProduct }) => {
     hover: { scale: 1.1 },
     tap: { scale: 0.9 }
   };
+
+
 
   return (
     <motion.div
@@ -144,6 +147,7 @@ const ProductCard = ({ product, selectedProduct, setSelectedProduct }) => {
           </motion.div>
         </CardContent>
       </Card>
+    
     </motion.div>
   );
 };

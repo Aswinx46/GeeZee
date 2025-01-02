@@ -311,7 +311,11 @@ const cancelOrder = async (req, res) => {
 const showAllOrders = async (req, res) => {
 
     try {
-        const orders = await Order.find().populate('orderItems.productId', 'productImg title').populate('address').populate('userId', 'lastName firstName email phoneNo')
+        const {pageNumber}=req.params
+        const page = parseInt(pageNumber, 10);
+        const limit=5
+        const skip=(page-1) * limit      
+        const orders = await Order.find().populate('orderItems.productId', 'productImg title').populate('address').populate('userId', 'lastName firstName email phoneNo').limit(limit).skip(skip)
         if (!orders) return res.status(400).json({ message: 'no order found' })
         return res.status(200).json({ message: "order details fetched", orders })
     } catch (error) {

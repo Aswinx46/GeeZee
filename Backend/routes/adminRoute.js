@@ -10,7 +10,7 @@ const couponConrtoller=require('../controllers/CouponController')
 const salesReportController=require('../controllers/SalesReportController')
 const offerController=require('../controllers/OfferController')
 admin_route.post('/login', adminController.login)
-admin_route.get('/usersList', auth.adminAuth, adminController.fetchUser)
+admin_route.get('/usersList/:pageNumber', auth.adminAuth, adminController.fetchUser)
 admin_route.patch('/userEdit/:id', auth.adminAuth, adminController.editUser)
 admin_route.post('/refreshToken', adminController.refreshToken)
 
@@ -22,7 +22,7 @@ admin_route.patch('/editCategoryName/:id', auth.adminAuth, categoryController.ed
 
 
 admin_route.post('/addProduct', auth.adminAuth, productController.addProduct)
-admin_route.get('/products', auth.adminAuth, productController.showProduct)
+admin_route.get('/products/:pageNumber', auth.adminAuth, productController.showProduct)
 admin_route.put('/editProduct/:id', auth.adminAuth, productController.editProduct)
 
 admin_route.get('/brands', auth.adminAuth, brandController.showBrand)
@@ -30,7 +30,7 @@ admin_route.post('/addBrand', auth.adminAuth, brandController.addBrand)
 admin_route.patch('/editBrand/:id', auth.adminAuth, brandController.changeStatus)
 admin_route.patch('/editBrandName/:brandId', auth.adminAuth, brandController.changeBrandName)
 
-admin_route.get('/showOrders', auth.adminAuth, OrderController.showAllOrders)
+admin_route.get('/showOrders/:pageNumber', auth.adminAuth, OrderController.showAllOrders)
 admin_route.patch('/changeOrderStatus/:orderId', auth.adminAuth, OrderController.changeOrderStatus)
 admin_route.get('/getReturnProducts', auth.adminAuth, OrderController.getReturnProducts)
 admin_route.patch('/confirmReturn/:orderId', auth.adminAuth, OrderController.confirmReturnProduct)

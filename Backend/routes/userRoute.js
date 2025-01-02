@@ -22,7 +22,7 @@ user_route.patch('/changePassword/:userId', auth.authToken, userController.chang
 user_route.put('/changeUserInfo/:userId', auth.authToken, userController.changeInformation)
 
 
-user_route.get('/products', productController.showProductListed)
+user_route.get('/products/:pageNumber', productController.showProductListed)
 user_route.get('/relatedProducts/:id', productController.showRelatedProducts)
 user_route.get('/showProductVariantQuantity/:id', productController.showProductVariantQuantity)
 user_route.get('/filterProducts', productController.filterProducts)

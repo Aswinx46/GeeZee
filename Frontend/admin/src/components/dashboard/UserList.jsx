@@ -3,6 +3,7 @@ import { FaSearch, FaUserCircle } from 'react-icons/fa';
 import { Loader2, AlertCircle } from 'lucide-react';
 import axios from '../../../axios/adminAxios';
 import { motion } from 'framer-motion';
+import Pagination from '../Pagination/Pagination';
 
 const UsersList = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -11,15 +12,20 @@ const UsersList = () => {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const[change,setChange]=useState(false)
+  const[totalPage,setTotalPage]=useState(5)
+  const[changePage,setChangePage]=useState(false)
   const usersPerPage = 10;
+  
+
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await axios.get('/usersList');
+        const response = await axios.get(`/usersList/${currentPage}`);
         setUsers(response.data.users);
+        console.log(response.data.users)
       } catch (error) {
         setError('Failed to fetch users. Please try again later.');
         console.error('Error fetching users:', error.message);
@@ -28,7 +34,7 @@ const UsersList = () => {
       }
     };
     fetchUsers();
-  }, []);
+  }, [changePage,change,currentPage]);
 
   const filteredUsers = users.filter(
     (user) =>
@@ -38,10 +44,7 @@ const UsersList = () => {
   );
 
   // Pagination logic
-  const indexOfLastUser = currentPage * usersPerPage;
-  const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
-  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+
 
     const handleToggleBlock =async(userId)=>{
       try {
@@ -59,8 +62,15 @@ const UsersList = () => {
     }
 
 
-  const startIndex = indexOfFirstUser + 1;
-  const endIndex = Math.min(indexOfLastUser, filteredUsers.length);
+
+
+  const onPageChange=async(newPage)=>{
+    console.log('asdkjfnkjl',newPage)
+    setCurrentPage(newPage)
+    setChangePage(!changePage)
+
+    
+  }
 
   if (error) {
     return (
@@ -148,7 +158,7 @@ const UsersList = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {currentUsers.map((user, index) => (
+                  {users.map((user, index) => (
                     <motion.tr
                       key={user._id}
                       initial={{ opacity: 0, y: 20 }}
@@ -214,44 +224,8 @@ const UsersList = () => {
               </table>
             </div>
 
-            {/* Pagination */}
-            <div className="bg-gray-50 px-4 py-3 border-t border-gray-200 sm:px-6">
-              <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-700">
-                  Showing <span className="font-medium">{startIndex}</span> to{' '}
-                  <span className="font-medium">{endIndex}</span> of{' '}
-                  <span className="font-medium">{filteredUsers.length}</span> results
-                </div>
-                <div className="flex space-x-2">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className={`px-3 py-1 rounded-md text-sm font-medium
-                      ${currentPage === 1
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : 'bg-black text-white hover:bg-gray-800'
-                      } transition-colors`}
-                  >
-                    Previous
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className={`px-3 py-1 rounded-md text-sm font-medium
-                      ${currentPage === totalPages
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : 'bg-black text-white hover:bg-gray-800'
-                      } transition-colors`}
-                  >
-                    Next
-                  </motion.button>
-                </div>
-              </div>
-            </div>
+        
+            <Pagination onPageChange={onPageChange} currentPage={currentPage} totalPages={totalPage}/>
           </motion.div>
         )}
       </div>

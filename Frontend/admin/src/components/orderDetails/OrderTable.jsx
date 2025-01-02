@@ -5,6 +5,7 @@ import axios from '../../../axios/adminAxios';
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import SpecificOrderDetails from './SpecificOrderDetail'
+import Pagination from '../Pagination/Pagination';
 
 import {
   Table,
@@ -33,10 +34,13 @@ const OrderTable = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [orderID, setOrderId] = useState()
   const [orderDetails, setOrderDetails] = useState({})
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(5)
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('/showOrders')
+        const response = await axios.get(`/showOrders/${currentPage}`)
         console.log(response.data.orders)
         setAllOrderItems(response.data.orders)
         const neededDetails = response.data.orders.map((order) => {
@@ -58,7 +62,7 @@ const OrderTable = () => {
       }
     }
     fetchData()
-  }, [isOpen])
+  }, [isOpen,currentPage])
 
 
   const statusColors = {
@@ -95,6 +99,10 @@ const OrderTable = () => {
 
     console.log('this is the order id', orderId)
   };
+
+  const onPageChange=(page)=>{
+    setCurrentPage(page)
+  }
 
   return (
     <motion.div
@@ -142,6 +150,7 @@ const OrderTable = () => {
             ))}
           </TableBody>
         </Table>
+        <Pagination onPageChange={onPageChange} currentPage={currentPage} totalPages={totalPage}/>
       </div>
       {isOpen && <SpecificOrderDetails isOpen={isOpen} setIsOpen={setIsOpen} orderID={orderID} orderDetails={orderDetails} />}
     </motion.div>
