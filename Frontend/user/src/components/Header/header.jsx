@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link, replace, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FaHome, FaShoppingCart, FaSearch, FaUser, FaCrown, FaStore } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaHome, FaShoppingCart, FaSearch, FaUser, FaCrown, FaStore, FaTimes } from 'react-icons/fa';
 import { store } from '../../redux/store'
 import logo from '../../assets/GeeZee.png'
 import { useSelector, useDispatch } from 'react-redux';
@@ -10,16 +10,26 @@ import { persistor } from '../../redux/store';
 import { removeToken } from '@/redux/slices/tokenSlice';
 import { resetCounter } from '@/redux/slices/CartCounter';
 import Badge from '@mui/material/Badge';
+import { throttle } from 'lodash';
+import { toast } from 'react-toastify';
+import axios from '../../axios/userAxios'
+
 const Header = (props) => {
   const [isHovered, setIsHovered] = useState(null);
   const navigate = useNavigate()
   const [isLogin, setIsLogin] = useState(false)
   const [checkToken, setCheckToken] = useState(false)
   const [user, setUser] = useState({})
-
+  const [loading, setLoading] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [result, setResult] = useState([])
   const userData = useSelector(state => state.user.user);
   const CartCount = useSelector(state => state.cartCounter.count)
   console.log(userData)
+
+
+
   const dispatch = useDispatch()
 
   const handleCartClick = (e) => {
@@ -30,6 +40,34 @@ const Header = (props) => {
     }
     navigate('/cart');
   };
+
+  const throttledSearch = useCallback(
+    throttle(async (searchTerm) => {
+      if (!searchTerm) {
+        setResult([]);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const response = await axios.get(`/search/?q=${searchTerm}`)
+        setResult(response.data.products)
+      } catch (error) {
+        console.log('error while searching')
+        toast.error('error while searching')
+      } finally {
+        setLoading(false)
+      }
+    }, 500),
+    []
+  )
+
+  useEffect(() => {
+    throttledSearch(searchTerm);
+
+    // Clean up to prevent memory leaks
+    return () => throttledSearch.cancel && throttledSearch.cancel();
+  }, [searchTerm, throttledSearch]);
 
   const handleLogin = () => {
     navigate('/login');
@@ -48,7 +86,7 @@ const Header = (props) => {
     localStorage.clear()
     dispatch(resetCounter())
     await persistor.purge();
-   
+
     console.log("Logout button clicked");
   };
 
@@ -79,7 +117,12 @@ const Header = (props) => {
               { name: 'Home', icon: FaHome, path: '/' },
               { name: 'Best Sellers', icon: FaCrown, path: '/bestSeller' },
               { name: 'Shop', icon: FaStore, path: '/productPage' },
-              { name: 'Search', icon: FaSearch, path: '#' },
+              {
+                name: 'Search',
+                icon: FaSearch,
+                path: '#',
+                onClick: () => setShowSearch(true)
+              },
               { name: 'Cart', icon: FaShoppingCart, path: '/cart' },
               ...(userData ? [{ name: 'Account', icon: FaUser, path: '/sidebar' }] : [])
             ].map((item, index) => (
@@ -93,6 +136,7 @@ const Header = (props) => {
                 <Link
                   to={item.path}
                   className="flex items-center space-x-1 hover:text-violet-400 transition-colors duration-200"
+                  onClick={item.onClick}
                 >
                   {item.name === 'Cart' ? (
                     <div onClick={handleCartClick}>
@@ -169,6 +213,74 @@ const Header = (props) => {
           </motion.button>
         </div>
       </div>
+
+      {/* Search Popup */}
+      <AnimatePresence>
+        {showSearch && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black bg-opacity-50 z-40"
+              onClick={() => setShowSearch(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: -20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: -20 }}
+              className="fixed top-20 left-[34%] transform -translate-x-1/2 bg-white rounded-lg shadow-xl p-8 z-50 w-[600px] max-w-[90vw]"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-semibold text-gray-900">Search Products</h3>
+                <button
+                  onClick={() => setShowSearch(false)}
+                  className="text-gray-400 hover:text-gray-500"
+                >
+                  <FaTimes className="h-6 w-6" />
+                </button>
+              </div>
+              <div className="space-y-4">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search products..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        navigate(`/search?q=${searchTerm}`);
+                        setShowSearch(false);
+                      }
+                    }}
+                    className="w-full px-5 py-3 text-base bg-white border-2 border-gray-200 rounded-lg 
+                             focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent 
+                             text-black placeholder-gray-400 transition-all duration-200"
+                    autoFocus
+                  />
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-4">
+                    <FaSearch className="h-5 w-5 text-gray-400" />
+                  </div>
+                </div>
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => {
+                      navigate(`/search?q=${searchTerm}`);
+                      setShowSearch(false);
+                    }}
+                    className="px-6 py-2.5 bg-black text-white rounded-lg hover:bg-gray-800 
+                             transition-colors duration-200 flex items-center space-x-2"
+                  >
+                    <FaSearch className="h-4 w-4" />
+                    <span>Search</span>
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       {/* <BreadCrumps/> */}
     </motion.header>
   );
