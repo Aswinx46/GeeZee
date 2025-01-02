@@ -238,7 +238,7 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
               <h2 className="text-lg font-semibold mb-2">Order Summary</h2>
               <div className="flex justify-between mb-2">
                 <span>Subtotal</span>
-                <span>₹{orderDetails.totalPrice + (orderDetails.discount -orderDetails.shippingCost) }</span>
+                <span>₹{orderDetails.finalAmount + (orderDetails.discount -orderDetails.shippingCost) }</span>
               </div>
               <div className="flex justify-between mb-2">
                 <span>Discount</span>
@@ -288,7 +288,8 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
                 shippingCost: orderDetails.shippingCost,
                 address: orderDetails.address,
                 paymentMethod: orderDetails.paymentMethod,
-                status: orderDetails.status
+                status: orderDetails.status,
+                discount:orderDetails.discount
               }} />}
               fileName={`invoice-${orderDetails.orderId}.pdf`}
             >

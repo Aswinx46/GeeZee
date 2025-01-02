@@ -146,6 +146,7 @@ const styles = StyleSheet.create({
 });
 
 const InvoicePDF = ({ orderDetails }) => (
+  
     
     <Document>
         <Page size="A4" style={styles.page}>

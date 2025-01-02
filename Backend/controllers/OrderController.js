@@ -111,7 +111,7 @@ const createOrder = async (req, res) => {
             finalAmount: total + shippingCharge - (selectedCoupon?.offerPrice || 0),
             address: mainAddress._id,
             paymentMethod,
-            discount: selectedCoupon?.offerPrice || originalAmount -  (total  - selectedCoupon?.offerPrice || 0),
+            discount:originalAmount -  (total  - selectedCoupon?.offerPrice || 0),
             shippingCost: shippingCharge,
             razorpayOrderId: razorPayIdOrder,
             paymentStatus: paymentMethod == 'Cash on Delivery' ? 'Pending' : 'Awaiting Payment'
