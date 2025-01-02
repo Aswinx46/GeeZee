@@ -49,11 +49,13 @@ const ProductDetails = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  console.log('this is the id',id)
   useEffect(() => {
     console.log('this is useEffect')
     const fetchProduct = async () => {
       console.log(id)
       if (!id) {
+
         console.log('this is the if case')
         const productSelected = localStorage.getItem('selectedProduct');
         console.log('this is the product selected', productSelected)
@@ -71,28 +73,20 @@ const ProductDetails = () => {
           const productOfferPrice = productOffer?.offerType == 'percentage' ? variant.price - (variant.price * (productOffer?.offerValue || 0) / 100) : variant.price - (productOffer?.offerValue || 0)
           console.log(categoryOfferPrice, productOfferPrice)
           let offerPrice
-          if(categoryOffer?.offerType && productOffer?.offerType )
-          {
+          if (categoryOffer?.offerType && productOffer?.offerType) {
 
-             offerPrice =
-            // Number.isNaN(categoryOfferPrice) ? productOfferPrice :
-            // Number.isNaN(productOfferPrice) ? categoryOfferPrice :
-            Math.min(categoryOfferPrice, productOfferPrice);
-            console.log('this is  the offer price',offerPrice)
-          }else if(categoryOffer?.offerType && !productOffer?.offerType )
-          {
-              offerPrice=categoryOfferPrice
-          }else if(!categoryOffer?.offerType && productOffer?.offerType )
-          {
-            offerPrice=productOfferPrice
+            offerPrice =
+
+              Math.min(categoryOfferPrice, productOfferPrice);
+            console.log('this is  the offer price', offerPrice)
+          } else if (categoryOffer?.offerType && !productOffer?.offerType) {
+            offerPrice = categoryOfferPrice
+          } else if (!categoryOffer?.offerType && productOffer?.offerType) {
+            offerPrice = productOfferPrice
           }
 
 
-          return {...variant,offerPrice:offerPrice}
-          // const validPrices = [categoryOfferPrice, productOfferPrice].filter(price => !isNaN(price) && price >= 0);
-          // const minOfferPrice = validPrices.length > 0 ? Math.min(...validPrices) : variant.price;
-          // console.log('this is the minprice', minOfferPrice)
-          // return { ...variant, offerPrice: minOfferPrice };
+          return { ...variant, offerPrice: offerPrice }
         })
 
         console.log('this is the needed', newVariants)
@@ -103,13 +97,14 @@ const ProductDetails = () => {
         console.log(single.variants)
       } else {
         console.log('this is the else case')
-        const productsResponse = await axios.get('/products')
+        const productsResponse = await axios.get(`/products/${id}`)
         console.log("re fetching")
+        console.log('this is  the else case prod', productsResponse.data.products)
         setProducts(productsResponse.data.products)
         const allProducts = productsResponse.data.products
         const selectedProduct = allProducts.find((item) => item._id == id)
         console.log(selectedProduct)
-        setProduct(selectedProduct)
+        setProduct(productsResponse.data.products)
       }
     }
     fetchProduct()
@@ -677,5 +672,6 @@ const ProductDetails = () => {
     </motion.div>
   )
 }
+
 
 export default ProductDetails

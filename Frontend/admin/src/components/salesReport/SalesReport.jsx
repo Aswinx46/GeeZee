@@ -11,6 +11,16 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import axios from '../../../axios/adminAxios'
 import { toast } from 'react-toastify'
 import { CSVLink, CSVDownload } from "react-csv";
+import SalesGraph from './SalesGraph'
+
+// Helper function to get week number
+const getWeekNumber = (date) => {
+  const currentDate = new Date(date);
+  const startOfYear = new Date(currentDate.getFullYear(), 0, 1);
+  const days = Math.floor((currentDate - startOfYear) / (24 * 60 * 60 * 1000));
+  return Math.ceil((days + startOfYear.getDay() + 1) / 7);
+};
+
 const SalesReport = () => {
   const [dateRange, setDateRange] = useState('month')
   const [startDate, setStartDate] = useState('')
@@ -18,7 +28,7 @@ const SalesReport = () => {
   const [update, setUpdate] = useState(false)
   const [salesReport, setSalesreport] = useState([])
   const [chartData, setChartData] = useState([])
-
+  const [xAxisFormat, setXAxisFormat] = useState('month')
 
   useEffect(() => {
     const fetchData = async (req, res) => {
@@ -29,14 +39,7 @@ const SalesReport = () => {
           }
         })
         setSalesreport(response.data.salesReport)
-        console.log(response.data.salesReport)
-
-        const formatedData = response.data.salesReport?.map((report) => ({
-          name: report.monthName || report.createdOn.split('T')[0],
-          totalAmount: report.totalOrderAmount,
-          orderCount: report.totalSalesCount
-        }))
-        setChartData(formatedData)
+        formatChartData(response.data.salesReport, 'month')
       } catch (error) {
         console.log('error while fetching sales report initially', error)
       }
@@ -44,21 +47,82 @@ const SalesReport = () => {
     fetchData()
   }, [])
 
+  const formatChartData = (data, range) => {
+    let formattedData = [];
+    
+    switch(range) {
+      case 'day':
+        formattedData = data.map(report => ({
+          name: new Date(report.createdOn).toLocaleDateString(),
+          totalAmount: report.totalOrderAmount,
+          orderCount: report.totalSalesCount
+        }));
+        setXAxisFormat('day');
+        break;
+      
+      case 'week':
+        formattedData = data.map(report => ({
+          name: `Week ${getWeekNumber(report.createdOn)}`,
+          totalAmount: report.totalOrderAmount,
+          orderCount: report.totalSalesCount
+        }));
+        setXAxisFormat('week');
+        break;
+      
+      case 'month':
+        formattedData = data.map(report => ({
+          name: report.monthName || new Date(report.createdOn).toLocaleString('default', { month: 'short' }),
+          totalAmount: report.totalOrderAmount,
+          orderCount: report.totalSalesCount
+        }));
+        setXAxisFormat('month');
+        break;
+      
+      case 'year':
+        formattedData = data.map(report => ({
+          name: new Date(report.createdOn).getFullYear().toString(),
+          totalAmount: report.totalOrderAmount,
+          orderCount: report.totalSalesCount
+        }));
+        setXAxisFormat('year');
+        break;
+      
+      default:
+        formattedData = data.map(report => ({
+          name: new Date(report.createdOn).toLocaleDateString(),
+          totalAmount: report.totalOrderAmount,
+          orderCount: report.totalSalesCount
+        }));
+        setXAxisFormat('custom');
+    }
+    
+    setChartData(formattedData);
+  };
+
   useEffect(() => {
     if (dateRange !== 'custom') {
       setStartDate('');
       setEndDate('');
     }
-
-
-    const formatedData = salesReport?.map((report) => ({
-      name: report.monthName || report.createdOn.split('T')[0],
-      totalAmount: report.totalOrderAmount,
-      orderCount: report.totalSalesCount
-    }))
-    setChartData(formatedData)
   }, [dateRange]);
 
+  const handleGenarateReport = async () => {
+    try {
+      const response = await axios.get('/salesReport', {
+        params: {
+          startDate, 
+          endDate, 
+          dateRange
+        }
+      });
+      setSalesreport(response.data.salesReport);
+      console.log('this is the sales report',response.data.salesReport)
+      formatChartData(response.data.salesReport, dateRange);
+    } catch (error) {
+      console.log('error while fetching sales report', error);
+      toast.error(error.response?.data?.message || 'Error generating report');
+    }
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -76,27 +140,6 @@ const SalesReport = () => {
     visible: { y: 0, opacity: 1 },
   }
 
-  const handleGenarateReport = async () => {
-    console.log(startDate)
-    console.log(endDate)
-    console.log(dateRange)
-
-    try {
-      const response = await axios.get('/salesReport', {
-        params: {
-          startDate, endDate, dateRange
-        }
-      })
-      console.log(response.data.salesReport)
-      setSalesreport(response.data.salesReport)
-    } catch (error) {
-      console.log('error while fetching sales report', error)
-      toast.error(error.data.response.message)
-    }
-
-  }
-
-  
   const csvData = [["Month/Year", "Total Sales",'totalDiscount','totalFinalAmount','totalOrderAmount']];
 
   salesReport.forEach((item) => {
@@ -175,116 +218,8 @@ const SalesReport = () => {
       
       </motion.div>
 
-      <motion.div className="grid gap-6 md:grid-cols-4" variants={itemVariants}>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Sales
-            </CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">₹{salesReport[0]?.totalOrderAmount}</div>
-            <p className="text-xs text-muted-foreground">
-              +20.1% from last month
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Orders
-            </CardTitle>
-            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+{salesReport[0]?.totalSalesCount}</div>
-            <p className="text-xs text-muted-foreground">
-              +180.1% from last month
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Discounts
-            </CardTitle>
-            <Tag className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">-{salesReport[0]?.totalDiscount}</div>
-            <p className="text-xs text-muted-foreground">
-              +19% from last month
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Net Sales
-            </CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">₹{salesReport[0]?.totalFinalAmount}</div>
-            <p className="text-xs text-muted-foreground">
-              +20.1% from last month
-            </p>
-          </CardContent>
-        </Card>
-      </motion.div>
+      <SalesGraph salesData={salesReport}/>
 
-      <motion.div
-        variants={itemVariants}
-        className="w-full"
-      >
-        <Card>
-          <CardHeader>
-            <CardTitle>Sales Trend</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="w-full h-[400px]"
-            >
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={chartData}
-                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis yAxisId="left" />
-                  <YAxis yAxisId="right" orientation="right" />
-                  <Tooltip formatter={(value, name) => {
-                    if (name === 'Total Amount') return [`₹${value}`, 'Total Sales'];
-                    return [value, 'Orders'];
-                  }} />
-                  <Legend />
-                  <Line
-                    yAxisId="left"
-                    type="monotone"
-                    dataKey="totalAmount"
-                    name="Total Amount"
-                    stroke="#8884d8"
-                    activeDot={{ r: 8 }}
-                  />
-                  <Line
-                    yAxisId="right"
-                    type="monotone"
-                    dataKey="orderCount"
-                    name="Orders"
-                    stroke="#82ca9d"
-                    activeDot={{ r: 8 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </motion.div>
-          </CardContent>
-        </Card>
-      </motion.div>
 
       <motion.div variants={itemVariants}>
         <Card>
@@ -305,7 +240,7 @@ const SalesReport = () => {
               <TableBody>
                 {salesReport.map((report, index) => (
                   <TableRow key={index}>
-                    <TableCell>{report.createdOn[index].split('T')[0]}</TableCell>
+                    <TableCell>{report.createdOn[index]?.split('T')[0]}</TableCell>
                     <TableCell>{report.totalSalesCount}</TableCell>
                     <TableCell>${report.totalOrderAmount}</TableCell>
                     <TableCell>-${report.totalDiscount}</TableCell>

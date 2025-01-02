@@ -221,7 +221,12 @@ const showOrders = async (req, res) => {
 
 
     try {
-        const orderDetails = await Order.find({ userId }).populate('orderItems.productId', 'productImg title').populate('address',)
+        const {pageNumber}=req.params
+        console.log('this is the pagenumber',pageNumber)
+        const page = parseInt(pageNumber, 10);
+        const limit=5
+        const skip=(page-1) * limit
+        const orderDetails = await Order.find({ userId }).populate('orderItems.productId', 'productImg title').populate('address',).limit(limit).skip(skip)
 
         if (!orderDetails) return res.status(400).json({ message: 'no orders ' })
 

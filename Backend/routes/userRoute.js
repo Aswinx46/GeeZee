@@ -23,6 +23,8 @@ user_route.put('/changeUserInfo/:userId', auth.authToken, userController.changeI
 
 
 user_route.get('/products/:pageNumber', productController.showProductListed)
+user_route.get('/products/:id', productController.showParticularProduct)
+user_route.get('/products', productController.showProductInHotDeals)
 user_route.get('/relatedProducts/:id', productController.showRelatedProducts)
 user_route.get('/showProductVariantQuantity/:id', productController.showProductVariantQuantity)
 user_route.get('/filterProducts', productController.filterProducts)
@@ -40,7 +42,7 @@ user_route.patch('/changeDefaultAddress/:addressId/:userId', auth.authToken, add
 user_route.put('/editAddress', auth.authToken, addressController.editAddress)
 
 user_route.post('/createOrder/:userId/:variantId', auth.authToken, orderController.createOrder)
-user_route.get('/orderDetails/:userId', auth.authToken, orderController.showOrders)
+user_route.get('/orderDetails/:userId/:pageNumber', auth.authToken, orderController.showOrders)
 user_route.patch('/cancelOrder/:orderId/:userId', auth.authToken, orderController.cancelOrder)
 user_route.post('/confirmPayment/:userId', auth.authToken, orderController.verifyPayment)
 user_route.patch('/returnProduct/:orderId/:orderItemId', auth.authToken, orderController.returnOrderProduct)
@@ -56,4 +58,6 @@ user_route.patch('/removeFromWishlist/:userId',auth.authToken,WishlistController
 user_route.get('/showCoupons',auth.authToken,couponConrtoller.showCouponInUserSide)
 
 user_route.get('/getWalletDetails/:userId',auth.authToken,WalletController.getWalletDetails)
+
+user_route.get('/search',productController.search)
 module.exports = user_route

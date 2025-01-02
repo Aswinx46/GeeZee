@@ -12,6 +12,7 @@ import {
 import { Package, ChevronDown, ChevronRight } from 'lucide-react'
 import { useSelector } from 'react-redux'
 import OrderDetailsModal from '../accountDetails/OrderDetails'
+import Pagination from '@/extraAddonComponents/Pagination'
 
 const OrderDetails = () => {
   const [selectedItem, setSelectedItem] = useState({})
@@ -19,19 +20,22 @@ const OrderDetails = () => {
   const [orderDetails, setOrderDetails] = useState([])
   const [expandedOrders, setExpandedOrders] = useState({})
   const [particularOrderDetails, setParticularOrderDetails] = useState({})
+  const[totalPage,setTotalPage]=useState(5)
+  const[changePage,setChangePage]=useState(false)
+  const [currentPage, setCurrentPage] = useState(1);
   const user = useSelector((state) => state.user.user)
   const userId = user._id
 
   useEffect(() => {
     const fetchData = async () => {
-      const orderDetails = await axios.get(`/orderDetails/${userId}`)
+      const orderDetails = await axios.get(`/orderDetails/${userId}/${currentPage}`)
       setOrderDetails(orderDetails.data.orderDetails)
       // if (orderDetails.data.orderDetails.length > 0) {
       //   setParticularOrderDetails(orderDetails.data.orderDetails[0].orderItems[0])
       // }
     }
     fetchData()
-  }, [isOpen])
+  }, [isOpen,currentPage])
 
   const toggleOrderExpansion = (orderId) => {
     setExpandedOrders(prev => ({
@@ -61,6 +65,12 @@ const OrderDetails = () => {
     setSelectedItem({ ...orderDetails, orderItem: item })
     setParticularOrderDetails(item)
     setIsOpen(true)
+  }
+  const onPageChange=async(newPage)=>{
+    setCurrentPage(newPage)
+    setChangePage(!changePage)
+
+    
   }
 
   return (
@@ -164,6 +174,7 @@ const OrderDetails = () => {
       >
         Thank you for your purchase. If you have any questions, please contact our support.
       </motion.div>
+      <Pagination onPageChange={onPageChange} currentPage={currentPage} totalPages={totalPage}/>
       {isOpen && <OrderDetailsModal isOpen={isOpen} setIsOpen={setIsOpen} item={particularOrderDetails} orderDetails={selectedItem} />}
     </motion.div>
   )

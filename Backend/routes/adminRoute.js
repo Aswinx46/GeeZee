@@ -23,6 +23,7 @@ admin_route.patch('/editCategoryName/:id', auth.adminAuth, categoryController.ed
 
 admin_route.post('/addProduct', auth.adminAuth, productController.addProduct)
 admin_route.get('/products/:pageNumber', auth.adminAuth, productController.showProduct)
+admin_route.get('/products', auth.adminAuth, productController.showProduct)
 admin_route.put('/editProduct/:id', auth.adminAuth, productController.editProduct)
 
 admin_route.get('/brands', auth.adminAuth, brandController.showBrand)

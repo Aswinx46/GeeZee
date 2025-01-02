@@ -26,7 +26,7 @@ const Header = (props) => {
   const [result, setResult] = useState([])
   const userData = useSelector(state => state.user.user);
   const CartCount = useSelector(state => state.cartCounter.count)
-  console.log(userData)
+
 
 
 
@@ -50,24 +50,25 @@ const Header = (props) => {
 
       try {
         setLoading(true);
-        const response = await axios.get(`/search/?q=${searchTerm}`)
+        const response = await axios.get('/search',{
+          params : {searchTerm},
+        })
         setResult(response.data.products)
+        console.log(response.data.products)
       } catch (error) {
         console.log('error while searching')
         toast.error('error while searching')
       } finally {
         setLoading(false)
       }
-    }, 500),
-    []
+    }, 2000),
+    [setResult, setLoading]
   )
 
   useEffect(() => {
-    throttledSearch(searchTerm);
-
-    // Clean up to prevent memory leaks
+    // Only cleanup
     return () => throttledSearch.cancel && throttledSearch.cancel();
-  }, [searchTerm, throttledSearch]);
+  }, [throttledSearch]);
 
   const handleLogin = () => {
     navigate('/login');
@@ -89,6 +90,19 @@ const Header = (props) => {
 
     console.log("Logout button clicked");
   };
+
+  const handleSearch=(e)=>{
+    const query=e.target.value
+    setSearchTerm(query)
+    throttledSearch(query)
+    
+  }
+
+  const handleSelectProduct=(product)=>{
+    setShowSearch(false);
+    localStorage.setItem("selectedProduct", JSON.stringify([product]));
+    navigate('/productDetails')
+  }
 
 
   return (
@@ -246,7 +260,7 @@ const Header = (props) => {
                     type="text"
                     placeholder="Search products..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={ handleSearch}
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
                         navigate(`/search?q=${searchTerm}`);
@@ -262,18 +276,50 @@ const Header = (props) => {
                     <FaSearch className="h-5 w-5 text-gray-400" />
                   </div>
                 </div>
+                {/* Search Results Section */}
+                {searchTerm && result.length > 0 && (
+                  <div className="mt-4 max-h-60 overflow-y-auto bg-white rounded-lg shadow-lg">
+                    {result.map((product) => (
+                      <div
+                        key={product._id}
+                        className="p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100"
+                        onClick={()=>handleSelectProduct(product)}
+                      >
+                        <div className="flex items-center space-x-4">
+                          <img 
+                            src={product.productImg[0]} 
+                            alt={product.title} 
+                            className="w-16 h-16 object-cover rounded"
+                          />
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-900">{product.title}</h4>
+                            <p className="text-sm text-gray-500">{product.description.substring(0, 60)}...</p>
+                            <p className="text-sm font-semibold text-gray-900 mt-1">₹{product.variants[0].price}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {searchTerm && result.length === 0 && !loading && (
+                  <div className="mt-4 p-4 text-center text-gray-500 bg-gray-50 rounded-lg">
+                    No products found
+                  </div>
+                )}
+                {loading && (
+                  <div className="mt-4 p-4 text-center text-gray-500 bg-gray-50 rounded-lg">
+                    Searching...
+                  </div>
+                )}
                 <div className="flex justify-end">
-                  <button
-                    onClick={() => {
-                      navigate(`/search?q=${searchTerm}`);
-                      setShowSearch(false);
-                    }}
+                  {/* <button
+                    onClick={handleSearch}
                     className="px-6 py-2.5 bg-black text-white rounded-lg hover:bg-gray-800 
                              transition-colors duration-200 flex items-center space-x-2"
                   >
                     <FaSearch className="h-4 w-4" />
                     <span>Search</span>
-                  </button>
+                  </button> */}
                 </div>
               </div>
             </motion.div>
