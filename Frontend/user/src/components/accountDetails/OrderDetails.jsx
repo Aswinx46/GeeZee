@@ -11,17 +11,17 @@ import { useSelector } from 'react-redux';
 import InvoicePDF from '@/extraAddonComponents/Invoice';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 
-const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
-  console.log('this is the sended item',item)
-  const user=useSelector(state=>state.user.user)
-  const userId=user._id
-  const[orderCancelPop,setOrderCancelPop]=useState(false)
-  const[cancel,setCancel]=useState(false)
-  const[isReturn,setIsReturn]=useState(false)
-  const[orderItemId,setOrderItemId]=useState()
-  console.log('this  is the order details from the parent',orderDetails)
-  const[orderId,setOrderId]=useState()
-  const navigate=useNavigate()
+const OrderDetailsModal = ({ isOpen, onClose, item, setIsOpen, orderDetails }) => {
+  console.log('this is the sended item', item)
+  const user = useSelector(state => state.user.user)
+  const userId = user._id
+  const [orderCancelPop, setOrderCancelPop] = useState(false)
+  const [cancel, setCancel] = useState(false)
+  const [isReturn, setIsReturn] = useState(false)
+  const [orderItemId, setOrderItemId] = useState()
+  console.log('this  is the order details from the parent', orderDetails)
+  const [orderId, setOrderId] = useState()
+  const navigate = useNavigate()
   const order = {
     id: '#ORD12345',
     status: 'Shipped',
@@ -43,10 +43,10 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
 
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.8 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       scale: 1,
-      transition: { 
+      transition: {
         when: "beforeChildren",
         staggerChildren: 0.1,
       },
@@ -61,47 +61,46 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
   };
 
 
-  const handleCancelOrder=async () => {
+  const handleCancelOrder = async () => {
     try {
       setOrderId(orderDetails._id)
       setOrderItemId(orderDetails.orderItemId)
       setCancel(true)
       setOrderCancelPop(true)
-      console.log('this is the orderDetails',orderDetails)
-      console.log(orderDetails._id,'asidfhksajdhfjkaosdfasfisadjh')
+      console.log('this is the orderDetails', orderDetails)
+      console.log(orderDetails._id, 'asidfhksajdhfjkaosdfasfisadjh')
       // console.log('this is the order id',orderDetails.orderObjectId)
       // console.log('this is the orderItem id',orderDetails.orderItemId)
-  
-     
+
+
     } catch (error) {
-      console.log('error while canceling the order',error)
+      console.log('error while canceling the order', error)
     }
   }
 
 
-  const handleReturnOrder=async()=>{
+  const handleReturnOrder = async () => {
     setIsReturn(true)
     setOrderCancelPop(true)
     console.log(orderDetails)
     setOrderId(orderDetails._id)
-      setOrderItemId(item._id)
-     
+    setOrderItemId(item._id)
+
   }
 
 
-  const handleRepayment=()=>{
+  const handleRepayment = () => {
 
-    const razorpayOrderId=orderDetails.razorpayOrderId
-    const amount=orderDetails.finalAmount
-    const currency='INR'
-    console.log('this is the razorpayOrderId',razorpayOrderId)
-    console.log('this is the currency',currency)
-    console.log("this si the amount",amount)
+    const razorpayOrderId = orderDetails.razorpayOrderId
+    const amount = orderDetails.finalAmount
+    const currency = 'INR'
+    console.log('this is the razorpayOrderId', razorpayOrderId)
+    console.log('this is the currency', currency)
+    console.log("this si the amount", amount)
 
-    console.log('this is the orderDetails inside the repayment',orderDetails)
+    console.log('this is the orderDetails inside the repayment', orderDetails)
 
-    if(orderDetails.paymentStatus=='Awaiting Payment')
-    {
+    if (orderDetails.paymentStatus == 'Awaiting Payment') {
       const options = {
         key: RAZORPAY_KEY_ID, // Replace with your Razorpay key
         amount,
@@ -145,8 +144,8 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
         console.error('Payment Failed:', response);
         toast.error('Payment Failed. Please try again.');
       });
-     
-    }else{
+
+    } else {
       navigate('/checkoutSuccess')
     }
   }
@@ -172,35 +171,35 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
               variant="ghost"
               size="icon"
               className="absolute top-4 right-4"
-              onClick={()=>setIsOpen(false)}
+              onClick={() => setIsOpen(false)}
             >
               <X className="h-4 w-4" />
             </Button>
 
             <motion.h1 className="text-2xl font-bold mb-6" variants={itemVariants}>
-              Order Details 
+              Order Details
             </motion.h1>
 
             <motion.div className="mb-6" variants={itemVariants}>
               <h2 className="text-lg font-semibold mb-2">Items</h2>
-             
-                <motion.div 
-                 
 
-                  className="flex items-center justify-between border-b border-gray-200 py-4"
-                  variants={itemVariants}
-                >
-                  <div className="flex items-center">
-                    <img src={orderDetails.orderItem.productId.productImg[0]} alt={orderDetails.orderItem.productId.title} className="w-20 h-20 object-cover rounded-md mr-4" />
-                    <div>
-                      <h3 className="font-medium">{orderDetails.orderItem.productId.title}</h3>
-                      <h3 className="font-medium">{Object.entries(item?.variant?.selectedAttributes).map((key)=><h1>{key.join(' : ')}</h1>)}</h3>
-                      <p className="text-gray-500">Quantity: {orderDetails.orderItem.quantity}</p>
-                    </div>
+              <motion.div
+
+
+                className="flex items-center justify-between border-b border-gray-200 py-4"
+                variants={itemVariants}
+              >
+                <div className="flex items-center">
+                  <img src={orderDetails.orderItem.productId.productImg[0]} alt={orderDetails.orderItem.productId.title} className="w-20 h-20 object-cover rounded-md mr-4" />
+                  <div>
+                    <h3 className="font-medium">{orderDetails.orderItem.productId.title}</h3>
+                    <h3 className="font-medium">{Object.entries(item?.variant?.selectedAttributes).map((key) => <h1>{key.join(' : ')}</h1>)}</h3>
+                    <p className="text-gray-500">Quantity: {orderDetails.orderItem.quantity}</p>
                   </div>
-                  <p className="font-semibold">₹{orderDetails.orderItem.price}</p>
-                </motion.div>
-            
+                </div>
+                <p className="font-semibold">₹{orderDetails.orderItem.price}</p>
+              </motion.div>
+
             </motion.div>
 
             <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6" variants={itemVariants}>
@@ -220,8 +219,8 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
                   <span>{order.shipping.method}</span>
                 </div>
                 <p className="text-sm text-gray-500 mt-1">{orderDetails.address.street} {orderDetails.address.city} <br></br>
-                {orderDetails.address.state} {orderDetails.address.street} <br></br> pincode: {orderDetails.address.pinCode}<br></br>
-                phone :{orderDetails.address.phone}
+                  {orderDetails.address.state} {orderDetails.address.street} <br></br> pincode: {orderDetails.address.pinCode}<br></br>
+                  phone :{orderDetails.address.phone}
                 </p>
               </div>
 
@@ -238,7 +237,7 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
               <h2 className="text-lg font-semibold mb-2">Order Summary</h2>
               <div className="flex justify-between mb-2">
                 <span>Subtotal</span>
-                <span>₹{orderDetails.finalAmount + (orderDetails.discount -orderDetails.shippingCost) }</span>
+                <span>₹{orderDetails.finalAmount + (orderDetails.discount - orderDetails.shippingCost)}</span>
               </div>
               <div className="flex justify-between mb-2">
                 <span>Discount</span>
@@ -254,31 +253,31 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
               </div>
             </motion.div>
 
-            {orderDetails.paymentStatus=='Awaiting Payment' ?
-                  <Button
-                  className="mt-6 w-full bg-black text-white hover:bg-gray-800"
-                  onClick={handleRepayment}
-                  >
-                    Retry Payment
-            </Button>
-            : ''}
-            {orderDetails.status=='Cancelled' ||  orderDetails.status=='Delivered'? '' : 
-                  <Button
-                  className="mt-6 w-full bg-black text-white hover:bg-gray-800"
-                  onClick={handleCancelOrder}
-                  >
-              Cancel Order
-            </Button>
+            {orderDetails.paymentStatus == 'Awaiting Payment' ?
+              <Button
+                className="mt-6 w-full bg-black text-white hover:bg-gray-800"
+                onClick={handleRepayment}
+              >
+                Retry Payment
+              </Button>
+              : ''}
+            {orderDetails.status == 'Cancelled' || orderDetails.status == 'Delivered' ? '' :
+              <Button
+                className="mt-6 w-full bg-black text-white hover:bg-gray-800"
+                onClick={handleCancelOrder}
+              >
+                Cancel Order
+              </Button>
             }
-               {orderDetails.status=='Delivered' &&  orderDetails.orderItem.variant?.returnOrder!=='Pending' &&  orderDetails.orderItem.variant?.returnOrder!=='Accepted'?
-                  <Button
-                  className="mt-6 w-full bg-black text-white hover:bg-gray-800"
-                  onClick={handleReturnOrder}
-                  >
-              Return Product
-            </Button>
-            :''}
-            <PDFDownloadLink 
+            {orderDetails.status == 'Delivered' && orderDetails.orderItem.variant?.returnOrder !== 'Pending' && orderDetails.orderItem.variant?.returnOrder !== 'Accepted' ?
+              <Button
+                className="mt-6 w-full bg-black text-white hover:bg-gray-800"
+                onClick={handleReturnOrder}
+              >
+                Return Product
+              </Button>
+              : ''}
+            <PDFDownloadLink
               document={<InvoicePDF orderDetails={{
                 orderId: orderDetails.orderId,
                 date: orderDetails.invoiceDate,
@@ -289,7 +288,7 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
                 address: orderDetails.address,
                 paymentMethod: orderDetails.paymentMethod,
                 status: orderDetails.status,
-                discount:orderDetails.discount
+                discount: orderDetails.discount
               }} />}
               fileName={`invoice-${orderDetails.orderId}.pdf`}
             >
@@ -305,12 +304,12 @@ const OrderDetailsModal = ({ isOpen, onClose,item,setIsOpen,orderDetails }) => {
 
             <Button
               className="mt-6 w-full bg-black text-white hover:bg-gray-800"
-              onClick={()=>setIsOpen(false)}
+              onClick={() => setIsOpen(false)}
             >
               Close
             </Button>
           </motion.div>
-          {orderCancelPop && <OrderCancellationModal isOpen={orderCancelPop}  isCancel={cancel} paymentMethod={orderDetails.paymentMethod} isReturnreturn={isReturn} orderItemId={orderItemId}  orderId={orderId} setIsOpen={setOrderCancelPop}/>}
+          {orderCancelPop && <OrderCancellationModal isOpen={orderCancelPop} isCancel={cancel} paymentMethod={orderDetails.paymentMethod} isReturnreturn={isReturn} orderItemId={orderItemId} orderId={orderId} setIsOpen={setOrderCancelPop} />}
 
         </motion.div>
       )}

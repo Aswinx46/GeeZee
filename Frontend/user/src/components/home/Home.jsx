@@ -1,12 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import image1 from '../../assets/https___hybrismediaprod.blob.core.windows.net_sys-master-phoenix-images-container_h93_h9a_9834855137310_241101-viper-v3-pro-sentinels-1500x1000-1.jpg'
 import image2 from '../../assets/pro-tips.jpeg'
 import Asus from '../../assets/https%3A%2F%2Fhybrismediaprod.blob.core.windows.net%2Fsys-master-phoenix-images-container%2Fh48%2Fh42%2F9814447783966%2F240909-blackshark-v2-pro-white-2023-1.png'
-
+import axios from '../../axios/userAxios'
 const Home = () => {
   const [isHovered, setIsHovered] = useState(null);
+  const [url,setUrl]=useState()
+
+  useEffect(()=>{
+    const fetchdata=async () => {
+      const response=await axios.get('/showBanner')
+      setUrl(response.data.allBanners.bannerUrl)
+      console.log(response.data.allBanners.bannerUrl)
+    }
+    fetchdata()
+  },[])
 
   const features = [
     { title: "Premium Quality", description: "High-end peripherals and accessories from top gaming brands" },
@@ -28,7 +38,8 @@ const Home = () => {
       >
           <video
           className="absolute inset-0 w-full h-full object-cover"
-          src="/CORSAIR_Header_2024_WQHD_2.webm" // Replace with your video file path
+          // src="/CORSAIR_Header_2024_WQHD_2.webm" // Replace with your video file path
+           src={url}
           autoPlay
           loop
           muted

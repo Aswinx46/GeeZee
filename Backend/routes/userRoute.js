@@ -11,6 +11,7 @@ const brandController = require('../controllers/BrandController')
 const WalletController=require('../controllers/WalletController')
 const couponConrtoller=require('../controllers/CouponController')
 const WishlistController=require('../controllers/WishlistController')
+const bannerController=require('../controllers/BannerController')
 
 user_route.post('/signup', userController.signup)
 user_route.post('/otpVerification', userController.otpVerification)
@@ -43,6 +44,7 @@ user_route.put('/editAddress', auth.authToken, addressController.editAddress)
 
 user_route.post('/createOrder/:userId/:variantId', auth.authToken, orderController.createOrder)
 user_route.get('/orderDetails/:userId/:pageNumber', auth.authToken, orderController.showOrders)
+user_route.get('/orderDetails/:userId', auth.authToken, orderController.showDetailOfOneOrder)
 user_route.patch('/cancelOrder/:orderId/:userId', auth.authToken, orderController.cancelOrder)
 user_route.post('/confirmPayment/:userId', auth.authToken, orderController.verifyPayment)
 user_route.patch('/returnProduct/:orderId/:orderItemId', auth.authToken, orderController.returnOrderProduct)
@@ -60,4 +62,6 @@ user_route.get('/showCoupons',auth.authToken,couponConrtoller.showCouponInUserSi
 user_route.get('/getWalletDetails/:userId',auth.authToken,WalletController.getWalletDetails)
 
 user_route.get('/search',productController.search)
+
+user_route.get('/showBanner',bannerController.showBanner)
 module.exports = user_route

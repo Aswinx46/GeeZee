@@ -9,6 +9,9 @@ const brandController = require('../controllers/BrandController')
 const couponConrtoller=require('../controllers/CouponController')
 const salesReportController=require('../controllers/SalesReportController')
 const offerController=require('../controllers/OfferController')
+const bannerController=require('../controllers/BannerController')
+
+
 admin_route.post('/login', adminController.login)
 admin_route.get('/usersList/:pageNumber', auth.adminAuth, adminController.fetchUser)
 admin_route.patch('/userEdit/:id', auth.adminAuth, adminController.editUser)
@@ -46,5 +49,11 @@ admin_route.post('/addOffer/:productId',auth.adminAuth,offerController.addOffer)
 admin_route.patch('/changeStatusOrder/:offerId',auth.adminAuth,offerController.changeStatusOfOffer)
 admin_route.post('/addOfferCategory/:categoryId',auth.adminAuth,offerController.addCategoryOffer)
 admin_route.patch('/changeListOfferCategory/:offerId',auth.adminAuth,offerController.changeStatusOfCategoryOffer)
+
+
+admin_route.post('/createBanner',auth.adminAuth,bannerController.createBanner)
+admin_route.get('/getBanners',auth.adminAuth,bannerController.currentBannersInAdmin)
+admin_route.patch('/changeBannerStatus/:bannerId',auth.adminAuth,bannerController.changeStatusOfBanner)
+
 
 module.exports = admin_route

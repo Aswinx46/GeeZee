@@ -151,6 +151,7 @@ export default function OrderSuccess() {
       console.log('this is the full order details', details.data.orderDetails)
       setOrderDetails(details.data.orderDetails)
       const lastOrder = details.data.orderDetails[details.data.orderDetails.length - 1];
+      console.log('this is the last order',lastOrder)
 
       if (lastOrder && Array.isArray(lastOrder.orderItems)) {
         // Transform the orderItems of the last order

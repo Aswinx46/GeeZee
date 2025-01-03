@@ -27,7 +27,7 @@ const createOrder = async (req, res) => {
     const { userId, variantId } = req.params
 
     const { mainAddress, cartItems, paymentMethod, total, shippingCharge, selectedCoupon } = req.body
- 
+
     const offerPrice = []
     const totalOfferPrice = cartItems.reduce((acc, item) => acc += item?.offerPrice, 0)
 
@@ -61,15 +61,15 @@ const createOrder = async (req, res) => {
             if (!variant || variant.stock < item.quantity) {
                 insufficientStock.push(item.id);
             }
-   
-            originalAmount=variant.price * item.quantity
+
+            originalAmount = variant.price * item.quantity
 
         }
         if (insufficientStock.length > 0) {
             return res.status(400).json({ message: "out of stock", insufficientStock });
         }
 
-        console.log('this is the original price',originalAmount)
+        console.log('this is the original price', originalAmount)
 
 
 
@@ -111,7 +111,7 @@ const createOrder = async (req, res) => {
             finalAmount: total + shippingCharge - (selectedCoupon?.offerPrice || 0),
             address: mainAddress._id,
             paymentMethod,
-            discount:originalAmount -  (total  - selectedCoupon?.offerPrice || 0),
+            discount: originalAmount - (total - selectedCoupon?.offerPrice || 0),
             shippingCost: shippingCharge,
             razorpayOrderId: razorPayIdOrder,
             paymentStatus: paymentMethod == 'Cash on Delivery' ? 'Pending' : 'Awaiting Payment'
@@ -141,7 +141,7 @@ const createOrder = async (req, res) => {
 
             await Brand.updateOne({ _id: product.brand }, { $inc: { salesCount: item.quantity } })
 
-            // console.log('this is the all variants', allVariants)
+            
         }
 
 
@@ -221,11 +221,11 @@ const showOrders = async (req, res) => {
 
 
     try {
-        const {pageNumber}=req.params
-        console.log('this is the pagenumber',pageNumber)
+        const { pageNumber } = req.params
+        console.log('this is the pagenumber', pageNumber)
         const page = parseInt(pageNumber, 10);
-        const limit=5
-        const skip=(page-1) * limit
+        const limit = 5
+        const skip = (page - 1) * limit
         const orderDetails = await Order.find({ userId }).populate('orderItems.productId', 'productImg title').populate('address',).limit(limit).skip(skip)
 
         if (!orderDetails) return res.status(400).json({ message: 'no orders ' })
@@ -238,6 +238,24 @@ const showOrders = async (req, res) => {
     }
 }
 
+
+const showDetailOfOneOrder = async (req, res) => {
+    const { userId } = req.params
+
+
+    try {
+
+        const orderDetails = await Order.find({ userId }).populate('orderItems.productId', 'productImg title').populate('address',)
+
+        if (!orderDetails) return res.status(400).json({ message: 'no orders ' })
+
+        return res.status(200).json({ message: "order details fetched", orderDetails })
+
+    } catch (error) {
+        console.log('error while fetching the order details', error)
+        return res.status(500).json({ message: "error while fetching the data" })
+    }
+}
 // const details = selectedOrder.orderItems.map((items) => ({
 //     variantId: items.variant._id,
 //     quantity: items.quantity,
@@ -252,7 +270,7 @@ const cancelOrder = async (req, res) => {
     try {
 
         const selectedOrder = await Order.findById(orderId, 'orderItems finalAmount shippingCost discount')
-    
+
 
 
 
@@ -281,25 +299,26 @@ const cancelOrder = async (req, res) => {
             await Brand.findByIdAndUpdate(product.brand, { $inc: { salesCount: -item.quantity } });
         }
 
+
         if (paymentMethod == 'Razorpay') {
             const wallet = await Wallet.findOne({ userId })
-
+            console.log(details, 'this is the details')
             if (!wallet) return res.status(400).json({ message: 'no wallet found' })
 
             const totalRefundAmount = details.reduce((sum, item) => sum + item.totalPrice, 0);
-
+            console.log('this is the selected order', selectedOrder)
 
             const transaction = {
                 type: 'Refund',
-                transaction_id: uuidv4(), // Generate a unique transaction ID
-                amount: selectedOrder.finalAmount - (selectedOrder.shippingCost + selectedOrder.discount),
+                transaction_id: uuidv4(),
+                amount: selectedOrder.finalAmount - (selectedOrder.shippingCost),
                 description: 'Product Returned amount',
-                date: new Date(), // Add a timestamp for the transaction
+                date: new Date(),
             };
             wallet.transactions.push(transaction)
-            wallet.balance += selectedOrder.finalAmount - (selectedOrder.shippingCost + selectedOrder.discount)
+            wallet.balance += selectedOrder.finalAmount - (selectedOrder.shippingCost)
             await wallet.save()
-           
+
         }
 
 
@@ -316,10 +335,10 @@ const cancelOrder = async (req, res) => {
 const showAllOrders = async (req, res) => {
 
     try {
-        const {pageNumber}=req.params
+        const { pageNumber } = req.params
         const page = parseInt(pageNumber, 10);
-        const limit=5
-        const skip=(page-1) * limit      
+        const limit = 5
+        const skip = (page - 1) * limit
         const orders = await Order.find().populate('orderItems.productId', 'productImg title').populate('address').populate('userId', 'lastName firstName email phoneNo').limit(limit).skip(skip)
         if (!orders) return res.status(400).json({ message: 'no order found' })
         return res.status(200).json({ message: "order details fetched", orders })
@@ -351,8 +370,8 @@ const returnOrderProduct = async (req, res) => {
         const { orderId } = req.params
         const { orderItemId } = req.params
         const { returnReason } = req.body
- 
-      
+
+
         const selectedOrder = await Order.findById(orderId)
         // console.log('this is the selcted order',selectedOrder)
         const selectedVariant = selectedOrder.orderItems.find((item) => item._id.toString() == orderItemId.toString())
@@ -376,7 +395,7 @@ const getReturnProducts = async (req, res) => {
             userId: 1, _id: 1, orderItems: 1,
             orderId: 1, paymentMethod: 1, invoiceDate: 1, finalAmount: 1, totalPrice: 1, shippingCost: 1, discount: 1
         }).populate('orderItems.productId', 'title productImg price').populate('address').populate('userId', 'firstName lastName email phoneNo');
-       
+
         const filteredOrders = orders.map((order) => ({
             ...order.toObject(), // Convert Mongoose document to plain JavaScript object
             orderItems: order.orderItems.filter(
@@ -393,14 +412,14 @@ const getReturnProducts = async (req, res) => {
 const confirmReturnProduct = async (req, res) => {
     try {
         const { orderId } = req.params
-      
+
         // const update=await Order.findByIdAndUpdate(orderId,{'orderItems.variant.returnOrder' : 'Accepted'},{new:true})
         const update = await Order.findOneAndUpdate(
             { _id: orderId, 'orderItems.variant.returnOrder': 'Pending' },
             { $set: { 'orderItems.$.variant.returnOrder': 'Accepted' } },
             { new: true }
         );
-    
+
         if (!update) return res.status(400).json({ message: "no order found" })
         const returnedVariant = update.orderItems.find((item) => item.variant.returnOrder == 'Accepted')
         const { productId, variant, quantity } = returnedVariant
@@ -420,7 +439,7 @@ const confirmReturnProduct = async (req, res) => {
             return res.status(400).json({ message: "Failed to update variant stock" });
         }
 
-        await Product.findByIdAndUpdate(productId,{$inc:{salesCount : -quantity}})
+        await Product.findByIdAndUpdate(productId, { $inc: { salesCount: -quantity } })
 
         const product = await Product.findById(productId, 'categoryId brand');
 
@@ -429,7 +448,7 @@ const confirmReturnProduct = async (req, res) => {
         await Brand.findByIdAndUpdate(product.brand, { $inc: { salesCount: -quantity } });
 
         const userId = update.userId
-       
+
         const wallet = await Wallet.findOne({ userId })
 
         if (!wallet) return res.status(400).json({ message: 'no wallet found' })
@@ -439,14 +458,14 @@ const confirmReturnProduct = async (req, res) => {
         const transaction = {
             type: 'Refund',
             transaction_id: uuidv4(), // Generate a unique transaction ID
-            amount: update.finalAmount - (update.shippingCost + update.discount),
+            amount: update.finalAmount - (update.shippingCost),
             description: 'Product Returned amount',
             date: new Date(), // Add a timestamp for the transaction
         };
         wallet.transactions.push(transaction)
-        wallet.balance += update.finalAmount - (update.shippingCost + update.discount)
+        wallet.balance += update.finalAmount - (update.shippingCost)
         await wallet.save()
-        
+
         return res.status(200).json({ message: "order Updated", update, selectedProduct })
     } catch (error) {
         console.log('error while confirming the return order', error)
@@ -454,19 +473,18 @@ const confirmReturnProduct = async (req, res) => {
     }
 }
 
-const trendingItems=async (req,res) => {
+const trendingItems = async (req, res) => {
     try {
-        const topTenProduct=await Product.find({}).sort({salesCount : -1}).limit(10)
-        const topTenCategory=await Category.find({}).sort({salesCount : -1}).limit(10)
-        const topTenBrand=await Brand.find({}).sort({salesCount:-1}).limit(10)
-   
-        if(topTenProduct && topTenCategory && topTenBrand )
-        {
-            return res.status(200).json({message:'trending data fetched',topTenProduct,topTenCategory,topTenBrand})
+        const topTenProduct = await Product.find({}).sort({ salesCount: -1 }).limit(10)
+        const topTenCategory = await Category.find({}).sort({ salesCount: -1 }).limit(10)
+        const topTenBrand = await Brand.find({}).sort({ salesCount: -1 }).limit(10)
+
+        if (topTenProduct && topTenCategory && topTenBrand) {
+            return res.status(200).json({ message: 'trending data fetched', topTenProduct, topTenCategory, topTenBrand })
         }
     } catch (error) {
-        console.log('error while fetching the trending data',error)
-        return res.status(500).json({message:"error while fetching the trending data"})
+        console.log('error while fetching the trending data', error)
+        return res.status(500).json({ message: "error while fetching the trending data" })
     }
 }
 
@@ -480,5 +498,6 @@ module.exports = {
     returnOrderProduct,
     getReturnProducts,
     confirmReturnProduct,
-    trendingItems
+    trendingItems,
+    showDetailOfOneOrder
 }
