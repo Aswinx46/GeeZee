@@ -10,7 +10,8 @@ const createBanner=async (req,res) => {
             startDate:formData.startDate,
             endDate:formData.endDate,
             status:formData.status,
-            bannerUrl:videoUrl
+            bannerUrl:videoUrl,
+            showPageName:formData.showPageName
         })
         await newBanner.save()
         return res.status(201).json({message:"new banner created"})
@@ -22,7 +23,8 @@ const createBanner=async (req,res) => {
 
 const showBanner=async (req,res) => {
     try {
-        const allBanners=await Banner.findOne({status:'active'})
+        const {showPageName}=req.params
+        const allBanners=await Banner.findOne({status:'active', showPageName})
         if(!allBanners) return res.status(400).json({message:"No banner found"})
 
         return res.status(200).json({message:'banner fetched',allBanners})

@@ -46,7 +46,7 @@ const salesReport = async (req, res) => {
       { $match: matchCondition },
       {
         $group: {
-          _id: { 
+          _id: {
             year: { $year: '$createdOn' },
             month: { $month: '$createdOn' },
           },
@@ -65,13 +65,13 @@ const salesReport = async (req, res) => {
           totalOrderAmount: 1,
           totalDiscount: 1,
           totalFinalAmount: 1,
-          
+
         },
       },
       { $sort: { year: 1, month: 1 } },
     ]);
 
-    console.log('this is the salesreport',salesReport)
+    console.log('this is the salesreport', salesReport)
     return res.status(200).json({ message: 'Sales report fetched', salesReport });
   } catch (error) {
     console.error('Error while fetching sales report', error);

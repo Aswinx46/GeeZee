@@ -10,33 +10,33 @@ const ProductPage = () => {
     const [category, setCategory] = useState([])
     const [currentIndex, setCurrentIndex] = useState(0)
     const carouselRef = useRef(null);
+    const [url,setUrl]=useState()
     const navigate = useNavigate()
-
+    useEffect(()=>{
+       
+        const fetchdata=async () => {
+            const response=await axios.get('/showBanner/productPage')
+            setUrl(response.data.allBanners.bannerUrl)
+            console.log(response.data.allBanners.bannerUrl)
+          }
+          fetchdata()
+        
+    },[])
     useEffect(() => {
         const fetchDetails = async () => {
             try {
                 const productsResponse = await axios.get('/products')
-                // setProducts(productsResponse.data.products)
                 console.log(productsResponse.data.products)
-                // const neededItems = productsResponse.data.products.map((product) => {
-                //     const variantPrice = product?.variants[0]?.price
-                //     const categoryOfferPrice = product.categoryId?.categoryOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.categoryId?.categoryOffer?.offerValue / 100 : variantPrice - product.categoryId?.categoryOffer?.offerValue
-                //     const productOfferPrice = product.productOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.productOffer?.offerValue / 100 : variantPrice - product.productOffer?.offerValue
-                //     const offerPrice = categoryOfferPrice > productOfferPrice ? categoryOfferPrice : productOfferPrice
-                //     // console.log(categoryOfferPrice,productOfferPrice,offerPrice)
-                //     return { ...product, offerPrice }
-                // })
+          
                 const neededItems = productsResponse.data.products.map((product) => {
                     const variantPrice = product?.variants[0]?.price
                     const categoryOfferPrice = product.categoryId?.categoryOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.categoryId?.categoryOffer?.offerValue / 100 : variantPrice - product.categoryId?.categoryOffer?.offerValue
                     const productOfferPrice = product.productOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.productOffer?.offerValue / 100 : variantPrice - product.productOffer?.offerValue
-                    // const offerPrice = categoryOfferPrice > productOfferPrice ? categoryOfferPrice : productOfferPrice
                     console.log('this is catprice',categoryOfferPrice,'this is pro price',productOfferPrice)
                     const offerPrice =
                       Number.isNaN(categoryOfferPrice) ? productOfferPrice :
                         Number.isNaN(productOfferPrice) ? categoryOfferPrice :
                           Math.max(categoryOfferPrice, productOfferPrice);
-                    // console.log(categoryOfferPrice,productOfferPrice,offerPrice)
                     return { ...product, offerPrice }
                   })
                 console.log(neededItems)
@@ -107,7 +107,7 @@ const ProductPage = () => {
                         /> */}
                         <video
                             className="absolute inset-0 w-full h-full object-cover"
-                            src="/keyboard video.mp4" // Replace with your video file path
+                            src= {url ? url :"/keyboard video.mp4"  } // Replace with your video file path
                             autoPlay
                             loop
                             muted

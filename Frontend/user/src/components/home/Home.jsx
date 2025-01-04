@@ -11,7 +11,7 @@ const Home = () => {
 
   useEffect(()=>{
     const fetchdata=async () => {
-      const response=await axios.get('/showBanner')
+      const response=await axios.get('/showBanner/home')
       setUrl(response.data.allBanners.bannerUrl)
       console.log(response.data.allBanners.bannerUrl)
     }

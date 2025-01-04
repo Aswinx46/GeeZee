@@ -30,6 +30,10 @@ const bannerSchema = new mongoose.Schema({
         enum: ['active', 'inactive'],
         default: 'active', 
     },
+    showPageName:{
+        type:String,
+        required:true
+    }
 });
 
 const Banner = mongoose.model('Banner', bannerSchema);

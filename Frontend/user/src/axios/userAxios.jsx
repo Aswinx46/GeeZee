@@ -26,7 +26,7 @@ instance.interceptors.request.use(
       config.headers['user_id'] = user._id
     }
 
-    
+
     console.log('token interceptor done')
     return config;
     (error) => {

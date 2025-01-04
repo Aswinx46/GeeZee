@@ -16,40 +16,40 @@ import { useNavigate } from 'react-router-dom';
 import axios from '../../../axios/adminAxios';
 const CouponList = () => {
   const [coupons, setCoupons] = useState([]);
-  const [update,setUpdate]=useState(false)
-  useEffect(()=>{
-    const fetchData=async () => {
-      const response=await axios.get('/getCoupon')
+  const [update, setUpdate] = useState(false)
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await axios.get('/getCoupon')
       console.log(response.data.allCoupon)
       setCoupons(response.data.allCoupon)
     }
     fetchData()
-  },[update])
+  }, [update])
 
-  const navigate=useNavigate()
+  const navigate = useNavigate()
 
-  const handleListUnlist = async(id) => {
+  const handleListUnlist = async (id) => {
     // setCoupons(coupons.map(coupon => 
     //   coupon._id === id ? { ...coupon, isList: !coupon.isList } : coupon
     // ));
-    const response=await axios.patch(`/changeStatusOfCoupon/${id}`)
+    const response = await axios.patch(`/changeStatusOfCoupon/${id}`)
     // const coupon = coupons.find(c => c.id === id);
-  setUpdate(!update)
+    setUpdate(!update)
     toast.success('changed status successfully');
   };
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
+    visible: {
       opacity: 1,
-      transition: { 
+      transition: {
         when: "beforeChildren",
         staggerChildren: 0.1,
       },
     },
   };
 
-  const handleCreateCoupon=()=>{
+  const handleCreateCoupon = () => {
     console.log('jakhkf')
     navigate('/addCoupon')
   }
@@ -70,10 +70,10 @@ const CouponList = () => {
         <Ticket className="mr-2" />
         Coupon List
       </h2>
-      <div onClick={()=>handleCreateCoupon()} className="flex justify-end mb-4">
-        <Button  className="bg-primary hover:bg-primary/90">
+      <div onClick={() => handleCreateCoupon()} className="flex justify-end mb-4">
+        <Button className="bg-primary hover:bg-primary/90">
           <Ticket className="mr-2 h-4 w-4" />
-          
+
           Create Coupon
         </Button>
       </div>
@@ -84,15 +84,16 @@ const CouponList = () => {
             <TableHead>Type</TableHead>
             <TableHead>Value</TableHead>
             <TableHead>Description</TableHead>
-   
+            <TableHead>Starting</TableHead>
             <TableHead>Expires</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Minimum Price</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           <AnimatePresence>
-            {coupons.map((coupon,i) => (
+            {coupons.map((coupon, i) => (
               <motion.tr
                 key={coupon._id}
                 variants={itemVariants}
@@ -107,13 +108,14 @@ const CouponList = () => {
                   {coupon.couponType === 'percentage' ? `${coupon.offerPrice}%` : `₹${coupon.offerPrice}`}
                 </TableCell>
                 <TableCell>{coupon.description}</TableCell>
-               
+                <TableCell>{coupon.createdOn.split('T')[0]}</TableCell>
                 <TableCell>{coupon.expireOn.split('T')[0]}</TableCell>
                 <TableCell>
                   <Badge variant={coupon.isList ? "success" : "secondary"}>
                     {coupon.isList ? 'Listed' : 'Unlisted'}
                   </Badge>
                 </TableCell>
+                <TableCell>{coupon.minimumPrice}</TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
                     <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
@@ -125,7 +127,7 @@ const CouponList = () => {
                         {coupon.isList ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </Button>
                     </motion.div>
-                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                    {/* <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                       <Button variant="outline" size="icon">
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -134,7 +136,7 @@ const CouponList = () => {
                       <Button variant="outline" size="icon">
                         <Trash className="h-4 w-4" />
                       </Button>
-                    </motion.div>
+                    </motion.div> */}
                   </div>
                 </TableCell>
               </motion.tr>
