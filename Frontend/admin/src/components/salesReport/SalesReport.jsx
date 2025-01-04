@@ -115,7 +115,9 @@ const SalesReport = () => {
           dateRange
         }
       });
+      
       setSalesreport(response.data.salesReport);
+      
       console.log('this is the sales report',response.data.salesReport)
       formatChartData(response.data.salesReport, dateRange);
     } catch (error) {
@@ -240,7 +242,7 @@ const SalesReport = () => {
               <TableBody>
                 {salesReport.map((report, index) => (
                   <TableRow key={index}>
-                    <TableCell>{report.createdOn[index]?.split('T')[0]}</TableCell>
+                    {/* <TableCell>{report?.createdOn[index]?.split('T')[0]}</TableCell> */}
                     <TableCell>{report.totalSalesCount}</TableCell>
                     <TableCell>${report.totalOrderAmount}</TableCell>
                     <TableCell>-${report.totalDiscount}</TableCell>

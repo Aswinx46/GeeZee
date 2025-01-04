@@ -58,12 +58,12 @@ const addProductWishlist=async (req,res) => {
         try {
             const{userId}=req.params
             const{item}=req.body
-            // console.log('this is the item',item)
+      
             const wishilst=await Wishlist.findOne({userId})
             if(!wishilst) return res.status(400).json({message:"no wishlist found"})
                 const updatedWishlist=wishilst.product.filter((prod)=>prod.productId.toString() !== item.productId._id.toString())
             console.log('this is the updated wishlist',updatedWishlist)
-            // console.log('this is the id',item.productId._id)
+    
 
                 wishilst.product=updatedWishlist
                 await wishilst.save()

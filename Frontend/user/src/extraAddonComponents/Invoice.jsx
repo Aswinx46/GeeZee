@@ -230,7 +230,7 @@ const InvoicePDF = ({ orderDetails }) => (
             <View style={styles.summary}>
                 <View style={styles.summaryRow}>
                     <Text style={styles.summaryLabel}>Subtotal:</Text>
-                    <Text style={styles.summaryValue}>₹{orderDetails.finalAmount - (orderDetails.shippingCost || 0)}</Text>
+                    <Text style={styles.summaryValue}>₹{orderDetails.finalAmount + (orderDetails.discount - orderDetails.shippingCost)}</Text>
                 </View>
                 <View style={styles.summaryRow}>
                     <Text style={styles.summaryLabel}>Shipping:</Text>

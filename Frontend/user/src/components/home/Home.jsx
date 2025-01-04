@@ -39,7 +39,7 @@ const Home = () => {
           <video
           className="absolute inset-0 w-full h-full object-cover"
           // src="/CORSAIR_Header_2024_WQHD_2.webm" // Replace with your video file path
-           src={url}
+           src={url ? url : '/CORSAIR_Header_2024_WQHD_2.webm'}
           autoPlay
           loop
           muted

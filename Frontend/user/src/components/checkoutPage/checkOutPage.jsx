@@ -32,51 +32,35 @@ const CheckoutPage = () => {
   const [discount, setDiscount] = useState()
   const [total, setTotal] = useState()
   useEffect(() => {
-    console.log('Razorpay Key:', RAZORPAY_KEY_ID);
     const fetchData = async () => {
       const addresses = await axios.get(`/showAddress/${userId}`) ?? []
       const defaultAdd = addresses.data.address.find((address) => address.defaultAddress == true)
       setDefaultAddress(defaultAdd)
 
       const coupon = await axios.get('/showCoupons')
-      console.log(coupon.data.allCoupons)
       const notUsedCoupons = coupon.data.allCoupons.filter((coupon) =>
         !coupon.userId.includes(userId))
-      console.log('this is the not used coupon', notUsedCoupons)
       setCoupons(notUsedCoupons)
       setMainAddress((prev) => {
         return selectedAddress ? selectedAddress : defaultAdd;
       });
 
-      // const savedAddress=addresses.data.address.filter((address)=>address._id != mainAddress)
       const savedAddress = addresses.data.address.filter((address) => address._id !== (selectedAddress?._id || defaultAdd?._id));
-      console.log('this is hte saved addresses', savedAddress)
       setSavedAddresses(savedAddress)
-      console.log(savedAddress)
       const cartItems = await axios.get(`/cartItems/${userId}`)
-      console.log('this is the cartItems',cartItems.data.result)
-      // const neededItems = cartItems.data.result.map((product) => {
-      //   const variantPrice = product?.variants[0]?.price
-      //   const categoryOfferPrice = product.categoryId?.categoryOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.categoryId?.categoryOffer?.offerValue / 100 : variantPrice - product.categoryId?.categoryOffer?.offerValue
-      //   const productOfferPrice = product.productOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.productOffer?.offerValue / 100 : variantPrice - product.productOffer?.offerValue
-      //   const offerPrice = categoryOfferPrice > productOfferPrice ? categoryOfferPrice : productOfferPrice
-      //   // console.log(categoryOfferPrice,productOfferPrice,offerPrice)
-      //   return { ...product, offerPrice }
-      // })
+
       const neededItems = cartItems.data.result.map((product) => {
         const variantPrice = product?.variants[0]?.price
         const categoryOfferPrice = product.categoryOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.categoryOffer?.offerValue / 100 : variantPrice - product.categoryOffer?.offerValue
         const productOfferPrice = product.productOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.productOffer?.offerValue / 100 : variantPrice - product.productOffer?.offerValue
-        // const offerPrice = categoryOfferPrice > productOfferPrice ? categoryOfferPrice : productOfferPrice
-        console.log('this is catprice',categoryOfferPrice,'this is pro price',productOfferPrice)
+     
         const offerPrice =
           Number.isNaN(categoryOfferPrice) ? productOfferPrice :
             Number.isNaN(productOfferPrice) ? categoryOfferPrice :
               Math.max(categoryOfferPrice, productOfferPrice);
-        // console.log(categoryOfferPrice,productOfferPrice,offerPrice)
         return { ...product, offerPrice }
       })
-      console.log('this is the needed items', neededItems)
+      
       setCartItems(neededItems)
 
       const calculateSubTotal = () => {
@@ -92,7 +76,7 @@ const CheckoutPage = () => {
 
       const total = await calculateSubTotal()
       setTotal(total)
-      console.log('this is the total', total)
+  
       const finalAmount = total - shippingCharge
       setFinalAmount(finalAmount)
 
@@ -117,33 +101,23 @@ const CheckoutPage = () => {
 
   const handlePlaceOrder = async (e) => {
     e.preventDefault()
-    console.log(defaultAddress)
-    console.log('this is main address', mainAddress)
-    console.log('this is the items', cartItems)
-    console.log('this is the user id', userId)
-    console.log('this is the paymnent method', paymentMethod)
-    console.log('this is the variant id', cartItems[0].variants[0]._id)
+
+
     const variantId = cartItems[0].variants[0]._id
     const blockedProduct = cartItems.some((item) => item.productStatus == 'inactive' || item.brandStatus == 'inactive' || item.categoryStatus == 'inactive')
-    console.log(blockedProduct)
+ 
     if (blockedProduct) {
       toast.error('Product is blocked by admin remove the product to continue purchase')
       return
     }
-    console.log('this is the main address', mainAddress)
+  
     if (!mainAddress) {
       toast.error('No address Selected')
       return
     }
     try {
-      // if(paymentMethod === 'Razorpay')
-      // {
-      //   console.log('this is inside razorpay')
-      // }
       const response = await axios.post(`/createOrder/${userId}/${variantId}`, { mainAddress, cartItems, paymentMethod, total, shippingCharge, selectedCoupon })
-      console.log('this is the response', response)
       if (paymentMethod == 'Razorpay') {
-        console.log('inside razor')
         const { razorpayOrderId, amount, currency } = response.data;
 
         const options = {
@@ -154,7 +128,7 @@ const CheckoutPage = () => {
           description: 'Order Payment',
           order_id: razorpayOrderId,
           handler: async (response) => {
-            console.log('Payment Success:', response);
+            // console.log('Payment Success:', response);
             toast.success('Payment Successful');
             navigate("/checkoutSuccess");
             // Optionally send payment confirmation to the backend
@@ -211,7 +185,6 @@ const CheckoutPage = () => {
   }
 
   const handleNewAddress = () => {
-    console.log('kajsfd')
     setIsOpen(true)
     console.log(isOpen)
     // navigate('/address')
@@ -227,7 +200,6 @@ const CheckoutPage = () => {
       }
     if (!appliedCoupon) toast.error('Invalid Coupon')
     setAppliedCoupon(appliedCoupon)
-    console.log(appliedCoupon)
     const tota = total + shippingCharge - appliedCoupon.offerPrice
     setFinalAmount(tota)
 
@@ -245,7 +217,6 @@ const CheckoutPage = () => {
   };
 
   const handleCouponSelect = async (id) => {
-    console.log(id)
     const selectedCoupon = coupons.find((coupon) => coupon._id == id)
     if (!selectedCoupon) toast.error('No coupon found')
 

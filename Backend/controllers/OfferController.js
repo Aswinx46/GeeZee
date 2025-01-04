@@ -9,11 +9,7 @@ const addOffer = async (req, res) => {
     try {
         const { offerType, offerValue, startDate, endDate } = req.body
         const { productId } = req.params
-        console.log('this isthe product id ', productId)
-        console.log(offerType)
-        console.log(offerValue);
-        console.log(startDate);
-        console.log(endDate);
+   
 
         const existingProductOffer = await Product.findById(productId, 'productOffer')
         console.log('sdnfkjdnlg', existingProductOffer)

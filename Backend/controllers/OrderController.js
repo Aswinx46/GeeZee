@@ -28,7 +28,8 @@ const createOrder = async (req, res) => {
 
     const { mainAddress, cartItems, paymentMethod, total, shippingCharge, selectedCoupon } = req.body
 
-    const offerPrice = []
+    // const offerPrice = cartItems.reduce((acc,cur)=>acc += cur.offerPrice)
+
     const totalOfferPrice = cartItems.reduce((acc, item) => acc += item?.offerPrice, 0)
 
 
@@ -54,8 +55,9 @@ const createOrder = async (req, res) => {
 
         const insufficientStock = [];
         let originalAmount
-        let discount
+        let discount 
         for (const item of cartItems) {
+            
             const product = await Product.findById(item.id, "variants");
             const variant = product.variants.find((v) => v._id.toString() === item.variants[0]._id);
             if (!variant || variant.stock < item.quantity) {
@@ -69,7 +71,7 @@ const createOrder = async (req, res) => {
             return res.status(400).json({ message: "out of stock", insufficientStock });
         }
 
-        console.log('this is the original price', originalAmount)
+        
 
 
 
@@ -107,11 +109,11 @@ const createOrder = async (req, res) => {
         const order = new Order({
             userId,
             orderItems,
-            totalPrice: total,
-            finalAmount: total + shippingCharge - (selectedCoupon?.offerPrice || 0),
+            totalPrice:  total + shippingCharge - (selectedCoupon?.offerPrice || 0),
+            finalAmount:originalAmount,
             address: mainAddress._id,
             paymentMethod,
-            discount: originalAmount - (total - selectedCoupon?.offerPrice || 0),
+            discount: total - (originalAmount - selectedCoupon?.offerPrice || originalAmount),
             shippingCost: shippingCharge,
             razorpayOrderId: razorPayIdOrder,
             paymentStatus: paymentMethod == 'Cash on Delivery' ? 'Pending' : 'Awaiting Payment'
@@ -222,13 +224,14 @@ const showOrders = async (req, res) => {
 
     try {
         const { pageNumber } = req.params
-        console.log('this is the pagenumber', pageNumber)
+   
         const page = parseInt(pageNumber, 10);
         const limit = 5
         const skip = (page - 1) * limit
         const orderDetails = await Order.find({ userId }).populate('orderItems.productId', 'productImg title').populate('address',).limit(limit).skip(skip)
 
         if (!orderDetails) return res.status(400).json({ message: 'no orders ' })
+            console.log('this is the orderDetials',orderDetails)
 
         return res.status(200).json({ message: "order details fetched", orderDetails })
 
@@ -302,11 +305,11 @@ const cancelOrder = async (req, res) => {
 
         if (paymentMethod == 'Razorpay') {
             const wallet = await Wallet.findOne({ userId })
-            console.log(details, 'this is the details')
+            
             if (!wallet) return res.status(400).json({ message: 'no wallet found' })
 
             const totalRefundAmount = details.reduce((sum, item) => sum + item.totalPrice, 0);
-            console.log('this is the selected order', selectedOrder)
+    
 
             const transaction = {
                 type: 'Refund',
