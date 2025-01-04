@@ -357,6 +357,28 @@ const changeOrderStatus = async (req, res) => {
 
     try {
 
+        if(newStatus == 'Cancelled')
+        {
+            const order=await Order.findById(orderId)
+            console.log('this is the cancel order',order)
+
+            for (const item of order.orderItems) {
+                await Product.findOneAndUpdate(
+                    { _id: item.productId, "variants._id": item.variant._id},
+                    { $inc: { "variants.$.stock": item.quantity } }
+                );
+                await Product.findByIdAndUpdate(item.productId, { $inc: { salesCount: -item.quantity } });
+    
+                const product = await Product.findById(item.productId, 'categoryId brand');
+    
+                await Category.findByIdAndUpdate(product.categoryId, { $inc: { salesCount: -item.quantity } });
+    
+                await Brand.findByIdAndUpdate(product.brand, { $inc: { salesCount: -item.quantity } });
+            }
+            order.status=newStatus
+            await order.save()
+            return res.status(200).json({message:'order status changed and stock incremented'})
+        }
 
         const order = await Order.findByIdAndUpdate(orderId, { status: newStatus }, { new: true })
         if (!order) return res.status(400).json({ message: "no order found" })
