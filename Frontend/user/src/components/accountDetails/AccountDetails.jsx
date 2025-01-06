@@ -7,7 +7,7 @@ import changeEmailVerification from './ChangeEmailOtpVerification'
 const AccountDetails = () => {
 
   const user = useSelector(state => state.user.user)
-  const[isOpen,setIsOpen]=useState(false)
+  const [isOpen, setIsOpen] = useState(false)
   const [formData, setFormData] = useState({
     firstName: user.firstName,
     lastName: user.lastName,
@@ -22,16 +22,14 @@ const AccountDetails = () => {
     }));
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const updateInformation=await axios.put(`/changeUserInfo/${user._id}`,{formData})
+      const updateInformation = await axios.put(`/changeUserInfo/${user._id}`, { formData })
       toast.success(updateInformation.data.message)
     } catch (error) {
-      console.log('error while updating the user')
       toast.error(error.response.data.message)
     }
-    console.log('Form submitted:', formData);
     // Handle form submission here
   };
 
@@ -99,7 +97,7 @@ const AccountDetails = () => {
           </motion.button>
         </form>
       </motion.div>
-      {isOpen && <changeEmailVerification isOpen={isOpen} setIsOpen={setIsOpen} formData={formData} userId={user._id}/>}
+      {isOpen && <changeEmailVerification isOpen={isOpen} setIsOpen={setIsOpen} formData={formData} userId={user._id} />}
     </div>
   );
 };

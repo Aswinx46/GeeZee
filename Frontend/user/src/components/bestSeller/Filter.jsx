@@ -21,12 +21,9 @@ const FilterModal = ({ isOpen, setIsOpen, setProducts }) => {
     const fetchData = async (req, res) => {
       try {
         const brands = await axios.get('/brands')
-        console.log('this is the brands', brands.data.brands)
         const categories = await axios.get('/categories')
-        console.log('this is categories', categories.data.category)
         const brandName = brands.data.brands
         const categoryName = categories.data.category
-        console.log(brandName, categoryName)
         setBrands(brandName)
         setCategories(categoryName)
       } catch (error) {
@@ -47,7 +44,6 @@ const FilterModal = ({ isOpen, setIsOpen, setProducts }) => {
 
   const handleSortChange = (value) => {
     setSelectedSort(value)
-    console.log(value)
   }
 
 
@@ -66,10 +62,7 @@ const FilterModal = ({ isOpen, setIsOpen, setProducts }) => {
   };
 
   const handleApplyFilter = async () => {
-    console.log('this is category', selectedCategories)
-    console.log('this is brand', selectedBrands)
-    console.log(priceRange)
-    console.log('this is sort', selectedSort)
+ 
 
     const response = await axios.get("/filterProducts", {
       params: {
@@ -80,7 +73,6 @@ const FilterModal = ({ isOpen, setIsOpen, setProducts }) => {
         maxPrice: priceRange[1],
       },
     });
-    console.log(response.data)
     setProducts(response.data)
 
   }

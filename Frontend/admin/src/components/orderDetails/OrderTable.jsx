@@ -41,7 +41,6 @@ const OrderTable = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`/showOrders/${currentPage}`)
-        console.log(response.data.orders)
         setAllOrderItems(response.data.orders)
         const neededDetails = response.data.orders.map((order) => {
           return {
@@ -55,7 +54,6 @@ const OrderTable = () => {
           };
         });
         setNeededItems(neededDetails)
-        console.log('this isthe needed details', neededDetails)
       } catch (error) {
         console.log('error while fetching order details', error)
 
@@ -92,12 +90,10 @@ const OrderTable = () => {
   const handleViewDetails = (orderId) => {
     setOrderId(orderId)
     const orderDetail = allOrderItems.find((order) => order._id == orderId)
-    console.log('this is the specfic order', orderDetail)
     setOrderDetails(orderDetail)
 
     setIsOpen(true)
 
-    console.log('this is the order id', orderId)
   };
 
   const onPageChange=(page)=>{

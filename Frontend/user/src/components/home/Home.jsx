@@ -13,7 +13,6 @@ const Home = () => {
     const fetchdata=async () => {
       const response=await axios.get('/showBanner/home')
       setUrl(response.data.allBanners.bannerUrl)
-      console.log(response.data.allBanners.bannerUrl)
     }
     fetchdata()
   },[])

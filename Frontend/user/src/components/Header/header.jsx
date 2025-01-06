@@ -54,7 +54,6 @@ const Header = (props) => {
           params : {searchTerm},
         })
         setResult(response.data.products)
-        console.log(response.data.products)
       } catch (error) {
         console.log('error while searching')
         toast.error('error while searching')
@@ -72,7 +71,6 @@ const Header = (props) => {
 
   const handleLogin = () => {
     navigate('/login');
-    console.log("Login button clicked");
   };
 
 
@@ -88,7 +86,6 @@ const Header = (props) => {
     dispatch(resetCounter())
     await persistor.purge();
 
-    console.log("Logout button clicked");
   };
 
   const handleSearch=(e)=>{

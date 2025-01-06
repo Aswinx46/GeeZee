@@ -60,8 +60,7 @@ const OrderDetails = () => {
   }
 
   const handleProductDetail = (item, orderDetails) => {
-    console.log('this is the item',item)
-    console.log('this is the order',orderDetails)
+   
     setSelectedItem({ ...orderDetails, orderItem: item })
     setParticularOrderDetails(item)
     setIsOpen(true)

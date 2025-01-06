@@ -4,7 +4,6 @@ const Wallet=require('../models/WalletSchema')
 const getWalletDetails=async(req,res)=>{
     try {
         const{userId}=req.params
-        console.log(userId,'this is the userid')
         const wallet=await Wallet.findOne({userId})
         if(!wallet)return res.status(400).json({message:"no Wallet found"})
             

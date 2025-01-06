@@ -13,8 +13,7 @@ import { toast } from 'react-toastify';
 const EditBrandModal = ({ isOpen, setIsOpen, brandName, setBrandName, onSave ,brandId}) => {
 
   const handleSave=async()=>{
-    console.log(brandName)
-    console.log(brandId)
+  
     try {
       
       const response=await axios.patch(`/editBrandName/${brandId}`,{brandName})

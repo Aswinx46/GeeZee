@@ -118,7 +118,6 @@ const SalesReport = () => {
       
       setSalesreport(response.data.salesReport);
       
-      console.log('this is the sales report',response.data.salesReport)
       formatChartData(response.data.salesReport, dateRange);
     } catch (error) {
       console.log('error while fetching sales report', error);

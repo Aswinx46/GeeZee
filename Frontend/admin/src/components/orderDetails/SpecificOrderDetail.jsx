@@ -63,7 +63,6 @@ const SpecificOrderDetail = ({ isOpen, onClose, setIsOpen, order: initialOrder,o
 
   const orderStatus=[currentOrderStatus,...statusOptions.filter((status)=>status !== currentOrderStatus)]
 
-  console.log('this is the order details in child',orderDetails)
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -77,8 +76,7 @@ const SpecificOrderDetail = ({ isOpen, onClose, setIsOpen, order: initialOrder,o
   };
 
   const handleSave=async () => {
-    console.log(newStatus)
-    console.log(orderDetails._id)
+    
     const orderId=orderDetails._id
     try {
       

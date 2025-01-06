@@ -3,7 +3,6 @@ const Order = require('../models/OrderSchema');
 const salesReport = async (req, res) => {
   try {
     const { startDate, endDate, dateRange } = req.query;
-    console.log(startDate, endDate, dateRange);
 
     let matchCondition = { status: 'Delivered' };
     const today = new Date();
@@ -71,7 +70,6 @@ const salesReport = async (req, res) => {
       { $sort: { year: 1, month: 1 } },
     ]);
 
-    console.log('this is the salesreport', salesReport)
     return res.status(200).json({ message: 'Sales report fetched', salesReport });
   } catch (error) {
     console.error('Error while fetching sales report', error);

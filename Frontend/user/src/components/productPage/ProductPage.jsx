@@ -17,7 +17,7 @@ const ProductPage = () => {
         const fetchdata=async () => {
             const response=await axios.get('/showBanner/productPage')
             setUrl(response.data.allBanners.bannerUrl)
-            console.log(response.data.allBanners.bannerUrl)
+           
           }
           fetchdata()
         
@@ -26,20 +26,19 @@ const ProductPage = () => {
         const fetchDetails = async () => {
             try {
                 const productsResponse = await axios.get('/products')
-                console.log(productsResponse.data.products)
+              
           
                 const neededItems = productsResponse.data.products.map((product) => {
                     const variantPrice = product?.variants[0]?.price
                     const categoryOfferPrice = product.categoryId?.categoryOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.categoryId?.categoryOffer?.offerValue / 100 : variantPrice - product.categoryId?.categoryOffer?.offerValue
                     const productOfferPrice = product.productOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.productOffer?.offerValue / 100 : variantPrice - product.productOffer?.offerValue
-                    console.log('this is catprice',categoryOfferPrice,'this is pro price',productOfferPrice)
                     const offerPrice =
                       Number.isNaN(categoryOfferPrice) ? productOfferPrice :
                         Number.isNaN(productOfferPrice) ? categoryOfferPrice :
                           Math.max(categoryOfferPrice, productOfferPrice);
                     return { ...product, offerPrice }
                   })
-                console.log(neededItems)
+              
                 setProducts(neededItems)
                 const categoryResponse = await axios.get('/category')
                 setCategory(categoryResponse.data.category)
@@ -52,7 +51,7 @@ const ProductPage = () => {
 
     const handleDeal = async (index) => {
         const selectedProduct = products.filter((_, i) => i == index)
-        console.log(selectedProduct)
+        
 
         localStorage.setItem("selectedProduct", JSON.stringify(selectedProduct));
         navigate('/productDetails')

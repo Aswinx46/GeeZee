@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button"
 import axios from '../axios/userAxios'
 import { Textarea } from "@/components/ui/textarea"
 import { useSelector } from 'react-redux';
-const OrderCancellationModal = ({ isOpen, onClose, onConfirm,paymentMethod, orderId,isReturn,orderItemId, isCancel, setIsOpen }) => {
+const OrderCancellationModal = ({ isOpen, onClose, onConfirm, paymentMethod, orderId, isReturn, orderItemId, isCancel, setIsOpen }) => {
   const [isCancelled, setIsCancelled] = useState(false);
   const [cancellationReason, setCancellationReason] = useState('');
-  const[returnReason,setReturnReason]=useState('')
-  const user=useSelector(state=>state.user.user)
+  const [returnReason, setReturnReason] = useState('')
+  const user = useSelector(state => state.user.user)
   // const[returnOrCancel,setReturnOrCancel]=useState()
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.8 },
@@ -48,27 +48,22 @@ const OrderCancellationModal = ({ isOpen, onClose, onConfirm,paymentMethod, orde
   };
 
   const handleConfirm = async () => {
-    console.log('this is the order id',orderId)
-    console.log('this is the payment method',paymentMethod)
-    if(isCancel)
-    {
-      console.log('this is inside canecl')
-      const response = await axios.patch(`/cancelOrder/${orderId}/${user._id}`,{reason:cancellationReason,paymentMethod})
-      console.log(response)
-    }else{
-      console.log('this is inside return')
-      console.log(returnReason)
-      console.log(orderId)
-      console.log(orderItemId,'this is the item id')
-      const response= await axios.patch(`returnProduct/${orderId}/${orderItemId}`,{returnReason})
-      console.log(response)
+
+    if (isCancel) {
+
+      const response = await axios.patch(`/cancelOrder/${orderId}/${user._id}`, { reason: cancellationReason, paymentMethod })
+
+    } else {
+
+      const response = await axios.patch(`returnProduct/${orderId}/${orderItemId}`, { returnReason })
+
     }
     setIsCancelled(true);
-    
+
   };
 
   const handleClose = () => {
-   
+
     setTimeout(() => setIsCancelled(false), 300);
   };
 
@@ -113,14 +108,14 @@ const OrderCancellationModal = ({ isOpen, onClose, onConfirm,paymentMethod, orde
                         <AlertTriangle className="h-6 w-6 text-yellow-600" />
                       </div>
                     </div>
-                {isCancel ?       <h2 className="text-2xl font-bold text-center mb-4">Cancel Order?</h2> :       <h2 className="text-2xl font-bold text-center mb-4">Return Order?</h2> }
-              
+                    {isCancel ? <h2 className="text-2xl font-bold text-center mb-4">Cancel Order?</h2> : <h2 className="text-2xl font-bold text-center mb-4">Return Order?</h2>}
 
-                 {isCancel ?<p className="text-center text-gray-600 mb-6">
+
+                    {isCancel ? <p className="text-center text-gray-600 mb-6">
                       Are you sure you want to cancel order #{orderId}? This action cannot be undone.
                     </p> : <p className="text-center text-gray-600 mb-6">
                       Are you sure you want to Return order #{orderId}? This action cannot be undone.
-                    </p> }   
+                    </p>}
                   </div>
                   <Textarea
                     placeholder="Please provide a reason for cancellation"
@@ -142,7 +137,7 @@ const OrderCancellationModal = ({ isOpen, onClose, onConfirm,paymentMethod, orde
                       onClick={handleConfirm}
                       className="w-full"
                     >
-                      {isCancel ? 'Yes, Cancel Order' : 'Yes return Product' }
+                      {isCancel ? 'Yes, Cancel Order' : 'Yes return Product'}
                     </Button>
                   </div>
                 </motion.div>
@@ -162,19 +157,19 @@ const OrderCancellationModal = ({ isOpen, onClose, onConfirm,paymentMethod, orde
                       </div>
                     </div>
 
-     
-                    
-                    {isCancel ? <h2 className="text-2xl font-bold text-center mb-4">Order Cancelled</h2>  :  <h2 className="text-2xl font-bold text-center mb-4">Return Request Sended</h2>
+
+
+                    {isCancel ? <h2 className="text-2xl font-bold text-center mb-4">Order Cancelled</h2> : <h2 className="text-2xl font-bold text-center mb-4">Return Request Sended</h2>
                     }
 
-                    {isCancel ?  <p className="text-center text-gray-600 mb-6">
+                    {isCancel ? <p className="text-center text-gray-600 mb-6">
                       Your order #{orderId} has been successfully cancelled.
-                      
-                    </p> :  <p className="text-center text-gray-600 mb-6">
+
+                    </p> : <p className="text-center text-gray-600 mb-6">
                       Your order #{orderId} has been successfully cancelled.
-                      
-                    </p> }
-                   
+
+                    </p>}
+
                   </div>
 
                   <div className="flex justify-center">

@@ -11,7 +11,7 @@ const adminAuth = async (req, res, next) => {
         req.userId = decoded.userId;
         next();
     } catch (error) {
-        console.log('token validation failed', error.message)
+        
         return res.status(403).json({ message: "Token is not valid" });
     }
 }

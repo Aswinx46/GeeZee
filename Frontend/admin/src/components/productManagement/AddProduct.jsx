@@ -11,279 +11,252 @@ import ProductForm from './Variant';
 import { useSelector } from 'react-redux';
 import EditVariant from './editVariant'
 const ProductManagement = () => {
-    const[imageUrl,setImageUrl]=useState([])
-    const[image,setImage]=useState([])
-    const [cropModalOpen, setCropModalOpen] = useState(false);
-    const [currentImage, setCurrentImage] = useState(null);
-    const [currentImageIndex, setCurrentImageIndex] = useState(null);
-    const [isLoading,setIsLoading]=useState(false)
-    const[categories,setCategories]=useState([])
-    const[success,setSuccess]=useState(false)
-    const [crop, setCrop] = useState({ x: 0, y: 0 });
-    const [zoom, setZoom] = useState(1);
-    const [rotation, setRotation] = useState(0);
-    const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-    const [isVariantModalOpen, setIsVariantModalOpen] = useState(false);
-    const navigate=useNavigate()
-    const formRef=useRef()
-    const [errors, setErrors] = useState({});
-    const[varients,setVarients]=useState([])
-    const[brands,setBrands]=useState([])
-    const[attributes,setAttributes]=useState([])
-    const[editingVariant,setEditingVariant]=useState()
-    const[isOpen,setIsOpen]=useState(false)
-    const[onClose,setOnClose]=useState(false)
-    const[index,setIndex]=useState()
+  const [imageUrl, setImageUrl] = useState([])
+  const [image, setImage] = useState([])
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [currentImage, setCurrentImage] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(null);
+  const [isLoading, setIsLoading] = useState(false)
+  const [categories, setCategories] = useState([])
+  const [success, setSuccess] = useState(false)
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [rotation, setRotation] = useState(0);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [isVariantModalOpen, setIsVariantModalOpen] = useState(false);
+  const navigate = useNavigate()
+  const formRef = useRef()
+  const [errors, setErrors] = useState({});
+  const [varients, setVarients] = useState([])
+  const [brands, setBrands] = useState([])
+  const [attributes, setAttributes] = useState([])
+  const [editingVariant, setEditingVariant] = useState()
+  const [isOpen, setIsOpen] = useState(false)
+  const [onClose, setOnClose] = useState(false)
+  const [index, setIndex] = useState()
 
-  const varientCallback=(varients,attributes)=>{
-    console.log('varients in parent'+varients)
-    console.log(Object.values(varients))
-    // if(varients.length>0)
-    // {
-    //   setVarients(varients)
-    // }else{
+  const varientCallback = (varients, attributes) => {
 
-      setVarients((prev)=>([...prev,...varients]))
-    // }
-    // setVarients(varients)
-    console.log('this is attributes',attributes)
+
+
+    setVarients((prev) => ([...prev, ...varients]))
+
     setAttributes(attributes)
   }
 
-    useEffect(()=>{
-        const getCategory=async () => {
-            const category= await axios.get('/category')
-            setCategories(category.data.category)
+  useEffect(() => {
+    const getCategory = async () => {
+      const category = await axios.get('/category')
+      setCategories(category.data.category)
 
-            const response = await axios.get('/brands');
-            setBrands(response.data.brands);
-            console.log('this is the brand',response.data.brands)
-            // console.log(response.data.brands)
-        }
-        getCategory()
-    },[success])
+      const response = await axios.get('/brands');
+      setBrands(response.data.brands);
+    }
+    getCategory()
+  }, [success])
 
-    const validateForm = (formData) => {
-        const newErrors = {};
-        
-        // Title validation
-        if (!formData.get('title').trim()) {
-            newErrors.title = 'Title is required';
-        }
+  const validateForm = (formData) => {
+    const newErrors = {};
 
-        // Price validation
-        const price = formData.get('price');
-        if (!price) {
-            newErrors.price = 'Please enter a valid price';
-        } else if (Number(price) <= 0) {
-            newErrors.price = 'Price must be greater than 0';
-        }
+    // Title validation
+    if (!formData.get('title').trim()) {
+      newErrors.title = 'Title is required';
+    }
 
-        // Quantity validation
-        const quantity = Number(formData.get('quantity'));
-        if (!formData.get('quantity')) {
-            newErrors.quantity = 'Please enter a valid quantity';
-        } else if (quantity <= 0) {
-            newErrors.quantity = 'Quantity must be greater than 0';
-        }
+    // Price validation
+    const price = formData.get('price');
+    if (!price) {
+      newErrors.price = 'Please enter a valid price';
+    } else if (Number(price) <= 0) {
+      newErrors.price = 'Price must be greater than 0';
+    }
 
-        // SKU validation
-        if (!formData.get('SKU').trim()) {
-            newErrors.SKU = 'SKU is required';
-        }
+    // Quantity validation
+    const quantity = Number(formData.get('quantity'));
+    if (!formData.get('quantity')) {
+      newErrors.quantity = 'Please enter a valid quantity';
+    } else if (quantity <= 0) {
+      newErrors.quantity = 'Quantity must be greater than 0';
+    }
 
-        // Description validation
-        if (!formData.get('description').trim()) {
-            newErrors.description = 'Description is required';
-        }
+    // SKU validation
+    if (!formData.get('SKU').trim()) {
+      newErrors.SKU = 'SKU is required';
+    }
 
-        // Specs validation
-        if (!formData.get('spec').trim()) {
-            newErrors.spec = 'Specifications are required';
-        }
+    // Description validation
+    if (!formData.get('description').trim()) {
+      newErrors.description = 'Description is required';
+    }
 
-        if (!formData.get('SubHeadings').trim()) {
-          newErrors.SubHeadings = 'SubHeadings are required';
+    // Specs validation
+    if (!formData.get('spec').trim()) {
+      newErrors.spec = 'Specifications are required';
+    }
+
+    if (!formData.get('SubHeadings').trim()) {
+      newErrors.SubHeadings = 'SubHeadings are required';
+    }
+
+
+
+    if (!formData.get('subHeadingdescription').trim()) {
+      newErrors.subHeadingdescription = 'subHeadingdescription are required';
+    }
+
+    return newErrors;
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+
+    const formData = new FormData(event.target);
+    // Validate form
+    const formErrors = validateForm(formData);
+    if (Object.keys(formErrors).length > 0) {
+      setErrors(formErrors);
+      toast.error('Please fill the form');
+      return;
+    }
+    setErrors({});
+    setIsLoading(true)
+    const data = new FormData(event.target)
+    const selectedCategory = categories.find((cat) => cat.categoryName == data.get('category'))
+    const selectedCategoryId = selectedCategory._id
+
+    const selectedBrand = brands.find((brand) => brand.name == data.get('brand'))
+
+    const selectedBrandId = selectedBrand._id
+    try {
+
+      const uploadPromises = image.map(async (file, index) => {
+        const formData = new FormData();
+        const croppedImageBlob = await fetch(imageUrl[index]).then(r => r.blob());
+        formData.append('file', croppedImageBlob);
+        formData.append('upload_preset', 'products')
+        formData.append('cloud_name', 'dotlezt0x')
+        return cloudAxios.post(
+          'https://api.cloudinary.com/v1_1/dotlezt0x/image/upload',
+          formData
+        )
+      })
+
+      const cloudinaryUpload = await Promise.all(uploadPromises)
+      const imageUrls = cloudinaryUpload.map(res => res.data?.secure_url)
+
+
+      const spec = data.get('spec')
+      const specArray = spec.split('>').map((item) => item.trim()).filter((item) => item.length > 0)
+      
+
+      const subHeading = data.get('SubHeadings')
+      const subHeadArray = subHeading.split('>').map((item) => item.trim()).filter((item) => item.length > 0)
+
+      const subHeadingdescription = data.get('subHeadingdescription')
+      const subHeadingDescriptionArray = subHeadingdescription.split('>').map((item) => item.trim()).filter((item) => item.length > 0)
+
+      
+
+
+      const productDetails = {
+        name: data.get('title'),
+        price: data.get('price'),
+        quantity: data.get('quantity'),
+        categoryId: selectedCategoryId,
+        sku: data.get('SKU'),
+        description: data.get('description'),
+        status: data.get('stockStatus'),
+        imageUrl: imageUrls,
+        specAndDetails: specArray,
+        subHead: subHeadArray,
+        subHeadDescription: subHeadingDescriptionArray,
+        variant: varients,
+        brand: selectedBrandId
       }
 
-      
+      try {
+        const uploadProduct = await axios.post('/addProduct', productDetails)
 
-      if (!formData.get('subHeadingdescription').trim()) {
-        newErrors.subHeadingdescription = 'subHeadingdescription are required';
-    }
-     
-        return newErrors;
-    };
+        toast.success(uploadProduct.data.message)
+        navigate('/showProduct')
+        setIsLoading(false)
+        setSuccess(!success)
+        if (formRef.current) formRef.current.reset()
 
-    const handleSubmit=async(event)=>{
-        event.preventDefault()
-       
-        // const varients=useSelector((state)=>state.variant.variant)
-        console.log(varients)
-        const formData = new FormData(event.target);
-        console.log(formData.get('variant'))
-        // Validate form
-        const formErrors = validateForm(formData);
-        console.log(formErrors)
-        if (Object.keys(formErrors).length > 0) {
-            setErrors(formErrors);
-            toast.error('Please fill the form');
-            return;
-        }
-        setErrors({});
-        setIsLoading(true)
-        const data=new FormData(event.target)
-        const selectedCategory=categories.find((cat)=>cat.categoryName==data.get('category'))
-        const selectedCategoryId=selectedCategory._id
-        
-        console.log( 'this is the brand name =', data.get('brand'))
-        console.log('this is hte brands',brands)
-        const selectedBrand=brands.find((brand)=>brand.name==data.get('brand'))
 
-        console.log( 'this is the selected brand name', selectedBrand)
-        const selectedBrandId=selectedBrand._id
-        console.log(selectedCategoryId)
-          try {
-          
-            const uploadPromises= image.map(async(file, index)=>{
-                const formData = new FormData();
-                const croppedImageBlob = await fetch(imageUrl[index]).then(r => r.blob());
-                formData.append('file', croppedImageBlob);
-                formData.append('upload_preset', 'products')
-                formData.append('cloud_name','dotlezt0x')
-                return cloudAxios.post(
-                    'https://api.cloudinary.com/v1_1/dotlezt0x/image/upload',
-                    formData
-                )
-            })
-            
-            const cloudinaryUpload=await Promise.all(uploadPromises) 
-            const imageUrls = cloudinaryUpload.map(res=>res.data?.secure_url)
-            console.log(imageUrls)
-            
-           
-            const spec=data.get('spec')
-            const specArray=spec.split('>').map((item)=>item.trim()).filter((item)=>item.length>0)
-            console.log(specArray)
+      } catch (error) {
+        console.log('error while adding the product', error)
+        toast.error(error.response.data.message)
+        if (formRef.current) formRef.current.reset()
+      }
 
-            const subHeading=data.get('SubHeadings')
-            const subHeadArray=subHeading.split('>').map((item)=>item.trim()).filter((item)=>item.length>0)
-            console.log(subHeadArray)
 
-            const subHeadingdescription=data.get('subHeadingdescription')
-            const subHeadingDescriptionArray=subHeadingdescription.split('>').map((item)=>item.trim()).filter((item)=>item.length>0)
-            console.log(subHeadingDescriptionArray)
 
-            // const variantsData=data.get('SubHeadings')
-            // const variantsArray=variantsData.split('>').map((item)=>item.trim()).filter((item)=>item.length>0)
-            // console.log(variantsArray)
-          
-            console.log(varients)
 
-            const productDetails={
-                name:data.get('title'),
-                price:data.get('price'),
-                quantity:data.get('quantity'),
-                categoryId:selectedCategoryId,
-                sku:data.get('SKU'),
-                description:data.get('description'),
-                status:data.get('stockStatus'),
-                imageUrl:imageUrls,
-                specAndDetails:specArray,
-                subHead:subHeadArray,
-                subHeadDescription:subHeadingDescriptionArray,
-                variant:varients,
-                brand:selectedBrandId
-            }
-         
-            try {
-                console.log(productDetails)
-                const uploadProduct=await axios.post('/addProduct',productDetails)
-              
-                console.log(uploadProduct)
-                toast.success(uploadProduct.data.message)
-                navigate('/showProduct')
-                setIsLoading(false)
-                setSuccess(!success)
-               if(formRef.current) formRef.current.reset()
-              
-              
-            } catch (error) {
-                console.log('error while adding the product',error)
-                toast.error(error.response.data.message)
-                if(formRef.current) formRef.current.reset()
-            }
-       
-           
-           
-
-          } catch (error) {
-            console.log('error in uploading the cloudinary',error)
-            setIsLoading(false)
-          }finally{
-            setIsLoading(false)
-          }
-     
+    } catch (error) {
+      console.log('error in uploading the cloudinary', error)
+      setIsLoading(false)
+    } finally {
+      setIsLoading(false)
     }
 
-    const handleImageChange = (e) => {
-        const files = Array.from(e.target.files);
-        if (files.length > 0) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                setCurrentImage(reader.result);
-                setCropModalOpen(true);
-                setCurrentImageIndex(imageUrl.length);
-            };
-            reader.readAsDataURL(files[0]);
-            setImage([...image, files[0]]);
-        }
-    };
+  }
 
-    const onCropComplete = (croppedArea, croppedAreaPixels) => {
-        setCroppedAreaPixels(croppedAreaPixels);
-    };
-
-    const handleCropSave = () => {
-        const newImageUrls = [...imageUrl];
-        newImageUrls[currentImageIndex] = currentImage;
-        setImageUrl(newImageUrls);
-        setCropModalOpen(false);
-        setCurrentImage(null);
-      
-        setCrop({ x: 0, y: 0 });
-        setZoom(1);
-        setRotation(0);
-    };
-
-    const handleCropCancel = () => {
-        setCropModalOpen(false);
-        setCurrentImage(null);
-        setImage(image.slice(0, -1));
-    };
-
-    const deleteImage =(index)=>{
-        const updatedImageUrl=imageUrl.filter((_,i)=>i!==index)
-        const updatedImage=image.filter((_,i)=>i!==index)
-        setImage(updatedImage)
-        setImageUrl(updatedImageUrl)
-        console.log(updatedImageUrl)
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length > 0) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setCurrentImage(reader.result);
+        setCropModalOpen(true);
+        setCurrentImageIndex(imageUrl.length);
+      };
+      reader.readAsDataURL(files[0]);
+      setImage([...image, files[0]]);
     }
+  };
 
-    const handleEditVariant=(index)=>{
-      setIsOpen(true)
-      setIndex(index)
-      console.log('this is the editing attribute index',index)
-    }
+  const onCropComplete = (croppedArea, croppedAreaPixels) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  };
 
-    const handleDeleteVariant=(index)=>{
-      console.log('this is the deleting attribute index',index)
-      const afterDelete=varients.filter((_,i)=>i!==index)
-      setVarients(afterDelete)
-    }
+  const handleCropSave = () => {
+    const newImageUrls = [...imageUrl];
+    newImageUrls[currentImageIndex] = currentImage;
+    setImageUrl(newImageUrls);
+    setCropModalOpen(false);
+    setCurrentImage(null);
+
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
+    setRotation(0);
+  };
+
+  const handleCropCancel = () => {
+    setCropModalOpen(false);
+    setCurrentImage(null);
+    setImage(image.slice(0, -1));
+  };
+
+  const deleteImage = (index) => {
+    const updatedImageUrl = imageUrl.filter((_, i) => i !== index)
+    const updatedImage = image.filter((_, i) => i !== index)
+    setImage(updatedImage)
+    setImageUrl(updatedImageUrl)
+  }
+
+  const handleEditVariant = (index) => {
+    setIsOpen(true)
+    setIndex(index)
+  }
+
+  const handleDeleteVariant = (index) => {
+    const afterDelete = varients.filter((_, i) => i !== index)
+    setVarients(afterDelete)
+  }
   return (
     <div className="min-h-screen bg-white">
-   
+
 
       {/* Main Content */}
       <div className="p-8">
@@ -363,7 +336,7 @@ const ProductManagement = () => {
                 {errors.quantity && <p className="text-red-500 text-sm">{errors.quantity}</p>}
               </motion.div>
 
-          
+
 
               {/* Category Field */}
               <motion.div
@@ -374,14 +347,14 @@ const ProductManagement = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Category
                 </label>
-              
-                     <select name='category' className="w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black">
-                     {categories.map((category,i)=>(
-                     <option key={i}>{category.categoryName}</option>
-                    ))}
-                   </select>
-              
-               
+
+                <select name='category' className="w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black">
+                  {categories.map((category, i) => (
+                    <option key={i}>{category.categoryName}</option>
+                  ))}
+                </select>
+
+
               </motion.div>
 
               <motion.div
@@ -392,14 +365,14 @@ const ProductManagement = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Brands
                 </label>
-              
-                     <select name='brand' className="w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black">
-                     {brands.map((brand,i)=>(
-                     <option key={i}>{brand.name}</option>
-                    ))}
-                   </select>
-              
-               
+
+                <select name='brand' className="w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black">
+                  {brands.map((brand, i) => (
+                    <option key={i}>{brand.name}</option>
+                  ))}
+                </select>
+
+
               </motion.div>
 
 
@@ -449,7 +422,7 @@ const ProductManagement = () => {
                 {errors.SKU && <p className="text-red-500 text-sm">{errors.SKU}</p>}
               </motion.div>
 
-            
+
 
               {/* Preview Images */}
               <motion.div
@@ -459,25 +432,25 @@ const ProductManagement = () => {
                 className="flex items-center space-x-2"
               >
                 {imageUrl.length > 0 ? (
-                    imageUrl.map((url,index)=>(
-                        <div key={index} className="relative w-24 h-24 group">
-                            <div className="w-full h-full bg-white border border-gray-300 rounded-md overflow-hidden">
-                                <img src={url} alt="preview" className="w-full h-full object-cover"/>
-                            </div>
-                            <button 
-                                onClick={() => deleteImage(index)}
-                                className="absolute top-1 right-1 bg-black text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-gray-800"
-                            >
-                                ×
-                            </button>
-                        </div>
-                    ))
-                ) : (
-                    <div className="w-24 h-24 bg-white border border-gray-300 rounded-md flex items-center justify-center">
-                         <FaImage className="w-6 h-6 text-gray-600" />
+                  imageUrl.map((url, index) => (
+                    <div key={index} className="relative w-24 h-24 group">
+                      <div className="w-full h-full bg-white border border-gray-300 rounded-md overflow-hidden">
+                        <img src={url} alt="preview" className="w-full h-full object-cover" />
+                      </div>
+                      <button
+                        onClick={() => deleteImage(index)}
+                        className="absolute top-1 right-1 bg-black text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-gray-800"
+                      >
+                        ×
+                      </button>
                     </div>
+                  ))
+                ) : (
+                  <div className="w-24 h-24 bg-white border border-gray-300 rounded-md flex items-center justify-center">
+                    <FaImage className="w-6 h-6 text-gray-600" />
+                  </div>
                 )}
-              
+
               </motion.div>
             </div>
             <motion.div
@@ -495,23 +468,23 @@ const ProductManagement = () => {
               </button>
             </motion.div>
             <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.7 }}
-              >
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Sub Headings
-                </label>
-                <input
-                  type="text"
-                  name='SubHeadings'
-                  className={`w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black ${errors.SKU ? 'border-red-500' : ''}`}
-                />
-               {errors.SubHeadings && <p className="text-red-500 text-sm">{errors.SubHeadings}</p>}
-              </motion.div>
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.7 }}
+            >
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Sub Headings
+              </label>
+              <input
+                type="text"
+                name='SubHeadings'
+                className={`w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black ${errors.SKU ? 'border-red-500' : ''}`}
+              />
+              {errors.SubHeadings && <p className="text-red-500 text-sm">{errors.SubHeadings}</p>}
+            </motion.div>
 
 
-              <motion.div
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.9 }}
@@ -575,26 +548,26 @@ const ProductManagement = () => {
             </motion.div>
           </form>
           <div className='flex justify-center'>
-          {isLoading &&  <MutatingDots className='items-center' visible={true} height="100" width="100" color="black" secondaryColor="yellow" radius="12.5" ariaLabel="mutating-dots-loading" wrapperClass="" wrapperStyle={{}}/> }        
+            {isLoading && <MutatingDots className='items-center' visible={true} height="100" width="100" color="black" secondaryColor="yellow" radius="12.5" ariaLabel="mutating-dots-loading" wrapperClass="" wrapperStyle={{}} />}
 
           </div>
 
         </motion.div>
       </div>
-      {isLoading&&
-            <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50'>
-                <MutatingDots
-                    height="100"
-                    width="100"
-                    color="#ee3a24"
-                    secondaryColor= '#ee3a24'
-                    radius='12.5'
-                    ariaLabel="mutating-dots-loading"
-                    wrapperStyle={{}}
-                    wrapperClass=""
-                    visible={true}
-                />
-            </div>}
+      {isLoading &&
+        <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50'>
+          <MutatingDots
+            height="100"
+            width="100"
+            color="#ee3a24"
+            secondaryColor='#ee3a24'
+            radius='12.5'
+            ariaLabel="mutating-dots-loading"
+            wrapperStyle={{}}
+            wrapperClass=""
+            visible={true}
+          />
+        </div>}
       {/* Variant Modal */}
       {isVariantModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -612,90 +585,90 @@ const ProductManagement = () => {
           </div>
         </div>
       )}
-         {varients.length > 0 && (
-                <div className="space-y-4">
-                    <h4 className="text-md font-medium text-gray-700">Current Variants:</h4>
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                {attributes.map((attr, idx) => (
-                                    <th key={idx} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        {Object.keys(attr)[0]}
-                                    </th>
-                                ))}
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {varients.map((variant, idx) => (
-                                <tr key={idx} className={editingVariant === idx ? 'bg-yellow-50' : ''}>
-                                    {Object.keys(variant.selectedAttributes).map((attr, attrIdx) => (
-                                        <td key={attrIdx} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {variant.selectedAttributes[attr]}
-                                        </td>
-                                    ))}
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{variant.price}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{variant.stock}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <button
-                                            onClick={() => handleEditVariant(idx)}
-                                            className="text-blue-600 hover:text-blue-800 font-medium"
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            onClick={() => handleDeleteVariant(idx)}
-                                            className="text-red-600 hover:text-red-800 font-medium ml-2"
-                                        >
-                                            Delete
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-            {isOpen && <EditVariant isOpen={isOpen} onClose={onClose} Varient={varients} index={index} setVarient={setVarients} setIsOpen={setIsOpen}/>}
+      {varients.length > 0 && (
+        <div className="space-y-4">
+          <h4 className="text-md font-medium text-gray-700">Current Variants:</h4>
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                {attributes.map((attr, idx) => (
+                  <th key={idx} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {Object.keys(attr)[0]}
+                  </th>
+                ))}
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {varients.map((variant, idx) => (
+                <tr key={idx} className={editingVariant === idx ? 'bg-yellow-50' : ''}>
+                  {Object.keys(variant.selectedAttributes).map((attr, attrIdx) => (
+                    <td key={attrIdx} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {variant.selectedAttributes[attr]}
+                    </td>
+                  ))}
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{variant.price}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{variant.stock}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <button
+                      onClick={() => handleEditVariant(idx)}
+                      className="text-blue-600 hover:text-blue-800 font-medium"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteVariant(idx)}
+                      className="text-red-600 hover:text-red-800 font-medium ml-2"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      {isOpen && <EditVariant isOpen={isOpen} onClose={onClose} Varient={varients} index={index} setVarient={setVarients} setIsOpen={setIsOpen} />}
       {cropModalOpen && currentImage && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-          >
-            <div className="bg-white p-4 rounded-lg w-[90%] max-w-2xl">
-              <h2 className="text-xl font-bold mb-4">Crop Image</h2>
-              <ImageCropper
-                image={currentImage}
-                crop={crop}
-                setCrop={setCrop}
-                zoom={zoom}
-                setZoom={setZoom}
-                rotation={rotation}
-                setRotation={setRotation}
-                onCropComplete={onCropComplete}
-              />
-              <div className="mt-4 flex justify-end space-x-2">
-                <button
-                  type="button"
-                  onClick={handleCropCancel}
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCropSave}
-                  className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800"
-                >
-                  Confirm
-                </button>
-              </div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+        >
+          <div className="bg-white p-4 rounded-lg w-[90%] max-w-2xl">
+            <h2 className="text-xl font-bold mb-4">Crop Image</h2>
+            <ImageCropper
+              image={currentImage}
+              crop={crop}
+              setCrop={setCrop}
+              zoom={zoom}
+              setZoom={setZoom}
+              rotation={rotation}
+              setRotation={setRotation}
+              onCropComplete={onCropComplete}
+            />
+            <div className="mt-4 flex justify-end space-x-2">
+              <button
+                type="button"
+                onClick={handleCropCancel}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleCropSave}
+                className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800"
+              >
+                Confirm
+              </button>
             </div>
-          </motion.div>
-        )}
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 };

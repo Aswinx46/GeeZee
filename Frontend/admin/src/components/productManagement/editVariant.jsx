@@ -10,18 +10,15 @@ const AttributeModal = ({ isOpen, onClose, onSave, Varient, index, setVarient, s
     const [entries, setEntries] = useState([])
 
     useEffect(() => {
-        console.log(Varient)
         setVarients(Varient)
         // console.log(varients[0].selectedAttributes)
         const keys = Object.entries(Varient[index].selectedAttributes)
-        console.log('this is the values', keys)
         setEntries(keys)
         setPrice(Varient[index]?.price)
         setStock(Varient[index]?.stock)
 
 
     }, [])
-    console.log(varients)
 
 
 
@@ -40,18 +37,13 @@ const AttributeModal = ({ isOpen, onClose, onSave, Varient, index, setVarient, s
 
 
     const handleSave = () => {
-        // onSave({ attributeName, attributeValue, price, stock });
 
-        console.log("this is entries", entries)
-        console.log(price)
-        console.log(stock)
         const result = entries.reduce((obj, [key, value]) => {
             obj[key] = value;
             return obj;
         }, {});
         setVarient((prev) => ([...prev.map((item, i) => i === index ? ({ ...item, price, stock, selectedAttributes: { ...result } }) : item)]))
         setIsOpen(false);
-        console.log(varients)
     };
 
     return (

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { CheckCircle2, AlertCircle, X } from 'lucide-react';
 
-const OTPVerificationModal = ({ isOpen, onClose,setIsOpen,formData,userId }) => {
+const OTPVerificationModal = ({ isOpen, onClose, setIsOpen, formData, userId }) => {
   const [otp, setOtp] = useState(['', '', '', '']);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
@@ -12,7 +12,6 @@ const OTPVerificationModal = ({ isOpen, onClose,setIsOpen,formData,userId }) => 
   const [resendDisabled, setResendDisabled] = useState(false);
   const [resendTimer, setResendTimer] = useState(30);
   const inputRefs = useRef([]);
-console.log(formData,userId)
   useEffect(() => {
     if (resendDisabled) {
       const timer = setInterval(() => {
@@ -51,7 +50,7 @@ console.log(formData,userId)
 
     // Simulating API call
     setTimeout(() => {
-      if (otp.join('') === '1234') { // Replace with actual verification logic
+      if (otp.join('') === '1234') {
         setIsVerified(true);
       } else {
         setError('Invalid OTP. Please try again.');
@@ -62,24 +61,22 @@ console.log(formData,userId)
 
   const handleResend = () => {
     setResendDisabled(true);
-    // Simulating OTP resend
-    console.log('Resending OTP...');
-    // Add your resend logic here
+
   };
 
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.8 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       scale: 1,
-      transition: { 
+      transition: {
         type: "spring",
         damping: 25,
         stiffness: 500
       }
     },
-    exit: { 
-      opacity: 0, 
+    exit: {
+      opacity: 0,
       scale: 0.8,
       transition: {
         type: "spring",

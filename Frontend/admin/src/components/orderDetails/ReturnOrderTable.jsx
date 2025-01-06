@@ -22,13 +22,11 @@ const ReturnedOrdersTable = () => {
         const fetchData = async () => {
             try {
                 const response = await axios.get('/getReturnProducts')
-                console.log('ashjdfjadks',response.data.orders)
 
                 const neededItems = response.data.orders.flatMap((order) =>
                     order.orderItems.map((item) => ({
                         ...item, date: order.invoiceDate, orderId: order.orderId, address: order.address, user: order.userId,_id:order._id
                     })))
-                console.log(neededItems)
                 setReturnedOrders(response.data.orders)
             } catch (error) {
                 console.log('error while fetching data', error)
@@ -98,7 +96,7 @@ const ReturnedOrdersTable = () => {
                                     exit="hidden"
                                     layout
                                 >
-                                    {console.log(order)}
+                                 
                                     <TableCell className="flex items-center gap-4">
                                         <img 
                                             className='h-16 w-16 rounded-lg object-cover shadow-md hover:scale-105 transition-transform duration-200' 
@@ -166,7 +164,6 @@ const OrderDetailsModal = ({ order, onClose }) => {
             }
         }
     };
-    console.log('this is the passed order',order)
 
     const handleConfirmReturn = async () => {
         try {

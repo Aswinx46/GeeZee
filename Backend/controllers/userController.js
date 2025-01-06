@@ -41,7 +41,6 @@ const signup = async (req, res) => {
     const { firstname, lastname, email, phoneNumber, password } = req.body
     req.session.user = { firstname, lastname, email, phoneNumber, password }
     req.session.email = email
-    console.log(req.session.user)
     try {
         const exisitingUSer = await User.findOne({ email })
         if (exisitingUSer) {
@@ -52,7 +51,6 @@ const signup = async (req, res) => {
         const emailSent = await sendVerificationMail(email, ogOtp)
         req.session.otp = ogOtp
 
-        console.log(emailSent)
 
         if (!emailSent) {
             return res.json({ "message": "invalid-email" })
@@ -79,7 +77,6 @@ const securePassword = async (password) => {
 const otpVerification = async (req, res) => {
     const { otp } = req.body
 
-    // console.log(req.session)
     const { firstname, lastname, email, phoneNumber, password } = req.session.user
     const sPassword = await securePassword(password)
 
@@ -102,7 +99,6 @@ const otpVerification = async (req, res) => {
                 userId: user._id,
             })
             await wallet.save()
-            console.log(user)
             return res.json({ message: "user created" })
         } else {
             return res.json({ message: "invalid otp " })
@@ -110,7 +106,7 @@ const otpVerification = async (req, res) => {
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({message:'error while creaing account'})
+        return res.status(500).json({ message: 'error while creaing account' })
     }
 }
 
@@ -123,7 +119,6 @@ const resendOtp = async (req, res) => {
         if (emailVerification) {
             req.session.otp = ogOtp
 
-            console.log(req.session.otp)
             res.status(200).json({ message: "the resend otp done" })
         } else {
             res.status(400).json({ message: "invalid mail in resend otp" })
@@ -138,7 +133,6 @@ const resendOtp = async (req, res) => {
 
 const googleSave = async (req, res) => {
     const { email, email_verified, firstName, id } = req.body
-    console.log(email, email_verified, firstName, id)
     try {
         const exisitingUSer = await User.findOne({ email })
         if (exisitingUSer) {
@@ -167,10 +161,8 @@ const googleSave = async (req, res) => {
 
 const login = async (req, res) => {
     const { email, password } = req.body
-    console.log(email, password)
 
     try {
-        console.log(mongoose.connection.readyState)
         const user = await User.findOne({ email })
         if (!user) {
             return res.status(400).json({ message: "the user not found" })
@@ -180,8 +172,6 @@ const login = async (req, res) => {
             if (user.googleId) {
                 token = await jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET_KEY, { expiresIn: '1d' })
                 refreshToken = await jwt.sign({ email: email }, process.env.REFRESH_TOKEN_SECRET_KEY, { expiresIn: '7d' })
-                // return res.status(200).json({message:"the user logged",user,token,refreshToken})
-                console.log(refreshToken)
 
 
             } else {
@@ -189,8 +179,6 @@ const login = async (req, res) => {
                 if (!isPasswordValid) return res.status(400).json({ message: "invalid password" })
                 token = await jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET_KEY, { expiresIn: '1d' })
                 refreshToken = await jwt.sign({ email: email }, process.env.REFRESH_TOKEN_SECRET_KEY, { expiresIn: '7d' })
-                // return res.status(200).json({message:"the user logged",user,token,refreshToken})
-                console.log(refreshToken)
             }
 
             res.cookie('refreshToken', refreshToken, {
@@ -229,28 +217,23 @@ const changePassword = async (req, res) => {
     try {
         const { userId } = req.params
         const { formData } = req.body
-        console.log(userId)
 
         const oldPassword = formData.oldPassword
         const newPassword = formData.newPassword
         const confirmPassword = formData.confirmPassword
-        console.log(oldPassword, newPassword, confirmPassword);
 
         const user = await User.findById(userId, 'password')
-        console.log(user.password)
         if (!user) return res.status(400).json({ message: "no user found" })
         const oldPasswordVerify = await bcrypt.compare(oldPassword, user.password)
         if (!oldPasswordVerify) return res.status(400).json({ message: 'old password is wrong' })
         if (newPassword == confirmPassword) {
             const newHashedPassword = await securePassword(newPassword)
-            console.log(newHashedPassword, 'this is new')
             user.password = newHashedPassword
             await user.save()
             return res.status(200).json({ message: 'password changed' })
         } else {
             return res.status(400).json({ message: 'password and confirm password not equal' })
         }
-        console.log(oldPasswordVerify)
     } catch (error) {
         console.log('error while changing the password', error)
         return res.status(500).json({ message: 'error while changing password' })
@@ -261,14 +244,11 @@ const changeInformation = async (req, res) => {
     try {
         const { userId } = req.params
         const { formData } = req.body
-        console.log(userId, formData)
         const user = await User.findById(userId, 'firstName lastName phoneNo email')
         if (!user) return res.status(400).json({ message: "no user found" })
         const allUser = await User.find()
         const existingEmail = allUser.find((user) => user.email == formData.email)
-        console.log('this is teh existing email', existingEmail)
         if (existingEmail) return res.status(400).json({ message: 'the email is already exist' })
-        console.log('this is the existing user', user)
         user.firstName = formData.firstName
         user.lastName = formData.lastName
         await user.save()

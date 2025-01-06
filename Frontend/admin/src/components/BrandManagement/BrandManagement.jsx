@@ -158,9 +158,7 @@ const BrandManagement = () => {
 
     const handleAddBrand = async (e) => {
         e.preventDefault();
-        console.log(newBrand)
-        console.log(status)
-        console.log(selectedImages[0].file)
+   
         if (newBrand.trim() && selectedImages.length > 0) {
             try {
                 const duplicate = brands.filter(
@@ -172,9 +170,7 @@ const BrandManagement = () => {
                 }
 
                 const formData = new FormData();
-                // formData.append('name', newBrand);
-                // formData.append('status', status);
-                // formData.append('file', croppedImageBlob);
+               
                 selectedImages.forEach((image, index) => {
                     formData.append('file', image.file);
                 });
@@ -182,11 +178,8 @@ const BrandManagement = () => {
                 formData.append('cloud_name','dotlezt0x')
                
                 const responseFromCloudinary=await cloudAxios.post('https://api.cloudinary.com/v1_1/dotlezt0x/image/upload',formData)
-                console.log(responseFromCloudinary.data.secure_url)
-                // const response = await axios.post('/addBrand', formData)
                 const imageUrl=responseFromCloudinary.data.secure_url
                 const responseFromDatabase=await axios.post('/addBrand',{status,newBrand,imageUrl})
-                console.log(responseFromDatabase.data)
 
                 setFetch(!fetch);
                 setNewBrand('');
@@ -202,10 +195,8 @@ const BrandManagement = () => {
     };
 
     const handleStatus = async (id) => {
-        console.log(id)
         try {
             const brand = brands.find((b) => b._id === id);
-            console.log(brand)
             const newStatus = brand.status === 'active' ? 'inactive' : 'active';
             const response = await axios.patch(`/editBrand/${id}`, { status: newStatus });
             toast.success(response.data.message);
@@ -220,26 +211,12 @@ const BrandManagement = () => {
 
     const handleEdit = async(index) => {
         const editingBrand = brands.find((_,i) => i === index);
-        console.log('this is the editing brand',editingBrand);
         setSelectedId(editingBrand._id);
         setEditBrandName(editingBrand.name);
         setIsEditOpen(true);
     };
 
-    // const handleSaveEdit = async () => {
-    //     try {
-    //         const response = await axios.patch(`/updateBrand/${selectedId}`, {
-    //             name: editBrandName
-    //         });
-    //         toast.success('Brand updated successfully');
-    //         setFetch(!fetch);
-    //         setIsEditOpen(false);
-    //     } catch (error) {
-    //         console.log('Error updating brand', error);
-    //         toast.error(error.response?.data?.message || 'Error updating brand');
-    //     }
-    // };
-
+   
     return (
         <div className="min-h-screen bg-white p-8">
             <div className="max-w-6xl mx-auto">

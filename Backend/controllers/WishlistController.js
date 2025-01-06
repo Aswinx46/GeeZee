@@ -7,9 +7,7 @@ const addProductWishlist=async (req,res) => {
         const{userId}=req.params
         const{product}=req.body
         
-        // console.log(product)
         const existingWishlist=await Wishlist.findOne({userId})
-        console.log('this is the existnig wishilst',existingWishlist)
         if(!existingWishlist)
         {
             const newWishlilst=new Wishlist({
@@ -41,7 +39,6 @@ const addProductWishlist=async (req,res) => {
         try {
             const {userId}=req.params
             const wishilst=await Wishlist.findOne({userId}).populate('product.productId')
-            console.log(Wishlist)
 
             if(!wishilst) return res.status(400).json({message:"no wishlist found"})
         
@@ -62,7 +59,6 @@ const addProductWishlist=async (req,res) => {
             const wishilst=await Wishlist.findOne({userId})
             if(!wishilst) return res.status(400).json({message:"no wishlist found"})
                 const updatedWishlist=wishilst.product.filter((prod)=>prod.productId.toString() !== item.productId._id.toString())
-            console.log('this is the updated wishlist',updatedWishlist)
     
 
                 wishilst.product=updatedWishlist

@@ -7,9 +7,9 @@ import axios from '../../axios/userAxios'
 const GraphicsSelector = ({sendVariant,receiveIndex,id,setProducts}) => {
   const [selectedGraphics, setSelectedGraphics] = useState(0)
   const[graphics,setgraphics]=useState([])
-  console.log(sendVariant)
+ 
   useLayoutEffect(()=>{
-    console.log(id)
+   
     setgraphics(sendVariant)
 
 
@@ -19,11 +19,11 @@ const GraphicsSelector = ({sendVariant,receiveIndex,id,setProducts}) => {
     e.preventDefault()
 
     const Productid=id
-    console.log(graphics[index]._id)
+    
      const variantId=graphics[index]._id
     try {
       const quantity=await axios.get(`/showProductVariantQuantity/${Productid}/?variantId=${variantId}`)
-      console.log("response" ,quantity.data)
+    
       
       setProducts((prev)=>({...prev, variants:prev.variants.map((variant, i)=>i===index?{...variant, stock:quantity.data}:variant)}))
       
@@ -31,10 +31,10 @@ const GraphicsSelector = ({sendVariant,receiveIndex,id,setProducts}) => {
       console.log('error in fetching product list in productVariant',error)
     }
     setSelectedGraphics(index)
-    console.log("clicked "+ selectedGraphics);
+    
     receiveIndex(index)
   }
-  // console.log(selectedGraphics)
+
   
   
   return (

@@ -32,7 +32,6 @@ const Sidebar = () => {
   ];
   const navigate=useNavigate()
   const handleLogout=()=>{
-    console.log('logout clicked')
     navigate('/', { replace: false });
     localStorage.removeItem('id')
   }

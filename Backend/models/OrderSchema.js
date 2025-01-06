@@ -29,6 +29,10 @@ const orderSchema = new mongoose.Schema({
             type: Number,
             required: true,
         },
+        // priceWhilePurchase:{
+        //     type:Number,
+        //     required:true
+        // },
         // variantId: {
         //     type: Schema.Types.ObjectId,
         //     required: true, // ID of the selected variant

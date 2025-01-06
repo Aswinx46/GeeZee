@@ -12,14 +12,12 @@ import InvoicePDF from '@/extraAddonComponents/Invoice';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 
 const OrderDetailsModal = ({ isOpen, onClose, item, setIsOpen, orderDetails }) => {
-  console.log('this is the sended item', item)
   const user = useSelector(state => state.user.user)
   const userId = user._id
   const [orderCancelPop, setOrderCancelPop] = useState(false)
   const [cancel, setCancel] = useState(false)
   const [isReturn, setIsReturn] = useState(false)
   const [orderItemId, setOrderItemId] = useState()
-  console.log('this  is the order details from the parent', orderDetails)
   const [orderId, setOrderId] = useState()
   const navigate = useNavigate()
   const order = {
@@ -67,10 +65,7 @@ const OrderDetailsModal = ({ isOpen, onClose, item, setIsOpen, orderDetails }) =
       setOrderItemId(orderDetails.orderItemId)
       setCancel(true)
       setOrderCancelPop(true)
-      console.log('this is the orderDetails', orderDetails)
-      console.log(orderDetails._id, 'asidfhksajdhfjkaosdfasfisadjh')
-      // console.log('this is the order id',orderDetails.orderObjectId)
-      // console.log('this is the orderItem id',orderDetails.orderItemId)
+
 
 
     } catch (error) {
@@ -82,7 +77,6 @@ const OrderDetailsModal = ({ isOpen, onClose, item, setIsOpen, orderDetails }) =
   const handleReturnOrder = async () => {
     setIsReturn(true)
     setOrderCancelPop(true)
-    console.log(orderDetails)
     setOrderId(orderDetails._id)
     setOrderItemId(item._id)
 
@@ -94,11 +88,9 @@ const OrderDetailsModal = ({ isOpen, onClose, item, setIsOpen, orderDetails }) =
     const razorpayOrderId = orderDetails.razorpayOrderId
     const amount = orderDetails.finalAmount
     const currency = 'INR'
-    console.log('this is the razorpayOrderId', razorpayOrderId)
-    console.log('this is the currency', currency)
-    console.log("this si the amount", amount)
 
-    console.log('this is the orderDetails inside the repayment', orderDetails)
+
+
 
     if (orderDetails.paymentStatus == 'Awaiting Payment') {
       const options = {
@@ -109,7 +101,6 @@ const OrderDetailsModal = ({ isOpen, onClose, item, setIsOpen, orderDetails }) =
         description: 'Order Payment',
         order_id: razorpayOrderId,
         handler: async (response) => {
-          console.log('Payment Success:', response);
           toast.success('Payment Successful');
           navigate("/checkoutSuccess");
           // Optionally send payment confirmation to the backend
@@ -120,7 +111,6 @@ const OrderDetailsModal = ({ isOpen, onClose, item, setIsOpen, orderDetails }) =
             signature: response.razorpay_signature
           });
           // toast.success("Payment Successful");
-          console.log('this is after the confirm payment route ')
 
         },
         prefill: {

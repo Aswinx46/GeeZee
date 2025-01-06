@@ -5,18 +5,14 @@ const mongoose = require('mongoose')
 require('dotenv').config()
 const login = async (req, res) => {
     const { email, password } = req.body
-    console.log(email, password)
     try {
-        console.log(mongoose.connection.readyState)
         const user = await User.findOne({ email: email, isAdmin: 1 })
-        console.log(user)
         if (!user) return res.status(400).json({ message: "No admin found" })
         if (user.isAdmin == 1) {
             let token, refreshToken
             const passwordVerify = await bcrypt.compare(password, user.password)
-            console.log(passwordVerify)
             if (!passwordVerify) return res.status(400).json({ message: "invalid password" })
-            token = await jwt.sign({ email: user.email,role:'admin' }, process.env.ADMIN_ACCESS_TOKEN_KEY, { expiresIn: '7h' })
+            token = await jwt.sign({ email: user.email, role: 'admin' }, process.env.ADMIN_ACCESS_TOKEN_KEY, { expiresIn: '7h' })
             refreshToken = await jwt.sign({ email: user.email }, process.env.ADMIN_REFRESH_TOKEN_KEY, { expiresIn: '7d' })
             res.cookie('refreshToken', refreshToken, {
                 httpOnly: true,
@@ -32,16 +28,14 @@ const login = async (req, res) => {
 }
 const fetchUser = async (req, res) => {
     try {
-        const {pageNumber}=req.params
+        const { pageNumber } = req.params
         const page = parseInt(pageNumber, 10);
-        const limit=5
-        const skip=(page-1) * limit
-        console.log('this is the pagenumber',pageNumber)
+        const limit = 5
+        const skip = (page - 1) * limit
         const users = await User.find().limit(limit).skip(skip)
-       
+
         res.status(200).json({ message: 'users fetched', users })
     } catch (error) {
-        console.log('error while fetching the user', error.message)
         return res.status(400).json({ message: 'failed to fetch the users list' })
     }
 }

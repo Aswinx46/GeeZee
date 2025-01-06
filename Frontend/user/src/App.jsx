@@ -52,19 +52,19 @@ function App() {
         <Route path='/productPage' element={<ProductPage />}></Route>
         {/* <Route path='/productDetails' element={  <ProductDetails/>}></Route> */}
         <Route path="/productDetails/:id?" element={<ProductDetails />} />
-        <Route path="/cart" element={<Cart />}></Route>
-        <Route path="/productDetails/cart" element={<Cart />}></Route>
+        <Route path="/cart" element={<ProtectedRoute> <Cart /> </ProtectedRoute> }></Route>
+        <Route path="/productDetails/cart" element={<ProtectedRoute>  <Cart /> </ProtectedRoute>}></Route>
         <Route path="/ProductVariants" element={<ProductVariants />}></Route>
         <Route path="/sidebar" element={<ProtectedRoute> <Sidebar /> </ProtectedRoute> }></Route>
-        <Route path="/address" element={<AddressForm />}></Route>
-        <Route path="/home/wishlist" element={<Wishlist />}></Route>
-        <Route path="/changePassword" element={<ChangePassword />}></Route>
-        <Route path="/accountDetails" element={<AccountDetails />}></Route>
-        <Route path="/wallet" element={<Wallet />}></Route>
-        <Route path="/order" element={<OrderDetails />}></Route>
-        <Route path="/checkoutPage" element={<CheckoutPage />}></Route>
-        <Route path="/checkoutSuccess" element={<CheckOutSuccess />}></Route>
-        <Route path="/orderDetailsTable" element={<OrderDetailsTable />}></Route>
+        <Route path="/address" element={<ProtectedRoute>  <AddressForm /> </ProtectedRoute>}></Route>
+        <Route path="/home/wishlist" element={<ProtectedRoute>  <Wishlist /> </ProtectedRoute>}></Route>
+        <Route path="/changePassword" element={<ProtectedRoute> <ChangePassword /></ProtectedRoute>}></Route>
+        <Route path="/accountDetails" element={<ProtectedRoute> <AccountDetails /></ProtectedRoute> }></Route>
+        <Route path="/wallet" element={<ProtectedRoute> <Wallet /></ProtectedRoute> }></Route>
+        <Route path="/order" element={<ProtectedRoute> <OrderDetails /></ProtectedRoute>}></Route>
+        <Route path="/checkoutPage" element={<ProtectedRoute> <CheckoutPage /></ProtectedRoute>}></Route>
+        <Route path="/checkoutSuccess" element={<ProtectedRoute> <CheckOutSuccess /></ProtectedRoute>}></Route>
+        <Route path="/orderDetailsTable" element={<ProtectedRoute> <OrderDetailsTable /></ProtectedRoute>}></Route>
         <Route path="/bestSeller" element={<BestSellers />}></Route>
         <Route path="/emailOtpVerification" element={<OTPVerification />}></Route>
         <Route path="/userBlockNotice" element={<UserBlockedNotice />}></Route>

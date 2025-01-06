@@ -22,14 +22,11 @@ const AddressModal = ({ isOpen, onClose, onSave ,setIsOpen,userId}) => {
   const handleSubmit = async(e) => {
     e.preventDefault();
     validation()
-    // onSave(address);
-    console.log('this is the userId',userId)
-    console.log(address)
+ 
     if(validation())
     {
      
         const response=await axios.post('/address',{shippingAddress:address , userId:userId})
-        console.log(address)
         setIsOpen(false)
     }
   };

@@ -2,9 +2,7 @@ const Product = require('../models/productSchema')
 const Brand = require('../models/brandSchema')
 
 const addBrand = async (req, res) => {
-    console.log('this is the add brand')
     const { status, newBrand, imageUrl } = req.body
-    console.log(status, newBrand, imageUrl)
     try {
         const isExist = await Brand.findOne({ name: newBrand })
         if (isExist) return res.status(400).json({ message: "the brand is already exist" })
@@ -15,7 +13,6 @@ const addBrand = async (req, res) => {
             brandImage: imageUrl
         })
         await brand.save()
-        console.log('new brand'.brand)
         return res.status(200).json({ message: 'brand created', brand })
     } catch (error) {
         console.log('error in creating new brand')
@@ -27,7 +24,6 @@ const showBrand = async (req, res) => {
 
     try {
         const brands = await Brand.find()
-        console.log('this is the brand', brands)
         if (!brands) return res.status(400).json({ message: 'no brand available' })
 
         return res.status(200).json({ messaage: "brands fetched", brands })
@@ -42,7 +38,6 @@ const showBrand = async (req, res) => {
 const changeBrandName = async (req, res) => {
     const { brandId } = req.params
     const { brandName } = req.body
-    console.log(brandId, brandName)
     try {
         const ChangedBrand = await Brand.findByIdAndUpdate(brandId, { name: brandName })
         if (!changeBrandName) return res.status(400).json({ message: " no brand found" })
@@ -55,14 +50,11 @@ const changeBrandName = async (req, res) => {
 
 
 const changeStatus = async (req, res) => {
-    console.log('this is changeStatus')
     const { id } = req.params
     const { status } = req.body
-    console.log(id, status)
     try {
         const brand = await Brand.findById(id)
         if (!brand) return res.status(400).json({ message: 'no brand found' })
-        console.log(brand)
         brand.status = status
         await brand.save()
         return res.status(200).json({ message: "status changed" })

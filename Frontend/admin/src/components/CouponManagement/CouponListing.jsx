@@ -20,7 +20,6 @@ const CouponList = () => {
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get('/getCoupon')
-      console.log(response.data.allCoupon)
       setCoupons(response.data.allCoupon)
     }
     fetchData()
@@ -50,7 +49,6 @@ const CouponList = () => {
   };
 
   const handleCreateCoupon = () => {
-    console.log('jakhkf')
     navigate('/addCoupon')
   }
 

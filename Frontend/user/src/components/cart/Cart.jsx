@@ -28,32 +28,20 @@ useEffect(()=>{
   const fetchCartItems=async () => {
     const cartItems=await axios.get(`/cartItems/${userId}`)
     const items=cartItems.data.result
-    console.log('this is items',items)
-  //   const neededItems = items.map((product) => {
-  //     const variantPrice = product?.variants[0]?.price
-  //     const categoryOfferPrice = product.categoryId?.categoryOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.categoryId?.categoryOffer?.offerValue / 100 : variantPrice - product.categoryId?.categoryOffer?.offerValue
-  //     const productOfferPrice = product.productOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.productOffer?.offerValue / 100 : variantPrice - product.productOffer?.offerValue
-  //     const offerPrice = categoryOfferPrice > productOfferPrice ? categoryOfferPrice : productOfferPrice
-  //     // console.log(categoryOfferPrice,productOfferPrice,offerPrice)
-  //     return { ...product, offerPrice }
-  // })
+ 
   const neededItems = items.map((product) => {
     const variantPrice = product?.variants[0]?.price
     const categoryOfferPrice = product.categoryOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.categoryOffer?.offerValue / 100 : variantPrice - product.categoryOffer?.offerValue
     const productOfferPrice = product.productOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.productOffer?.offerValue / 100 : variantPrice - product.productOffer?.offerValue
     // const offerPrice = categoryOfferPrice > productOfferPrice ? categoryOfferPrice : productOfferPrice
-    console.log('this is catprice',categoryOfferPrice,'this is pro price',productOfferPrice)
     const offerPrice =
       Number.isNaN(categoryOfferPrice) ? productOfferPrice :
         Number.isNaN(productOfferPrice) ? categoryOfferPrice :
           Math.max(categoryOfferPrice, productOfferPrice);
-    // console.log(categoryOfferPrice,productOfferPrice,offerPrice)
     return { ...product, offerPrice }
   })
-  console.log('this is the needed items',neededItems)
     const count=items.length
     setCount(count)
-    // console.log(cartItems.data.result)
     setCartItems(neededItems)
     dispatch(incrementCounter(count))
   }
@@ -90,14 +78,12 @@ const dispatch=useDispatch()
     const cartId=item.cartId
     setCartItems(items => items.filter(item => item.variants[0]._id !== itemId));
     const deleteItem =await axios.delete(`/deleteItem/${itemId}/${cartId}`)
-    console.log('this is the item to be delted',item.cartId)
   };
 
   const calculateSubtotal = () => {
     return cartItems.reduce((total, item) => {
       const itemTotal = item.offerPrice ? item.offerPrice * item.quantity :  item.variants[0].price * item.quantity;
    
-      // console.log('this is the item in the calculate sub total',itemTotal)
       return total + itemTotal ;
     }, 0);
   };
@@ -113,14 +99,10 @@ const dispatch=useDispatch()
   const handleQuantity=async(i,count)=>{
 
     const itemToBeChanged=cartItems.find((_,index)=>index==i)
-    console.log(itemToBeChanged)
     const productId=itemToBeChanged.id
     const itemId=itemToBeChanged.variants[0]._id
     const cartId=itemToBeChanged.cartId
-    console.log('this is the cartId',cartId)
-    console.log('this is the item id',itemId)
-    console.log('this isthe product id',productId)
-    console.log('this is the item',itemToBeChanged)
+  
     const stock = itemToBeChanged.variants[0].stock;
     const currentQuantity = itemToBeChanged.quantity;
     const newQuantity = currentQuantity + count;

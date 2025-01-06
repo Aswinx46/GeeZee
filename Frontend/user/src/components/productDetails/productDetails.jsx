@@ -49,20 +49,13 @@ const ProductDetails = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  console.log('this is the id',id)
   useEffect(() => {
-    console.log('this is useEffect')
     const fetchProduct = async () => {
-      console.log(id)
       if (!id) {
 
-        console.log('this is the if case')
         const productSelected = localStorage.getItem('selectedProduct');
-        console.log('this is the product selected', productSelected)
         const produc = productSelected ? JSON.parse(productSelected) : [];
-        console.log(produc)
         const single = produc[0];
-        console.log('this is single', single)
 
 
 
@@ -71,14 +64,12 @@ const ProductDetails = () => {
         const newVariants = single.variants.map((variant) => {
           const categoryOfferPrice = categoryOffer?.offerType == 'percentage' ? variant.price - (variant.price * (categoryOffer?.offerValue || 0) / 100) : variant.price - (categoryOffer?.offerValue || 0)
           const productOfferPrice = productOffer?.offerType == 'percentage' ? variant.price - (variant.price * (productOffer?.offerValue || 0) / 100) : variant.price - (productOffer?.offerValue || 0)
-          console.log(categoryOfferPrice, productOfferPrice)
           let offerPrice
           if (categoryOffer?.offerType && productOffer?.offerType) {
 
             offerPrice =
 
               Math.min(categoryOfferPrice, productOfferPrice);
-            console.log('this is  the offer price', offerPrice)
           } else if (categoryOffer?.offerType && !productOffer?.offerType) {
             offerPrice = categoryOfferPrice
           } else if (!categoryOffer?.offerType && productOffer?.offerType) {
@@ -89,21 +80,17 @@ const ProductDetails = () => {
           return { ...variant, offerPrice: offerPrice }
         })
 
-        console.log('this is the needed', newVariants)
 
 
         setProduct({ ...single, variants: newVariants });
 
-        console.log(single.variants)
       } else {
-        console.log('this is the else case')
         const productsResponse = await axios.get(`/products/${id}`)
-        console.log("re fetching")
-        console.log('this is  the else case prod', productsResponse.data.products)
+        
         setProducts(productsResponse.data.products)
         const allProducts = productsResponse.data.products
         const selectedProduct = allProducts.find((item) => item._id == id)
-        console.log(selectedProduct)
+        
         setProduct(productsResponse.data.products)
       }
     }
@@ -111,7 +98,7 @@ const ProductDetails = () => {
   }, [id]);
 
 
-  console.log("products", product)
+ 
 
   const handleDoubleClick = () => {
     setIsZoomed(!isZoomed);
@@ -132,33 +119,29 @@ const ProductDetails = () => {
   };
 
   const receiveIndex = (index) => {
-    console.log(index)
+   
     setIndex(index)
   }
 
   const handleCart = async () => {
-    console.log(token)
-    console.log(quantity)
+  
     if (!token) {
       toast.warning('Please login to add product to the cart')
     }
     try {
-      console.log('this is inside the try catcvh')
+      
       const userId = userData._id
       const selectedProductId = product._id
       const selectedVariant = product.variants.find((_, i) => i == index)
       const selectedVariantId = selectedVariant._id
-      console.log(selectedVariant._id)
-      console.log(product._id)
-      console.log(index)
+   
       const uploadToCart = await axios.post('/cart', { userId: userId, productId: selectedProductId, selectedVariantId: selectedVariantId, quantity })
-      console.log(uploadToCart.data)
+     
       toast.success(uploadToCart.data.message)
-      // dispatch(incrementCounter())
-      // navigate('/productDetails/cart')
+    
     } catch (error) {
-      console.log(error)
-      console.log('error in adding to the cart')
+    
+      console.log('error in adding to the cart',error)
 
       toast.error(error.response.data.message)
     }
@@ -172,7 +155,7 @@ const ProductDetails = () => {
   }
 
   const handleQuantityChange = (newQuantity) => {
-    console.log(`Quantity changed to: ${newQuantity}`);
+   
     // Here you can update your cart state or perform any other actions
   };
 

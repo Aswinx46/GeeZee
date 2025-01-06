@@ -87,7 +87,6 @@ const ChangePassword = () => {
       toast.error(error.response.data.message)
     }
 
-    console.log('Password change submitted:', formData);
   };
 
   return (

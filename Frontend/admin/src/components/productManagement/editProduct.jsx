@@ -50,32 +50,26 @@ const EditProduct = () => {
             const sendedProduct = store.getState().product.product
             setVarients(sendedProduct.variants)
             const response = await axios.get('/brands');
-            console.log('this is the brands from the backend', response.data.brands)
             const selectedBrand = response.data.brands.find((brand) => brand._id == sendedProduct.brand)
-            console.log('this is the selected brand name', selectedBrand)
             setSelectedBrand([selectedBrand])
             setProduct(prev => ({ ...prev, brand: selectedBrand.name }))
             setProductId(product?._id)
 
             const brand = response.data.brands.filter((bran) => bran.name !== selectedBrand.name)
-            console.log('this is after brand filter', brand)
-            console.log(selectedBrand)
-            console.log('this is the brands without selected one', brand)
+        
 
             setBrands(brand);
 
-            console.log("Old urls are ", product.productImg)
-            console.log(sendedProduct.spec)
-            console.log(category)
+       
             const cat = category.data.category.filter((cat) => cat.categoryName != sendedProduct.categoryId.categoryName)
-            console.log(cat)
+            
 
 
 
             setOldUrl(sendedProduct.productImg)
             setCategories(cat);
             setSuccess(false)
-            console.log(sendedProduct)
+        
             setExistingProductOffer(sendedProduct.productOffer)
             if (sendedProduct.productImg && sendedProduct.productImg.length > 0) setImageUrl(sendedProduct.productImg)
         };
@@ -93,7 +87,7 @@ const EditProduct = () => {
             };
             reader.readAsDataURL(files[0]);
             setImage([...image, files[0]]);
-            console.log("handle Image chagen", oldUrl)
+            
         }
     };
 
@@ -193,9 +187,9 @@ const EditProduct = () => {
     }
 
     const handleEditVariant = (index) => {
-        console.log('modal opened')
+        
         setIndex(index)
-        console.log(isOpen)
+        
         setIsOpen(true)
     }
 
@@ -203,7 +197,7 @@ const EditProduct = () => {
 
     const handleAddOffer = () => {
         setOpenOffer(true)
-        console.log(OpenOffer)
+        
     }
     const handleListOffer=async()=>{
         try {
@@ -218,9 +212,7 @@ const EditProduct = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        console.log('this is the variant from the parent', varients)
-        // Validate all fields
-        console.log('this is the product', product)
+       
         const newErrors = {};
         if (!product.title?.trim()) {
             newErrors.title = 'Title is required';
@@ -248,16 +240,13 @@ const EditProduct = () => {
             return;
         }
 
-        console.log('this is the product after edit', product)
 
         setErrors({});
         setSuccess(true)
-        console.log("Before axios.put, product:", product);
         const newImageUrls = imageUrl.filter(url => !url.startsWith('https://res.cloudinary.com'));
 
         const uploadPromises = newImageUrls.map(async (url, index) => {
             try {
-                console.log('Processing new image:', index)
 
                 const formData = new FormData();
                 const croppedImageBlob = await fetch(url).then(r => r.blob());
@@ -279,15 +268,11 @@ const EditProduct = () => {
 
         try {
             const cloudinaryResponse = await Promise.all(uploadPromises)
-            console.log(cloudinaryResponse)
             const urls = cloudinaryResponse.map((obj) => obj.data.secure_url)
 
-            console.log(product)
             if (urls.length > 0) {
-                console.log('jhfoasjdf;jaso')
                 const response = await axios.put(`/editProduct/${product._id}`, { product, urls: [...oldUrl, ...urls], variants: varients })
-                console.log(product)
-                console.log(response)
+              
                 setSuccess(true)
                 navigate('/showProduct')
             } else {
@@ -303,14 +288,14 @@ const EditProduct = () => {
 
     }
 
-    const handleDeleteOffer=async()=>{
-        try {
+    // const handleDeleteOffer=async()=>{
+    //     try {
             
-        } catch (error) {
-            console.log('error while deleting the error',error)
-            toast.error('error while deleting the error')
-        }
-    }
+    //     } catch (error) {
+    //         console.log('error while deleting the error',error)
+    //         toast.error('error while deleting the error')
+    //     }
+    // }
 
     return (
         <motion.div

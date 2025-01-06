@@ -10,7 +10,7 @@ const Wishlist = () => {
 
   const user = useSelector(state => state.user.user)
   const [wishlist, setWishlist] = useState([])
-  const [update,setUpdate]=useState(false) 
+  const [update, setUpdate] = useState(false)
   const userId = user._id
   const navigate = useNavigate()
   useEffect(() => {
@@ -18,11 +18,9 @@ const Wishlist = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`/getWishlist/${user._id}`)
-        console.log(response.data.wishilst.product)
         const neededDetails = response.data.wishilst.product.map((product) => {
           return { ...product, variants: product.productId.variants[0] }
         })
-        console.log(neededDetails)
         setWishlist(neededDetails)
       } catch (error) {
         console.log('error while fetching the data', error)
@@ -32,31 +30,25 @@ const Wishlist = () => {
   }, [update])
 
 
-  const removeFromWishlist = async(item) => {
-    console.log(item)
+  const removeFromWishlist = async (item) => {
     try {
-      const response=await axios.patch(`removeFromWishlist/${userId}`,{item})
-      console.log(response)
+      const response = await axios.patch(`removeFromWishlist/${userId}`, { item })
       toast.success(response.data.message)
       setUpdate(!update)
     } catch (error) {
-      console.log('error while removing item from the wishlist',error)
+      console.log('error while removing item from the wishlist', error)
       toast.error('error while removing item from the wishlist')
     }
   };
 
   const handleAddToCart = async (item) => {
 
-    console.log(item.productId._id)
     try {
-      console.log('this is inside the try catcvh')
 
 
       const selectedVariantId = item.productId.variants[0]._id
-      console.log(selectedVariantId)
       const quantity = 1
       const uploadToCart = await axios.post('/cart', { userId: userId, productId: item.productId._id, selectedVariantId: selectedVariantId, quantity })
-      console.log(uploadToCart.data)
       toast.success(uploadToCart.data.message)
     } catch (error) {
       console.log(error)

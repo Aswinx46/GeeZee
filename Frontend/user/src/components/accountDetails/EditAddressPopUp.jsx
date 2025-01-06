@@ -3,23 +3,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import axios from '../../axios/userAxios'
 import { toast } from 'react-toastify';
-const EditAddressModal = ({ isOpen, onClose ,setIsOpen, editAddress,setEditAddress }) => {
+const EditAddressModal = ({ isOpen, onClose, setIsOpen, editAddress, setEditAddress }) => {
   const [address, setAddress] = useState(editAddress);
-    // console.log(editAddress)
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEditAddress(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Updated address:', address);
 
-    console.log('this is the edited address',editAddress)
-    
-    const addressId=editAddress._id
-    console.log(addressId)
-    const updateAddress=await axios.put('/editAddress',{editAddress})
+
+    const addressId = editAddress._id
+    const updateAddress = await axios.put('/editAddress', { editAddress })
     toast.success(updateAddress.data.message)
     setIsOpen(false)
   };
@@ -57,7 +53,7 @@ const EditAddressModal = ({ isOpen, onClose ,setIsOpen, editAddress,setEditAddre
           >
             <motion.button
               className="absolute top-4 right-4 text-gray-500 hover:text-black"
-              onClick={()=>setIsOpen(false)}
+              onClick={() => setIsOpen(false)}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             >

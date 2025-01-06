@@ -27,8 +27,7 @@ const StaticCategoryManagement = () => {
             setCategories(category.data.category)
             const offerCategories=category.data.category.filter((category)=>category.categoryOffer)
             setOfferCategories(offerCategories)
-            console.log(offerCategories,'this is the truth one')
-            console.log('category added in the state')
+            
           } catch (error) {
             console.log(error)
             toast.error('error in fetching category')
@@ -43,13 +42,11 @@ const StaticCategoryManagement = () => {
 
     const handleAddCategory=async (e) => {
         e.preventDefault()
-        console.log(categories)
         if(newCategory.trim())
       {
       
         
         try {
-            console.log(newCategory)
             const duplicate=categories.filter((cat)=>cat.categoryName.toLowerCase()==newCategory.toLowerCase())
             if(duplicate.length>0) 
               {
@@ -58,7 +55,6 @@ const StaticCategoryManagement = () => {
               }
             
             const response=await axios.post('/addCategory',{newCategory})
-            console.log(response)
             setFetch(!fetch)
         } catch (error) {
             console.log('error in adding the category',error)
@@ -67,7 +63,6 @@ const StaticCategoryManagement = () => {
         }
       }else{
 
-        console.log('cant add empty string')
         toast.error('cant add empty string')
       }
     }
@@ -76,9 +71,7 @@ const StaticCategoryManagement = () => {
       try {
         const category=categories.find((cat)=>cat._id==id)
         const status=category.status=='active'?'inactive':'active'
-        console.log(status)
         const response =await axios.patch(`/editCategory/${id}`,{status})
-        console.log(response)
         toast.success(response.data.message)
         setCategories((p)=>p.map((cat)=>cat._id==id?{...cat,status:status}:cat))
       } catch (error) {
@@ -90,8 +83,7 @@ const StaticCategoryManagement = () => {
 
     const handleEditCategory = async () => {
       try {
-        console.log(selectedId)
-        console.log(editNameCategory)
+    
 
         const clone=categories.find((item)=>item.categoryName.toLowerCase()==editNameCategory.toLowerCase())
         setIsEditOpen(false)
@@ -101,7 +93,6 @@ const StaticCategoryManagement = () => {
           return
         }
         const editName=await axios.patch(`/editCategoryName/${selectedId}`,{editNameCategory})
-        console.log(editName.data.changeName)
        setFetch(!fetch)
        toast.success(editName.data.message)
         // setCategories(editName.data.changeName)
@@ -113,14 +104,12 @@ const StaticCategoryManagement = () => {
    const handleAddOfferCateogry=(category)=>{
      setOpenOffer(true)
     setSelectedCategoryId(category._id)
-      console.log(category)
 
    }
 
    const handleListOffer = async (id) => {
     try {
       const response = await axios.patch(`/changeListOfferCategory/${id}`);
-      console.log(response);
       toast.success(response.data.message);
       setUpdate(!update)
    
@@ -131,7 +120,6 @@ const StaticCategoryManagement = () => {
   };
 
   const handleEditCategoryOffer=(category)=>{
-    console.log(category)
     setSelectedOffer(category.categoryOffer)
     setSelectedCategoryId(category._id)
     setOpenOffer(true)

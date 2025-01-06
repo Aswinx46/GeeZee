@@ -4,12 +4,10 @@ const authToken=async(req,res,next)=>{
     const authHeader=req.headers['authorization']
     const userId=req.headers['user_id']
     const token=authHeader && authHeader.split(' ')[1]
-    console.log(token)
     if(!token) return res.status(401).json({message:"no token available"})
         try {
             const decoded=jwt.verify(token,process.env.ACCESS_TOKEN_SECRET_KEY)
             req.userId=decoded.userId;
-            console.log('this is the requserId',userId)
             if(userId)
             {
                 const user=await User.findById(userId)

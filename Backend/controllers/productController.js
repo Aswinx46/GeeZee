@@ -6,19 +6,16 @@ const Brand = require('../models/brandSchema')
 const addProduct = async (req, res) => {
     const { name, price, quantity, subHead, categoryId, subHeadDescription, variant, brand, sku, description, status, imageUrl, specAndDetails } = req.body
 
-    // console.log( 'this is spec', specAndDetails)
 
     try {
 
         const category = await Category.findById(categoryId)
 
-        // console.log(category)
 
         if (!category) return res.status(400).json({ message: "the category is not found" })
 
         const existingProduct = await Product.findOne({ title: new RegExp(`^${name}$`, 'i') })
 
-        // console.log(existingProduct)
 
 
 
@@ -58,7 +55,6 @@ const addProduct = async (req, res) => {
 
         })
 
-        // console.log(product)
 
         await product.save()
 
@@ -83,9 +79,7 @@ const showProduct = async (req, res) => {
         const page = parseInt(pageNumber, 10);
         const limit = 5
         const skip = (page - 1) * limit
-        console.log('this is the pagenumber', pageNumber)
         const products = await Product.find().populate('categoryId').populate('productOffer').limit(limit).skip(skip)
-        console.log(products)
         return res.status(200).json({ message: 'products fetched', products })
     } catch (error) {
         console.log('error while fetching the products', error)
@@ -100,7 +94,6 @@ const showProductInHotDeals = async (req, res) => {
 
     try {
         const products = await Product.find().populate('categoryId').populate('productOffer')
-        console.log(products)
         return res.status(200).json({ message: 'products fetched', products })
     } catch (error) {
         console.log('error while fetching the products', error)
@@ -144,9 +137,7 @@ const editProduct = async (req, res) => {
 
     const { title, sku, price, availableQuantity, brand, subHeadDescription, description, status, categoryId, stock, category, spec, subHead } = req.body.product
 
-    //    console.log('this is the variants id',categoryId)
 
-    console.log('this is the brand name', brand)
 
     const oldCatId = categoryId._id
 
@@ -154,7 +145,6 @@ const editProduct = async (req, res) => {
 
     const { variants } = req.body
 
-    //   console.log('this is the name of the editing brand',variants)
 
 
 
@@ -168,7 +158,6 @@ const editProduct = async (req, res) => {
 
         const checkBrand = await Brand.findOne({ name: brand })
 
-        console.log('this is the checkbrand', checkBrand)
 
 
 
@@ -208,7 +197,6 @@ const editProduct = async (req, res) => {
 
             })
 
-            // console.log("Spec saved " , spec)
 
 
 
@@ -216,7 +204,6 @@ const editProduct = async (req, res) => {
 
         } else {
 
-            // console.log(checkCategory)
 
             const editedProduct = await Product.findByIdAndUpdate(id, {
 
@@ -319,13 +306,10 @@ const showProductListed = async (req, res) => {
 
         }).limit(limit).skip(skip)
 
-        console.log('this is products', products)
 
-        console.log(products)
 
         const activeProducts = products.filter(product => product.categoryId && product.brand?.status == 'active');
 
-        // console.log('this is active products',activeProducts)
 
         return res.status(200).json({ message: 'products fetched', products: activeProducts })
 
@@ -349,17 +333,13 @@ const showProductVariantQuantity = async (req, res) => {
 
     try {
 
-        console.log(id)
 
         const selectedProduct = await product.findById(id)
 
-        console.log("selected ", selectedProduct.variants)
 
-        //    console.log(Array.isArray(selectedProduct));
 
         const selectedVariant = selectedProduct.variants.find((variant) => variant._id == variantId)
 
-        console.log(selectedVariant)
 
         res.status(200).json(selectedVariant.stock)
 
@@ -379,7 +359,6 @@ const showRelatedProducts = async (req, res) => {
 
 
 
-    // console.log(id)
 
     try {
 
@@ -405,7 +384,6 @@ const showRelatedProducts = async (req, res) => {
 
 const filterProducts = async (req, res) => {
 
-    console.log(req.query)
 
     try {
 
@@ -542,14 +520,11 @@ const filterProducts = async (req, res) => {
 const search = async (req, res) => {
 
     try {
-        console.log('this is search')
         const { searchTerm } = req.query
-        console.log(searchTerm)
         const products = await Product.find({
             title: { $regex: searchTerm, $options: 'i' },
             status: 'active'
         }).populate('categoryId').populate('productOffer').limit(5);
-        console.log('the is the product', products)
         return res.status(200).json({ message: 'Searched product fetched', products })
     } catch (error) {
         console.log('error while searching', error)

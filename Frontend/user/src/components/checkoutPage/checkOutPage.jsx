@@ -128,7 +128,6 @@ const CheckoutPage = () => {
           description: 'Order Payment',
           order_id: razorpayOrderId,
           handler: async (response) => {
-            // console.log('Payment Success:', response);
             toast.success('Payment Successful');
             navigate("/checkoutSuccess");
             // Optionally send payment confirmation to the backend
@@ -163,7 +162,6 @@ const CheckoutPage = () => {
           toast.error('Payment Failed. Please try again.');
         });
       } else {
-        console.log('this is else case')
         toast.success(response.data.message)
         navigate('/checkoutSuccess')
       }
@@ -186,7 +184,7 @@ const CheckoutPage = () => {
 
   const handleNewAddress = () => {
     setIsOpen(true)
-    console.log(isOpen)
+    
     // navigate('/address')
   }
 

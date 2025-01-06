@@ -21,7 +21,6 @@ const ProductList = () => {
     const fetchProducts = async () => {
 
       const products = await axios.get(`/products/${currentPage}`)
-      console.log(products)
       setProducts(products.data.products)
 
     }
@@ -31,7 +30,6 @@ const ProductList = () => {
 
   const EditProduct = async (index) => {
     const product = products.find((_, ind) => ind == index)
-    console.log(product)
     dispatch(addProductSlice(product))
     navigate('/editProduct')
 
@@ -42,7 +40,6 @@ const ProductList = () => {
       product.status?.toLowerCase().includes(search.toLowerCase())
 
   );
-  console.log(filteredProducts)
   
 
   const onPageChange=async(newPage)=>{

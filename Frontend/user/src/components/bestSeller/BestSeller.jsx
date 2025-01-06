@@ -14,23 +14,20 @@ const ProductCard = ({ product, selectedProduct, setSelectedProduct }) => {
 
 
 
-  const user=useSelector(state=>state.user.user)
-  const userId=user?._id
+  const user = useSelector(state => state.user.user)
+  const userId = user?._id
 
-  const handleWishlilst=async()=>{
-    console.log(product)
-    console.log(userId)
-    console.log('this isthe wishlist')
+  const handleWishlilst = async () => {
+
     try {
-      if(!userId)
-      {
+      if (!userId) {
         toast.error('Please login to add product to wishlist')
         return
       }
-      const response=await axios.post(`addProductWishlist/${userId}`,{product},)
+      const response = await axios.post(`addProductWishlist/${userId}`, { product },)
       toast.success(response.data.message)
     } catch (error) {
-      console.log('error while adding product in the wishlist',error)
+      console.log('error while adding product in the wishlist', error)
       toast.error(error.response.data.message)
     }
   }
@@ -89,7 +86,7 @@ const ProductCard = ({ product, selectedProduct, setSelectedProduct }) => {
               variants={buttonVariants}
               whileHover="hover"
               whileTap="tap"
-              onClick={()=>handleWishlilst()}
+              onClick={() => handleWishlilst()}
               className="p-3 rounded-full bg-[#39FF14] text-black"
             >
               <Heart size={20} />
@@ -129,7 +126,7 @@ const ProductCard = ({ product, selectedProduct, setSelectedProduct }) => {
                 {/* <p className="text-[#39FF14] font-bold text-lg">
                   ₹{product.variants[0].price}
                 </p> */}
-                    {product.offerPrice ? <> <p className="text-[#39FF14] font-bold text-lg">₹{product.offerPrice }</p> <del className='text-red-600'> ₹{product.variants[0].price} </del> </> :  <p className="text-[#39FF14] font-bold text-lg">₹{product.variants[0].price}</p>}    
+                {product.offerPrice ? <> <p className="text-[#39FF14] font-bold text-lg">₹{product.offerPrice}</p> <del className='text-red-600'> ₹{product.variants[0].price} </del> </> : <p className="text-[#39FF14] font-bold text-lg">₹{product.variants[0].price}</p>}
                 {product.discount > 0 && (
                   <p className="text-sm text-gray-400 line-through">
                     ₹{Math.round(product.variants[0].price * (1 + product.discount / 100))}
@@ -147,7 +144,7 @@ const ProductCard = ({ product, selectedProduct, setSelectedProduct }) => {
           </motion.div>
         </CardContent>
       </Card>
-    
+
     </motion.div>
   );
 };

@@ -15,8 +15,7 @@ const OfferModal = ({ OpenOffer, setOpenOffer, onClose, onSubmit,productId, upda
   const [endDate, setEndDate] = useState('');
   const [errors, setErrors] = useState({});
 
-  console.log('this is the existingoffer',existingProductOffer)
-  console.log('this is the category id',categoryId)
+
 
   const validateForm = () => {
     const newErrors = {};
@@ -65,10 +64,9 @@ const OfferModal = ({ OpenOffer, setOpenOffer, onClose, onSubmit,productId, upda
   const handleSubmit = async(e) => {
     e.preventDefault();
     if (validateForm()) {
-      console.log(offerType, offerValue, startDate, endDate,productId);
       try {
         if(productId)
-        {console.log('this is inside the product');
+        {
         
           const response=await axios.post(`/addOffer/${productId}`,{offerType, offerValue, startDate, endDate})
           console.log(response.data)
@@ -76,8 +74,7 @@ const OfferModal = ({ OpenOffer, setOpenOffer, onClose, onSubmit,productId, upda
           setOpenOffer(false);
 
         }else if(categoryId)
-        {console.log('this is inside teh category')
-          console.log(offerType, offerValue, startDate, endDate)
+        {
           const response=await axios.post(`/addOfferCategory/${categoryId}`,{offerType, offerValue, startDate, endDate})
           toast.success(response.data.message);
           setOpenOffer(false);

@@ -24,7 +24,6 @@ const otpVerification = () => {
 
 
     useEffect(()=>{
-      console.log(otpCheck)
       setCheck(otpCheck)
         const interval = setInterval(() => {
             setTimer((prevTimer) => (prevTimer > 0 ? prevTimer - 1 : 0));
@@ -41,11 +40,9 @@ const otpVerification = () => {
           if(timer>0)
             {
                 const OTP=otp.join('')
-                console.log(OTP)
 
                 try {
                     const response= await axios.post('/otpVerification',{otp:OTP})
-                    console.log(response)
                     if(response.data.message=='user created')
                         {
                             toast.success(response.data.message);
@@ -87,7 +84,6 @@ const otpVerification = () => {
         const OTP=otp.join('')
         try {
           const response=axios.post('/resendOtp',{otp:OTP})
-          console.log(response)
         } catch (error) {
           console.log('error while sending resend otp',error)
         }

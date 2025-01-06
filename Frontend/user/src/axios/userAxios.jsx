@@ -14,10 +14,8 @@ instance.interceptors.request.use(
   (config) => {
 
     const token = store.getState().token.token
-    console.log(token)
+    
     const user = store.getState().user?.user
-    console.log('this is the userID', user)
-
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`
     }
@@ -27,7 +25,6 @@ instance.interceptors.request.use(
     }
 
 
-    console.log('token interceptor done')
     return config;
     (error) => {
       return promise.reject(error)
@@ -39,9 +36,7 @@ instance.interceptors.response.use(
   response => response,
   async (error) => {
     const originalRequest = error.config;
-    console.log('this is the error', error)
     if (error.response.status == 423) {
-      console.log('user is blocked by admin')
 
       window.location.href = '/userBlockNotice';
 
@@ -58,7 +53,6 @@ instance.interceptors.response.use(
         originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
         return instance(originalRequest);
       } catch (refreshError) {
-        console.log('refresh token failed', refreshError)
         window.location.href = '/login';
         return Promise.reject(refreshError);
       }

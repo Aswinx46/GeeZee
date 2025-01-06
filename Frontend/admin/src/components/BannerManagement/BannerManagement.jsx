@@ -185,8 +185,7 @@ const BannerManagement = () => {
   }, [previewUrl]);
 
   const handleUploadBanner = async () => {
-    console.log('this is the form data', formData)
-    console.log('thios is the video', selectedVideo)
+  
     try {
       const cloudFormData = new FormData();
 
@@ -197,7 +196,6 @@ const BannerManagement = () => {
       cloudFormData.append('cloud_name', 'dotlezt0x')
 
       const responseFromCloudinary = await cloudAxios.post('https://api.cloudinary.com/v1_1/dotlezt0x/video/upload', cloudFormData)
-      console.log(responseFromCloudinary)
       const videoUrl = responseFromCloudinary.data.secure_url
       const responseFromBackend = await axios.post('/createBanner', { formData, videoUrl })
       toast.success(responseFromBackend.data.message)

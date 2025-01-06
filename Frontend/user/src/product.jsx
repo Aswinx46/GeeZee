@@ -34,7 +34,6 @@ const ProductDetails = () => {
     const productSelected = localStorage.getItem('selectedProduct');
     const produc = productSelected ? JSON.parse(productSelected) : [];
     const single = produc[0];
-    console.log(single)
     setProduct(single);
   }, []);
   return (

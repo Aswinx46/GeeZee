@@ -25,7 +25,6 @@ const UsersList = () => {
         setError(null);
         const response = await axios.get(`/usersList/${currentPage}`);
         setUsers(response.data.users);
-        console.log(response.data.users)
       } catch (error) {
         setError('Failed to fetch users. Please try again later.');
         console.error('Error fetching users:', error.message);
@@ -52,9 +51,7 @@ const UsersList = () => {
         const user=users.find((u)=> u._id==userId)
         const userStatus=user.status=='active'? 'inactive' : 'active'
         setChange(!change)
-        console.log(userStatus)
         const response=await axios.patch(`/userEdit/${userId}`,{status:userStatus})
-        console.log(response.data.message)
         setUsers((prevUsers)=>prevUsers.map((u)=>u._id==userId ? {...u,status:userStatus} : u))
       } catch (error) {
         console.log('error in editing the user status',error.message)
@@ -65,7 +62,6 @@ const UsersList = () => {
 
 
   const onPageChange=async(newPage)=>{
-    console.log('asdkjfnkjl',newPage)
     setCurrentPage(newPage)
     setChangePage(!changePage)
 

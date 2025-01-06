@@ -36,7 +36,7 @@ export default function SignupPage() {
     try {
       if (validation()) {
         const response = await axios.post('/signup', user);
-        console.log(response.data.message)
+      
         toast.success('DATA SUBMITTED');
         dispatch(addValidation('otp validation done'))
         navigate('/otpVerification');
@@ -96,12 +96,12 @@ export default function SignupPage() {
     {
         try {
           const credential=jwtDecode(credentialResponse.credential)
-          console.log(credential)
+         
           const{email,email_verified,name,sub}=credential
          
 
           const response=await axios.post('/googleAuthenticate',{email:email,email_verified,firstName:name,id:sub})
-          console.log(response)
+         
           toast.success(response.data.message)
           navigate('/login')
         

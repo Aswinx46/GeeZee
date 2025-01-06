@@ -105,7 +105,6 @@ const CouponCreationForm = () => {
     e.preventDefault();
 
     if (validateForm()) {
-      console.log('Coupon creation data:', formData);
       try {
         const response = await axios.post('/createCoupon', { formData })
         toast.success(`Coupon ${response.data.newCoupon.couponCode} has been created successfully.`);

@@ -30,7 +30,6 @@ export default function LoginPage() {
           email: data.get('email'),
           password: data.get('password'),
         });
-        console.log(response.data.user);
         
       
         dispatch(addToken(response.data.token))
@@ -77,11 +76,8 @@ export default function LoginPage() {
       {
           try {
             const credential=jwtDecode(credentialResponse.credential)
-            console.log(credential)
             const{email}=credential
-            console.log(email)
             const response=await axios.post('/login',{email})
-           console.log(response.data.user._id)
            localStorage.setItem('id',response.data.user._id)
            toast.success(response.data.message)
            dispatch(addToken(response.data.token))
@@ -98,7 +94,6 @@ export default function LoginPage() {
           }
       }
     
-    console.log('Google login clicked');
   };
 
   return (

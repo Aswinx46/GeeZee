@@ -28,7 +28,6 @@ const createOrder = async (req, res) => {
 
     const { mainAddress, cartItems, paymentMethod, total, shippingCharge, selectedCoupon } = req.body
 
-    // const offerPrice = cartItems.reduce((acc,cur)=>acc += cur.offerPrice)
 
     const totalOfferPrice = cartItems.reduce((acc, item) => acc += item?.offerPrice, 0)
 
@@ -45,17 +44,15 @@ const createOrder = async (req, res) => {
             coupon.userId.push(userId)
             await coupon.save()
         }
-        // console.log('this is the cart item',cartItems.quantity)
         const status = await productBlockCheckingFunction(productId, brandId, categoryId)
-        // console.log('this is the status', status)
         const isBlock = status.some((item) => item.status == 'inactive')
         if (isBlock) return res.status(400).json({ message: "Product blocked by admin remove the product to continue" })
 
 
 
         const insufficientStock = [];
-        let originalAmount
-        let discount 
+        let originalAmount=0
+       
         for (const item of cartItems) {
             
             const product = await Product.findById(item.id, "variants");
@@ -64,14 +61,13 @@ const createOrder = async (req, res) => {
                 insufficientStock.push(item.id);
             }
 
-            originalAmount = variant.price * item.quantity
+            originalAmount += item.offerPrice * item.quantity
 
         }
         if (insufficientStock.length > 0) {
             return res.status(400).json({ message: "out of stock", insufficientStock });
         }
 
-        
 
 
 
@@ -84,7 +80,6 @@ const createOrder = async (req, res) => {
             }
 
             const razorpayOrder = await razorpay.orders.create(razorpayOptions)
-            // console.log('this is  razorpay order', razorpayOrder)
             if (!razorpayOrder) return res.status(500).json({ message: "Razorpay payment Failed" })
             razorPayIdOrder = razorpayOrder.id
 
@@ -101,7 +96,7 @@ const createOrder = async (req, res) => {
         const orderItems = cartItems.map((item) => ({
             productId: item.id,
             quantity: item.quantity,
-            price: item.variants[0].price,
+            price: item.offerPrice,
             variant: item.variants[0]
             // variantId:changeVariant
         }))
@@ -109,8 +104,8 @@ const createOrder = async (req, res) => {
         const order = new Order({
             userId,
             orderItems,
-            totalPrice:  total + shippingCharge - (selectedCoupon?.offerPrice || 0),
-            finalAmount:originalAmount,
+            totalPrice: originalAmount,
+            finalAmount: total + shippingCharge - (selectedCoupon?.offerPrice || 0),
             address: mainAddress._id,
             paymentMethod,
             discount: total - (originalAmount - selectedCoupon?.offerPrice || originalAmount),
@@ -123,8 +118,7 @@ const createOrder = async (req, res) => {
 
 
         for (item of cartItems) {
-            // console.log("--------------------------------------------------------------")
-            // console.log('this is the items', item)
+           
 
             const product = await Product.findById(item.id, 'variants categoryId brand salesCount')
             const changeVariant = product.variants.find(
@@ -132,7 +126,6 @@ const createOrder = async (req, res) => {
             );
             if (changeVariant) {
                 changeVariant.stock -= item.quantity
-                // console.log('this is the final stock ', changeVariant.stock)
                 if (changeVariant.stock < 0) {
                     return res.status(400).json({ message: "Out of Stock" })
                 }
@@ -153,7 +146,6 @@ const createOrder = async (req, res) => {
 
         if (paymentMethod != 'Razorpay') {
             await Cart.updateOne({ userId }, { $set: { items: [] } })
-            // console.log('this is inside the cod')
             return res.status(200).json({ message: "order created" })
 
         }
@@ -167,14 +159,11 @@ const createOrder = async (req, res) => {
 
 
 const verifyPayment = async (req, res) => {
-    // console.log('this is inside the verify payment')
     const { paymentId, orderId, signature } = req.body;
     const { userId } = req.params
-    // console.log('this is the payment id', paymentId, 'this is the orderid', orderId)
     try {
         // Step 1: Fetch payment details from Razorpay
         const paymentDetails = await razorpay.payments.fetch(paymentId);
-        // console.log('this is the ', paymentDetails)
         if (paymentDetails.status !== 'captured') {
             return res.status(400).json({ message: 'Payment not successful. Please try again.' });
         }
@@ -231,7 +220,7 @@ const showOrders = async (req, res) => {
         const orderDetails = await Order.find({ userId }).populate('orderItems.productId', 'productImg title').populate('address',).limit(limit).skip(skip)
 
         if (!orderDetails) return res.status(400).json({ message: 'no orders ' })
-            console.log('this is the orderDetials',orderDetails)
+        
 
         return res.status(200).json({ message: "order details fetched", orderDetails })
 
@@ -259,12 +248,6 @@ const showDetailOfOneOrder = async (req, res) => {
         return res.status(500).json({ message: "error while fetching the data" })
     }
 }
-// const details = selectedOrder.orderItems.map((items) => ({
-//     variantId: items.variant._id,
-//     quantity: items.quantity,
-//     productId: items.productId,
-//     totalPrice: ...totalPrice +(items.quantity * items.price)
-// }))
 
 const cancelOrder = async (req, res) => {
     const { orderId, userId } = req.params
@@ -360,7 +343,7 @@ const changeOrderStatus = async (req, res) => {
         if(newStatus == 'Cancelled')
         {
             const order=await Order.findById(orderId)
-            console.log('this is the cancel order',order)
+       
 
             for (const item of order.orderItems) {
                 await Product.findOneAndUpdate(
@@ -398,7 +381,6 @@ const returnOrderProduct = async (req, res) => {
 
 
         const selectedOrder = await Order.findById(orderId)
-        // console.log('this is the selcted order',selectedOrder)
         const selectedVariant = selectedOrder.orderItems.find((item) => item._id.toString() == orderItemId.toString())
 
         selectedVariant.variant.returnOrder = 'Pending'
@@ -438,7 +420,6 @@ const confirmReturnProduct = async (req, res) => {
     try {
         const { orderId } = req.params
 
-        // const update=await Order.findByIdAndUpdate(orderId,{'orderItems.variant.returnOrder' : 'Accepted'},{new:true})
         const update = await Order.findOneAndUpdate(
             { _id: orderId, 'orderItems.variant.returnOrder': 'Pending' },
             { $set: { 'orderItems.$.variant.returnOrder': 'Accepted' } },
