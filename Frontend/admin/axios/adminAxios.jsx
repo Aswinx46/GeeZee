@@ -1,9 +1,8 @@
 import axios from 'axios'
-import { SERVER_URL } from '../.config/serverURL';
 import {store} from '../src/redux/store'
 import { addToken } from '@/redux/slices/tokenSlice';
 const instance = axios.create({
-    baseURL:SERVER_URL,
+    baseURL:import.meta.env.VITE_API_BASE_URL,
     withCredentials:true
   });
 
