@@ -93,7 +93,7 @@ const showProduct = async (req, res) => {
 const showProductInHotDeals = async (req, res) => {
 
     try {
-        const products = await Product.find().populate('categoryId').populate('productOffer')
+        const products = await Product.find({status:'active'}).populate('categoryId').populate('productOffer')
         return res.status(200).json({ message: 'products fetched', products })
     } catch (error) {
         console.log('error while fetching the products', error)
