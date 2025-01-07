@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import axios from '../../axios/userAxios'
 
-const AddressModal = ({ isOpen, onClose, onSave ,setIsOpen,userId}) => {
+const AddressModal = ({ isOpen, onClose, onSave, setIsOpen, userId }) => {
   const [address, setAddress] = useState({
     street: '',
     city: '',
@@ -11,44 +11,72 @@ const AddressModal = ({ isOpen, onClose, onSave ,setIsOpen,userId}) => {
     pinCode: '',
     country: '',
     phone: '',
-   
+
   });
-  const [errors,setErrors]=useState({})
+  const [errors, setErrors] = useState({})
   const handleChange = (e) => {
     const { name, value } = e.target;
     setAddress(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     validation()
- 
-    if(validation())
-    {
-     
-        const response=await axios.post('/address',{shippingAddress:address , userId:userId})
-        setIsOpen(false)
+
+    if (validation()) {
+
+      const response = await axios.post('/address', { shippingAddress: address, userId: userId })
+      setIsOpen(false)
     }
   };
 
-  const validation=()=>{
-    const error={}
-    if(!address.street.trim()) error.street='enter a valid street'
+  const validation = () => {
+    const error = {}
+    // Validate street
+    if (!address.street.trim()) {
+      error.street = 'Enter a valid street';
+    }
 
-    if(!address.city.trim()) error.city='enter a valid city'
+    // Validate city (should only contain alphabets and spaces)
+    if (!address.city.trim()) {
+      error.city = 'Enter a valid city';
+    } else if (!/^[A-Za-z\s]+$/.test(address.city)) {
+      error.city = 'City should only contain alphabets';
+    }
 
-    if(!address.country.trim()) error.country='enter a valid country'
+    // Validate country (should only contain alphabets and spaces)
+    if (!address.country.trim()) {
+      error.country = 'Enter a valid country';
+    } else if (!/^[A-Za-z\s]+$/.test(address.country)) {
+      error.country = 'Country should only contain alphabets';
+    }
 
-    if(!address.pinCode.trim()) error.pinCode='enter a valid pinCode'
+    // Validate pin code (should be exactly 6 digits)
+    if (!address.pinCode.trim()) {
+      error.pinCode = 'Enter a valid pin code';
+    } else if (!/^\d{6}$/.test(address.pinCode)) {
+      error.pinCode = 'Pin code should be exactly 6 digits';
+    }
 
-    if(!address.state.trim()) error.state='enter a valid street'
-    
+    // Validate state (should only contain alphabets and spaces)
+    if (!address.state.trim()) {
+      error.state = 'Enter a valid state';
+    } else if (!/^[A-Za-z\s]+$/.test(address.state)) {
+      error.state = 'State should only contain alphabets';
+    }
+
+    // Validate phone (should be exactly 10 digits and numeric)
     if (!address.phone.trim()) {
       error.phone = 'Phone number is required';
-    } else if (!/^\d+$/.test(address.phone)) {
-      error.phone = 'Phone number should contain only digits';
-    } else if (address.phone.length !== 10) {
+    } else if (!/^\d{10}$/.test(address.phone)) {
       error.phone = 'Phone number should be exactly 10 digits';
+    }
+
+    // Validate name (should only contain alphabets and spaces)
+    if (!address.name.trim()) {
+      error.name = 'Name is required';
+    } else if (!/^[A-Za-z\s]+$/.test(address.name)) {
+      error.name = 'Name should only contain alphabets';
     }
     setErrors(error)
     return Object.keys(error).length === 0;
@@ -85,7 +113,7 @@ const AddressModal = ({ isOpen, onClose, onSave ,setIsOpen,userId}) => {
           >
             <motion.button
               className="absolute top-4 right-4 text-gray-500 hover:text-black"
-              onClick={()=>setIsOpen(false)}
+              onClick={() => setIsOpen(false)}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             >
@@ -117,9 +145,9 @@ const AddressModal = ({ isOpen, onClose, onSave ,setIsOpen,userId}) => {
                     value={address[field.name]}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                    
+
                   />
-                        <span className="text-red-500 text-sm">{errors[field.name] && errors[field.name]}</span>
+                  <span className="text-red-500 text-sm">{errors[field.name] && errors[field.name]}</span>
                 </motion.div>
               ))}
               <motion.button

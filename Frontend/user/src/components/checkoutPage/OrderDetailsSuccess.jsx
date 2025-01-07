@@ -17,7 +17,7 @@ const OrderDetailsSuccess = ({ orderDetails }) => {
     orderObjectId,
     variants,
     orderItemId,
-    name,
+    title,
     quantity,
     price,
   } = orderDetails;
@@ -97,7 +97,7 @@ const OrderDetailsSuccess = ({ orderDetails }) => {
           </CardHeader>
           <CardContent className="pt-4 space-y-3">
             <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="flex justify-between mb-2"><span className="text-gray-600">Name:</span> <span className="font-medium text-gray-800">{name}</span></p>
+              <p className="flex justify-between mb-2"><span className="text-gray-600">Name:</span> <span className="font-medium text-gray-800">{title}</span></p>
               <p className="flex justify-between mb-2"><span className="text-gray-600">Quantity:</span> <span className="font-medium text-gray-800">{quantity}</span></p>
               <p className="flex justify-between"><span className="text-gray-600">Price:</span> <span className="font-medium text-green-600">₹{price.toFixed(2)}</span></p>
             </div>
