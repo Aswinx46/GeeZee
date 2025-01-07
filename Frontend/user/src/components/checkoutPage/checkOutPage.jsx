@@ -17,7 +17,7 @@ const CheckoutPage = () => {
   const [cartItems, setCartItems] = useState([])
   const [mainAddress, setMainAddress] = useState({})
   const user = useSelector(state => state.user.user)
-  const userId = user._id
+  const userId = user?._id
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [couponCode, setCouponCode] = useState('');
   const [couponApplied, setCouponApplied] = useState(false);

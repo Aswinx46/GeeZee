@@ -51,7 +51,7 @@ const OrderCancellationModal = ({ isOpen, onClose, onConfirm, paymentMethod, ord
 
     if (isCancel) {
 
-      const response = await axios.patch(`/cancelOrder/${orderId}/${user._id}`, { reason: cancellationReason, paymentMethod })
+      const response = await axios.patch(`/cancelOrder/${orderId}/${user?._id}`, { reason: cancellationReason, paymentMethod })
 
     } else {
 

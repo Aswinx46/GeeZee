@@ -18,11 +18,11 @@ const AddressForm = () => {
 
   useEffect(() => {
     const fetchAddress = async () => {
-      const addressList = await axios.get(`/showAddress/${user._id}`)
+      const addressList = await axios.get(`/showAddress/${user?._id}`)
       setAddresses(addressList.data.address)
       const defaultAddressTrue = addressList.data.address.find((address) => address.defaultAddress == true)
       setDefaultAddress(defaultAddressTrue)
-      setUserId(user._id)
+      setUserId(user?._id)
     }
     fetchAddress()
   }, [update, isOpen])

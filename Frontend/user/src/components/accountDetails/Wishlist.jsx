@@ -11,13 +11,13 @@ const Wishlist = () => {
   const user = useSelector(state => state.user.user)
   const [wishlist, setWishlist] = useState([])
   const [update, setUpdate] = useState(false)
-  const userId = user._id
+  const userId = user?._id
   const navigate = useNavigate()
   useEffect(() => {
 
     const fetchData = async () => {
       try {
-        const response = await axios.get(`/getWishlist/${user._id}`)
+        const response = await axios.get(`/getWishlist/${user?._id}`)
         const neededDetails = response.data.wishilst.product.map((product) => {
           return { ...product, variants: product.productId.variants[0] }
         })

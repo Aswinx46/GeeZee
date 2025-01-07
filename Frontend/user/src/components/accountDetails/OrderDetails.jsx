@@ -13,7 +13,7 @@ import { PDFDownloadLink } from '@react-pdf/renderer';
 
 const OrderDetailsModal = ({ isOpen, onClose, item, setIsOpen, orderDetails }) => {
   const user = useSelector(state => state.user.user)
-  const userId = user._id
+  const userId = user?._id
   const [orderCancelPop, setOrderCancelPop] = useState(false)
   const [cancel, setCancel] = useState(false)
   const [isReturn, setIsReturn] = useState(false)

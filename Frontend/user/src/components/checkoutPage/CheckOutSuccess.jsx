@@ -16,7 +16,7 @@ export default function OrderSuccess() {
   const [allOrderItems, setAllOrderItems] = useState([])
   const [lastOrder, setLastOrder] = useState({})
   const user = useSelector(state => state.user.user)
-  const userId = user._id
+  const userId = user?._id
 
   useEffect(() => {
     const fetchData = async () => {

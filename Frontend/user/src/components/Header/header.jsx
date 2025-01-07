@@ -28,7 +28,7 @@ const Header = (props) => {
   const CartCount = useSelector(state => state.cartCounter.count)
 
   
-  const userLoggedIn = userData._id? true:false;
+  const userLoggedIn = userData?._id? true:false;
 
 
 
@@ -80,8 +80,8 @@ const Header = (props) => {
 
   const handleLogout = async () => {
     navigate('/', { replace: true });
-    // localStorage.removeItem('id');
-    // localStorage.removeItem('user');
+    localStorage.removeItem('id');
+    localStorage.removeItem('user');
     setIsLogin(false);
     dispatch(removeUser())
     dispatch(removeToken())

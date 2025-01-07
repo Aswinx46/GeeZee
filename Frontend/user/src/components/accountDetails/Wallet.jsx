@@ -17,7 +17,7 @@ const Wallet = () => {
   const [totalAmount, setTotalAmount] = useState(0)
   useEffect(() => {
     const fetchData = async () => {
-      const walletDetails = await axios.get(`/getWalletDetails/${user._id}`)
+      const walletDetails = await axios.get(`/getWalletDetails/${user?._id}`)
       setWallet(walletDetails.data.wallet)
       const totalAmount = walletDetails.data.wallet.transactions.reduce((acc, transaction) => acc + transaction.amount, 0)
       setTotalAmount(totalAmount)

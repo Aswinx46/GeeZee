@@ -75,7 +75,7 @@ const ChangePassword = () => {
     }
     try {
 
-      const changePassword = await axios.patch(`/changePassword/${user._id}`, { formData })
+      const changePassword = await axios.patch(`/changePassword/${user?._id}`, { formData })
       setFormData({
         oldPassword: '',
         newPassword: '',

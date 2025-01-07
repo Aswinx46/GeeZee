@@ -25,7 +25,7 @@ const AccountDetails = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const updateInformation = await axios.put(`/changeUserInfo/${user._id}`, { formData })
+      const updateInformation = await axios.put(`/changeUserInfo/${user?._id}`, { formData })
       toast.success(updateInformation.data.message)
     } catch (error) {
       toast.error(error.response.data.message)
@@ -97,7 +97,7 @@ const AccountDetails = () => {
           </motion.button>
         </form>
       </motion.div>
-      {isOpen && <changeEmailVerification isOpen={isOpen} setIsOpen={setIsOpen} formData={formData} userId={user._id} />}
+      {isOpen && <changeEmailVerification isOpen={isOpen} setIsOpen={setIsOpen} formData={formData} userId={user?._id} />}
     </div>
   );
 };
