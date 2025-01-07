@@ -55,7 +55,7 @@ function App() {
         <Route path="/cart" element={<ProtectedRoute> <Cart /> </ProtectedRoute> }></Route>
         <Route path="/productDetails/cart" element={<ProtectedRoute>  <Cart /> </ProtectedRoute>}></Route>
         <Route path="/ProductVariants" element={<ProductVariants />}></Route>
-        <Route path="/sidebar" element={<ProtectedRoute> <Sidebar /> </ProtectedRoute> }></Route>
+        <Route path="/sidebar" element={ <Sidebar />  }></Route>
         <Route path="/address" element={<ProtectedRoute>  <AddressForm /> </ProtectedRoute>}></Route>
         <Route path="/home/wishlist" element={<ProtectedRoute>  <Wishlist /> </ProtectedRoute>}></Route>
         <Route path="/changePassword" element={<ProtectedRoute> <ChangePassword /></ProtectedRoute>}></Route>
