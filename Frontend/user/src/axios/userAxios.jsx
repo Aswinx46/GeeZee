@@ -14,6 +14,7 @@ instance.interceptors.request.use(
     const token = store.getState().token.token
     
     const user = store.getState().user?.user
+    console.log('this is',token)
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`
     }
