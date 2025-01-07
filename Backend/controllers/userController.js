@@ -198,7 +198,7 @@ const login = async (req, res) => {
 const refreshToken = async (req, res) => {
     const refreshToken = req.cookies.refreshToken
 
-    if (!refreshToken) return res.status(401).json({ message: "no refresh token available" })
+    if (!refreshToken) return res.status(400).json({ message: "no refresh token available" })
 
     try {
         const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET_KEY)
