@@ -17,6 +17,7 @@ const BestSeller = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(5)
+  const[filteredProductChange,setFilteredProductChange]=useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,7 +37,7 @@ const BestSeller = () => {
       setProducts(neededItems)
     }
     fetchData()
-  }, [currentPage,products])
+  }, [currentPage,products,filteredProductChange])
   const navigate = useNavigate()
   const handleItem = (item) => {
   
@@ -287,7 +288,7 @@ const BestSeller = () => {
           
         )}
           <Pagination onPageChange={onPageChange} currentPage={currentPage} totalPages={totalPage}/>
-        {isOpen && <Filter isOpen={isOpen} setIsOpen={setIsOpen} {...{ setProducts }} />}
+        {isOpen && <Filter isOpen={isOpen} setIsOpen={setIsOpen} {...{ setProducts }} setFilteredProductChange={setFilteredProductChange} filteredProductChange={filteredProductChange} />}
       </AnimatePresence>
     </div>
   );

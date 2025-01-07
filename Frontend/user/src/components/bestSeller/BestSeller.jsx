@@ -10,7 +10,7 @@ import { toast } from 'react-toastify';
 import Pagination from '@/extraAddonComponents/Pagination';
 const ProductCard = ({ product, selectedProduct, setSelectedProduct }) => {
   const [isHovered, setIsHovered] = useState(false);
-
+  
 
 
 

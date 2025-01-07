@@ -7,7 +7,7 @@ import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import axios from '../../axios/userAxios'
-const FilterModal = ({ isOpen, setIsOpen, setProducts }) => {
+const FilterModal = ({ isOpen, setIsOpen, setProducts,setFilteredProductChange,filteredProductChange }) => {
   //   const [isOpen, setIsOpen] = useState(false);
   const [priceRange, setPriceRange] = useState([0, 1000000]);
   const [brands, setBrands] = useState([])
@@ -74,6 +74,7 @@ const FilterModal = ({ isOpen, setIsOpen, setProducts }) => {
       },
     });
     setProducts(response.data)
+    setFilteredProductChange(!filteredProductChange)
 
   }
 
