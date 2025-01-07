@@ -148,7 +148,7 @@ const AddressModal = ({ isOpen, onClose, onSave ,setIsOpen,userId}) => {
                   />
                         <span className="text-red-500 text-sm">{errors[field.name] && errors[field.name]}</span>
                 </motion.div>
-              ))}/* eslint-enable */
+              ))}
               <motion.button
                 type="submit"
                 className="w-full bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800 transition-colors"
