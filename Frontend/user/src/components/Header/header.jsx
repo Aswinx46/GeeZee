@@ -178,7 +178,7 @@ const Header = (props) => {
             <motion.div
               whileHover={{ scale: 1.1 }}
             >
-
+              <h2>dat{userData?.user}</h2>
               {userData?.user?.user?._id ? <button
                 onClick={handleLogout}
                 className="flex items-center space-x-1 hover:text-violet-400 transition-colors duration-200"
