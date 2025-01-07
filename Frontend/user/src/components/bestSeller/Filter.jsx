@@ -73,7 +73,19 @@ const FilterModal = ({ isOpen, setIsOpen, setProducts,setFilteredProductChange,f
         maxPrice: priceRange[1],
       },
     });
-    setProducts(response.data)
+    const neededItems = response.data.map((product) => {
+      const variantPrice = product?.variants[0]?.price
+      const categoryOfferPrice = product.categoryId?.categoryOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.categoryId?.categoryOffer?.offerValue / 100 : variantPrice - product.categoryId?.categoryOffer?.offerValue
+      const productOfferPrice = product.productOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.productOffer?.offerValue / 100 : variantPrice - product.productOffer?.offerValue
+      // const offerPrice = categoryOfferPrice > productOfferPrice ? categoryOfferPrice : productOfferPrice
+      const offerPrice =
+        Number.isNaN(categoryOfferPrice) ? productOfferPrice :
+          Number.isNaN(productOfferPrice) ? categoryOfferPrice :
+            Math.max(categoryOfferPrice, productOfferPrice);
+      return { ...product, offerPrice }
+    })
+    setProducts(neededItems)
+  
     setFilteredProductChange(!filteredProductChange)
 
   }

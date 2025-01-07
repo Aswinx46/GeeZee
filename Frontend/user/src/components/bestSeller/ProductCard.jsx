@@ -37,7 +37,7 @@ const BestSeller = () => {
       setProducts(neededItems)
     }
     fetchData()
-  }, [currentPage,products,filteredProductChange])
+  }, [currentPage,products])
   const navigate = useNavigate()
   const handleItem = (item) => {
   
