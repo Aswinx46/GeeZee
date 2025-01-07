@@ -80,8 +80,8 @@ const Header = (props) => {
 
   const handleLogout = async () => {
     navigate('/', { replace: true });
-    localStorage.removeItem('id');
-    localStorage.removeItem('user');
+    // localStorage.removeItem('id');
+    // localStorage.removeItem('user');
     setIsLogin(false);
     dispatch(removeUser())
     dispatch(removeToken())
