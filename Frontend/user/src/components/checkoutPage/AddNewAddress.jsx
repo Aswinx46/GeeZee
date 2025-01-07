@@ -34,6 +34,7 @@ const AddressModal = ({ isOpen, onClose, onSave ,setIsOpen,userId}) => {
   const validation=()=>{
     const error={}
     const alphanumericRegex = /^[a-zA-Z0-9\s]+$/;
+    const onlyLettersRegex = /^[a-zA-Z\s]+$/;
     const numberRegex = /^\d+$/;
 
     if(!address.street.trim()) {
@@ -44,20 +45,20 @@ const AddressModal = ({ isOpen, onClose, onSave ,setIsOpen,userId}) => {
 
     if(!address.city.trim()) {
       error.city = 'City is required';
-    } else if (!alphanumericRegex.test(address.city)) {
-      error.city = 'City should only contain letters and numbers';
+    } else if (!onlyLettersRegex.test(address.city)) {
+      error.city = 'City should only contain letters';
     }
 
     if(!address.state.trim()) {
       error.state = 'State is required';
-    } else if (!alphanumericRegex.test(address.state)) {
-      error.state = 'State should only contain letters and numbers';
+    } else if (!onlyLettersRegex.test(address.state)) {
+      error.state = 'State should only contain letters';
     }
 
     if(!address.country.trim()) {
       error.country = 'Country is required';
-    } else if (!alphanumericRegex.test(address.country)) {
-      error.country = 'Country should only contain letters and numbers';
+    } else if (!onlyLettersRegex.test(address.country)) {
+      error.country = 'Country should only contain letters';
     }
 
     if (!address.pinCode.trim()) {
