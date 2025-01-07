@@ -27,6 +27,10 @@ const Header = (props) => {
   const userData = useSelector(state => state.user.user);
   const CartCount = useSelector(state => state.cartCounter.count)
 
+  const parsedData = JSON.parse(userData);
+
+  const userId = parsedData.user._id;
+
 
 
 
@@ -178,8 +182,8 @@ const Header = (props) => {
             <motion.div
               whileHover={{ scale: 1.1 }}
             >
-              <h2>dat{userData?.user}</h2>
-              {userData?.user?.user?._id ? <button
+              <h2>dat{userId}</h2>
+              {userId? <button
                 onClick={handleLogout}
                 className="flex items-center space-x-1 hover:text-violet-400 transition-colors duration-200"
               >
