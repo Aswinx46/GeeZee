@@ -389,7 +389,9 @@ const filterProducts = async (req, res) => {
 
         const { sortBy, brands, categories, minPrice, maxPrice } = req.query
 
-        const filter = {};
+        const filter = {
+            status: "active" 
+        };
 
 
 
