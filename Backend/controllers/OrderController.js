@@ -380,6 +380,7 @@ const returnOrderProduct = async (req, res) => {
         const { returnReason } = req.body
 
 
+
         const selectedOrder = await Order.findById(orderId)
         const selectedVariant = selectedOrder.orderItems.find((item) => item._id.toString() == orderItemId.toString())
 
@@ -425,6 +426,7 @@ const confirmReturnProduct = async (req, res) => {
             { $set: { 'orderItems.$.variant.returnOrder': 'Accepted' } },
             { new: true }
         );
+        const selectedProductForReturn=await Product.findOne()
 
         if (!update) return res.status(400).json({ message: "no order found" })
         const returnedVariant = update.orderItems.find((item) => item.variant.returnOrder == 'Accepted')
@@ -441,6 +443,7 @@ const confirmReturnProduct = async (req, res) => {
             ],
         }
         )
+        console.log('this is returnedVariant',returnedVariant)
         if (!selectedProduct) {
             return res.status(400).json({ message: "Failed to update variant stock" });
         }
@@ -463,7 +466,7 @@ const confirmReturnProduct = async (req, res) => {
 
         const transaction = {
             type: 'Refund',
-            transaction_id: uuidv4(), // Generate a unique transaction ID
+            transaction_id: uuidv4(), // Generate a unique transaction ID 
             amount: update.finalAmount - (update.shippingCost),
             description: 'Product Returned amount',
             date: new Date(), // Add a timestamp for the transaction

@@ -493,7 +493,7 @@ const filterProducts = async (req, res) => {
 
 
 
-            const sortedProducts = await Product.find(filter).sort(sortOptions).populate('categoryId').populate('productOffer')
+            const sortedProducts = await Product.find(filter).populate('categoryId').populate('productOffer').sort(sortOptions)
 
             return res.status(200).json(sortedProducts);
 
