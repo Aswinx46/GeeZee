@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import axios from '../axios/userAxios'
 import { Textarea } from "@/components/ui/textarea"
 import { useSelector } from 'react-redux';
-const OrderCancellationModal = ({ isOpen, onClose, onConfirm, paymentMethod, orderId, isReturn, orderItemId, isCancel, setIsOpen }) => {
+const OrderCancellationModal = ({ isOpen, onClose, onConfirm, paymentMethod, orderId, isReturn, orderItemId, isCancel, setIsOpen,productPrice }) => {
   const [isCancelled, setIsCancelled] = useState(false);
   const [cancellationReason, setCancellationReason] = useState('');
   const [returnReason, setReturnReason] = useState('')
@@ -55,7 +55,7 @@ const OrderCancellationModal = ({ isOpen, onClose, onConfirm, paymentMethod, ord
 
     } else {
 
-      const response = await axios.patch(`returnProduct/${orderId}/${orderItemId}`, { returnReason })
+      const response = await axios.patch(`returnProduct/${orderId}/${orderItemId}`, { returnReason,productPrice })
 
     }
     setIsCancelled(true);

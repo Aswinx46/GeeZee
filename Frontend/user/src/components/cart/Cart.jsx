@@ -124,6 +124,9 @@ const dispatch=useDispatch()
     setUpdate(!update)
 
   }
+  const handleContinueShopping=()=>{
+    navigate(-1)
+  }
 
   return (
     <>
@@ -266,6 +269,7 @@ const dispatch=useDispatch()
                     variant="outline"
                     className="w-full text-black border-zinc-700"
                     size="lg"
+                    onClick={handleContinueShopping}
                   >
                     Continue Shopping
                   </Button>
