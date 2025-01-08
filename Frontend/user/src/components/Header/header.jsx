@@ -37,7 +37,7 @@ const Header = (props) => {
   const dispatch = useDispatch()
 
   const handleCartClick = (e) => {
-    if (!userData) {
+    if (!userLoggedIn) {
       e.preventDefault();
       navigate('/login');
       return;
@@ -139,7 +139,7 @@ const Header = (props) => {
                 onClick: () => setShowSearch(true)
               },
               { name: 'Cart', icon: FaShoppingCart, path: '/cart' },
-              ...(userData ? [{ name: 'Account', icon: FaUser, path: '/sidebar' }] : [])
+              ...(userLoggedIn ? [{ name: 'Account', icon: FaUser, path: '/sidebar' }] : [])
             ].map((item, index) => (
               <motion.div
 
@@ -182,7 +182,7 @@ const Header = (props) => {
             <motion.div
               whileHover={{ scale: 1.1 }}
             >
-              {token? <button
+              {userLoggedIn? <button
                 onClick={handleLogout}
                 className="flex items-center space-x-1 hover:text-violet-400 transition-colors duration-200"
               >
