@@ -192,6 +192,7 @@ const CheckoutPage = () => {
     setCouponApplied(true)
     const appliedCoupon = coupons.find((coupon) => coupon.name == couponCode)
     if (!appliedCoupon)
+      console.log("")
       if (total < appliedCoupon.minimumPrice) {
         toast.error(`minimum total amount is ${appliedCoupon.minimumPrice}`)
         return
