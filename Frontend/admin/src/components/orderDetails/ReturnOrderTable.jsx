@@ -174,7 +174,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
             //     window.location.reload();
             // }
             toast.success(response.data.message)
-            window.location.reload();
+            // window.location.reload();
         } catch (error) {
             console.log('Error confirming return:', error);
             toast.error(error.response.data.message)
