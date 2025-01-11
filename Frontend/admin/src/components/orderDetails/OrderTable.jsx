@@ -40,6 +40,7 @@ const OrderTable = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        console.log("this is the current page")
         const response = await axios.get(`/showOrders/${currentPage}`)
         setAllOrderItems(response.data.orders)
         const neededDetails = response.data.orders.map((order) => {

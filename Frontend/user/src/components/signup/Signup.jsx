@@ -9,6 +9,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
 import { useDispatch } from 'react-redux';
 import { addValidation } from '@/redux/slices/OtpCheck';
+import OtpVerificationModal from '../otpVerification/otpVerification';
 export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const dispatch=useDispatch()
@@ -22,6 +23,7 @@ export default function SignupPage() {
   });
   const [error, setError] = useState({});
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const[isOpen,setIsOpen]=useState(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
   const navigate = useNavigate();
 
@@ -37,9 +39,10 @@ export default function SignupPage() {
       if (validation()) {
         const response = await axios.post('/signup', user);
       
-        toast.success('DATA SUBMITTED');
+        toast.success('Otp Sended');
         dispatch(addValidation('otp validation done'))
-        navigate('/otpVerification');
+        setIsOpen(true)
+        
       }
     } catch (error) {
       console.log(error)
@@ -269,7 +272,7 @@ export default function SignupPage() {
     </div>
       <span className='text-gray-400 flex justify-center' >Already have a account ? <Link className='text-green-400' to='/login'> CLICK HERE </Link> </span>
       </div>
-    
+    {isOpen && <OtpVerificationModal isOpen={isOpen} user={user} setIsOpen={setIsOpen}/>}
     </div>
     
   )

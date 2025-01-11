@@ -4,7 +4,10 @@ const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
 const mongoose = require('mongoose')
 require('dotenv').config()
+const NodeCache=require('node-cache')
 const Wallet = require('../models/WalletSchema.js')
+const otpCache = new NodeCache({ stdTTL: 300, checkperiod: 60 }); // TTL in seconds
+
 
 function genarateOtp() {
     return Math.floor(100000 + Math.random() * 900000).toString()
@@ -38,25 +41,28 @@ async function sendVerificationMail(email, otp) {
 }
 
 const signup = async (req, res) => {
+    
     const { firstname, lastname, email, phoneNumber, password } = req.body
-    req.session.user = { firstname, lastname, email, phoneNumber, password }
-    req.session.email = email
+   
     try {
+        const ogOtp = genarateOtp()
+        const emailSent = await sendVerificationMail(email, ogOtp)
+        // otpCache.set(email, ogOtp);
+        otpCache.set(email, ogOtp, (err, success) => {
+            if (err) {
+                console.log('Error setting OTP in cache', err);
+            } else {
+                console.log('OTP successfully set in cache for', email);
+            }
+        });
+        if (!emailSent) {
+            return res.json({ "message": "invalid-email" })
+        } 
         const exisitingUSer = await User.findOne({ email })
         if (exisitingUSer) {
             return res.status(400).json({ message: "the user is already exist" })
         }
-
-        const ogOtp = genarateOtp()
-        const emailSent = await sendVerificationMail(email, ogOtp)
-        req.session.otp = ogOtp
-
-
-        if (!emailSent) {
-            return res.json({ "message": "invalid-email" })
-        } else {
-            return res.status(200).json({ message: "otp sent" })
-        }
+        return res.status(200).json({message:'forwarded to the otp verification page'})
 
     } catch (error) {
         console.log('error in sending the email ', error)
@@ -75,16 +81,21 @@ const securePassword = async (password) => {
 }
 
 const otpVerification = async (req, res) => {
-    const { otp } = req.body
+    const { otp ,user} = req.body
+   
 
-    const { firstname, lastname, email, phoneNumber, password } = req.session.user
+    const { firstname, lastname, email, phoneNumber, password } = user
     const sPassword = await securePassword(password)
 
+
     try {
-        if (!req.session.otp || req.session.otp !== otp) {
+      
+        const cachedOtp = otpCache.get(email);
+       
+        if (!cachedOtp || cachedOtp !== otp) {
             return res.status(400).json({ message: "Invalid OTP" });
         }
-        if (otp == req.session.otp) {
+        if (otp == cachedOtp) {
             const user = new User({
                 firstName: firstname,
                 lastName: lastname,
@@ -111,17 +122,24 @@ const otpVerification = async (req, res) => {
 }
 
 const resendOtp = async (req, res) => {
-    const email = req.session.email
+    const {email} = req.body
 
     try {
         const ogOtp = await genarateOtp()
+        otpCache.set(email, ogOtp, (err, success) => {
+            if (err) {
+                console.log('Error setting OTP in cache', err);
+            } else {
+                console.log('OTP successfully set in cache for', email);
+            }
+        });
         const emailVerification = await sendVerificationMail(email, ogOtp)
         if (emailVerification) {
             req.session.otp = ogOtp
 
-            res.status(200).json({ message: "the resend otp done" })
+            return res.status(200).json({ message: "the resend otp done" })
         } else {
-            res.status(400).json({ message: "invalid mail in resend otp" })
+            return res.status(400).json({ message: "invalid mail in resend otp" })
         }
 
     } catch (error) {
