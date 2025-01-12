@@ -80,6 +80,8 @@ const showProduct = async (req, res) => {
         const limit = 5
         const skip = (page - 1) * limit
         const products = await Product.find().populate('categoryId').populate('productOffer').limit(limit).skip(skip)
+       
+
         return res.status(200).json({ message: 'products fetched', products })
     } catch (error) {
         console.log('error while fetching the products', error)
@@ -93,7 +95,22 @@ const showProduct = async (req, res) => {
 const showProductInHotDeals = async (req, res) => {
 
     try {
-        const products = await Product.find({status:'active'}).populate('categoryId').populate('productOffer')
+        // const products = await Product.find({ status: 'active' }).populate('categoryId').populate('productOffer')
+        const products = await Product.find({status:'active'})
+        .populate({
+            path: 'categoryId',
+            match: { status: 'active' }, // Filter categoryId where isListed is true
+            populate: {
+                path: 'categoryOffer',
+                match:{isListed:true} // Populate the categoryOffer inside categoryId
+            },
+        })
+        .populate({
+            path:'productOffer',
+            match:{isListed:true}
+        })// Populate productOffer directly
+        
+        console.log(products)
         return res.status(200).json({ message: 'products fetched', products })
     } catch (error) {
         console.log('error while fetching the products', error)
@@ -390,7 +407,7 @@ const filterProducts = async (req, res) => {
         const { sortBy, brands, categories, minPrice, maxPrice } = req.query
 
         const filter = {
-            status: "active" 
+            status: "active"
         };
 
 

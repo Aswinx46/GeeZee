@@ -26,7 +26,7 @@ const ProductPage = () => {
         const fetchDetails = async () => {
             try {
                 const productsResponse = await axios.get('/products')
-              
+            //   console.log(productsResponse.data.products)
           
                 const neededItems = productsResponse.data.products.map((product) => {
                     const variantPrice = product?.variants[0]?.price
@@ -35,11 +35,13 @@ const ProductPage = () => {
                     const offerPrice =
                       Number.isNaN(categoryOfferPrice) ? productOfferPrice :
                         Number.isNaN(productOfferPrice) ? categoryOfferPrice :
-                          Math.max(categoryOfferPrice, productOfferPrice);
+                          Math.min(categoryOfferPrice, productOfferPrice);
+                          console.log(categoryOfferPrice, productOfferPrice)
                     return { ...product, offerPrice }
                   })
               
                 setProducts(neededItems)
+                console.log(neededItems)
                 const categoryResponse = await axios.get('/category')
                 setCategory(categoryResponse.data.category)
             } catch (error) {

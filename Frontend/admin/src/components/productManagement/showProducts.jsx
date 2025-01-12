@@ -129,7 +129,7 @@ const ProductList = () => {
                 </td>
                 <td className="py-4 px-6">
                   <span className="px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800">
-                    {product.categoryId.categoryName}
+                    {product.categoryId?.categoryName}
                   </span>
                 </td>
                 <td className="py-4 px-6">
