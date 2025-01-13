@@ -52,7 +52,19 @@ const DynamicCarousel = (props) => {
         }
 
         const response = await axios.get(`/relatedProducts/${id}`);
-        setItems(response.data.relatedProducts);
+      
+        const neededItems = response.data.relatedProducts.map((product) => {
+          const variantPrice = product?.variants[0]?.price
+          const categoryOfferPrice = product.categoryId?.categoryOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.categoryId?.categoryOffer?.offerValue / 100 : variantPrice - product.categoryId?.categoryOffer?.offerValue
+          const productOfferPrice = product.productOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.productOffer?.offerValue / 100 : variantPrice - product.productOffer?.offerValue
+          const offerPrice =
+              Number.isNaN(categoryOfferPrice) ? productOfferPrice :
+                  Number.isNaN(productOfferPrice) ? categoryOfferPrice :
+                      Math.min(categoryOfferPrice, productOfferPrice);
+          
+          return { ...product, offerPrice }
+      })
+        setItems(neededItems);
         setLoading(false);
       } catch (err) {
         setError(`Failed to fetch related products: ${err.message}`);
@@ -142,7 +154,8 @@ const DynamicCarousel = (props) => {
                         </Badge>
                         <h3 className="text-2xl font-bold mb-2 text-white">{items[imageIndex].title}</h3>
                         <p className="text-gray-400 mb-4">{items[imageIndex].description.slice(0, 100)}...</p>
-                        <p className="text-xl font-bold mb-4 text-white">₹{items[imageIndex].price}</p>
+                      
+                        {items[imageIndex].offerPrice ? <> <p className="text-lg font-bold text-[#8b5cf6] mb-2">₹{items[imageIndex].offerPrice}</p> <del className='text-red-600'> ₹{items[imageIndex].variants[0].price} </del> </> : <p className="text-lg font-bold text-[#8b5cf6] mb-2">₹{items[imageIndex].variants[0].price}</p>}
                       </div>
                       <div className="flex justify-between items-center">
                         <p className="text-sm text-gray-400">SKU: {items[imageIndex].sku}</p>

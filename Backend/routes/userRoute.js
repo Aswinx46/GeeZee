@@ -27,7 +27,7 @@ user_route.post('/resendOtpInResetPassword',userController.forgetPassword)
 user_route.post('/forgotPasswordResetting',userController.forgotPasswordResetting)
 
 user_route.get('/products/:pageNumber', productController.showProductListed)
-user_route.get('/products/:id', productController.showParticularProduct)
+user_route.get('/particularProduct/:id', productController.showParticularProduct)
 user_route.get('/products', productController.showProductInHotDeals)
 user_route.get('/relatedProducts/:id', productController.showRelatedProducts)
 user_route.get('/showProductVariantQuantity/:id', productController.showProductVariantQuantity)

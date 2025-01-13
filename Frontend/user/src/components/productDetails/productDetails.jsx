@@ -61,6 +61,7 @@ const ProductDetails = () => {
 
         const productOffer = single.productOffer
         const categoryOffer = single.categoryId?.categoryOffer
+      
         const newVariants = single.variants.map((variant) => {
           const categoryOfferPrice = categoryOffer?.offerType == 'percentage' ? variant.price - (variant.price * (categoryOffer?.offerValue || 0) / 100) : variant.price - (categoryOffer?.offerValue || 0)
           const productOfferPrice = productOffer?.offerType == 'percentage' ? variant.price - (variant.price * (productOffer?.offerValue || 0) / 100) : variant.price - (productOffer?.offerValue || 0)
@@ -85,13 +86,34 @@ const ProductDetails = () => {
         setProduct({ ...single, variants: newVariants });
 
       } else {
-        const productsResponse = await axios.get(`/products/${id}`)
         
-        setProducts(productsResponse.data.products)
-        const allProducts = productsResponse.data.products
-        const selectedProduct = allProducts.find((item) => item._id == id)
+        const productsResponse = await axios.get(`/particularProduct/${id}`)
+       
+        const single=productsResponse.data.products
+        const productOffer = single.productOffer
+        const categoryOffer = single.categoryId?.categoryOffer
+        const newVariants = single.variants.map((variant) => {
+          const categoryOfferPrice = categoryOffer?.offerType == 'percentage' ? variant.price - (variant.price * (categoryOffer?.offerValue || 0) / 100) : variant.price - (categoryOffer?.offerValue || 0)
+          const productOfferPrice = productOffer?.offerType == 'percentage' ? variant.price - (variant.price * (productOffer?.offerValue || 0) / 100) : variant.price - (productOffer?.offerValue || 0)
+          let offerPrice
+          if (categoryOffer?.offerType && productOffer?.offerType) {
+
+            offerPrice =
+
+              Math.min(categoryOfferPrice, productOfferPrice);
+          } else if (categoryOffer?.offerType && !productOffer?.offerType) {
+            offerPrice = categoryOfferPrice
+          } else if (!categoryOffer?.offerType && productOffer?.offerType) {
+            offerPrice = productOfferPrice
+          }
+
+
+          return { ...variant, offerPrice: offerPrice }
+        })
+
         
-        setProduct(productsResponse.data.products)
+        setProduct({ ...single, variants: newVariants });
+     
       }
     }
     fetchProduct()

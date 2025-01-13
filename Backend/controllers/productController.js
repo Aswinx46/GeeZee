@@ -99,18 +99,18 @@ const showProductInHotDeals = async (req, res) => {
         const products = await Product.find({status:'active'})
         .populate({
             path: 'categoryId',
-            match: { status: 'active' }, // Filter categoryId where isListed is true
+            match: { status: 'active' },
             populate: {
                 path: 'categoryOffer',
-                match:{isListed:true} // Populate the categoryOffer inside categoryId
+                match:{isListed:true}
             },
         })
         .populate({
             path:'productOffer',
             match:{isListed:true}
-        })// Populate productOffer directly
+        })
         
-        console.log(products)
+        
         return res.status(200).json({ message: 'products fetched', products })
     } catch (error) {
         console.log('error while fetching the products', error)
@@ -127,8 +127,24 @@ const showParticularProduct = async (req, res) => {
     try {
 
         const { id } = req.params
+       
+        // const products = await Product.findById(id, { status: 'active' }).populate('categoryId').populate('productOffer')
+        const products = await Product.findOne({ _id: id, status: 'active' }) // Ensure the product itself has 'active' status
+        .populate({
+          path: 'categoryId',
+          match: { status: 'active' }, // Filter only active categories
+          populate: {
+            path: 'categoryOffer',
+            match: { isListed: true }, // Filter listed category offers
+          },
+        })
+        .populate({
+          path: 'productOffer',
+          match: { isListed: true }, // Filter listed product offers
+        });
+        console.log(products)
 
-        const products = await Product.findById(id, { status: 'active' }).populate('categoryId').populate('productOffer')
+        if(!products) return res.status(400).json({message:"no product found"})
 
         return res.status(200).json({ message: 'products fetched', products })
 
@@ -374,15 +390,43 @@ const showRelatedProducts = async (req, res) => {
 
     const { id } = req.params
 
-
+    
 
 
     try {
 
-        const relatedProducts = await Product.find({ status: 'active', categoryId: id }).limit(4)
+        // const relatedProducts = await Product.find({ status: 'active', categoryId: id }).limit(4)
+        const relatedProducts = await Product.find({status:'active',categoryId: id})
+        .populate({
+            path: 'categoryId',
+            match: { status: 'active' },
+            populate: {
+                path: 'categoryOffer',
+                match:{isListed:true}
+            },
+        })
+        .populate({
+            path:'productOffer',
+            match:{isListed:true}
+        }).limit(4)
+        
 
-        const notRelatedProducts = await Product.find({ status: "active" }).limit(4)
-
+        // const notRelatedProducts = await Product.find({ status: "active" }).limit(4)
+        
+        const notRelatedProducts = await Product.find({status:'active'})
+        .populate({
+            path: 'categoryId',
+            match: { status: 'active' },
+            populate: {
+                path: 'categoryOffer',
+                match:{isListed:true}
+            },
+        })
+        .populate({
+            path:'productOffer',
+            match:{isListed:true}
+        }).limit(4)
+        
         if (!relatedProducts) return res.status(200).json({ message: "related products is empty so random products", notRelatedProducts })
 
         return res.status(200).json({ message: "related products fetched", relatedProducts })
