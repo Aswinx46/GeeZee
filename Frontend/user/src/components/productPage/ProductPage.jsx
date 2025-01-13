@@ -182,7 +182,7 @@ const ProductPage = () => {
                                         <div className="p-3">
                                             <h3 className="text-sm font-semibold mb-2 line-clamp-2 text-white">{product.title}</h3>
 
-                                            {product.offerPrice ? <> <p className="text-lg font-bold text-[#8b5cf6] mb-2">₹{product.offerPrice}</p> <del className='text-red-600'> ₹{product.variants[0].price} </del> </> : <p className="text-lg font-bold text-[#8b5cf6] mb-2">₹{product.variants[0].price}</p>}
+                                            {product.offerPrice ? <div className='flex gap-36'> <p className="text-lg font-bold text-[#8b5cf6] mb-2">₹{product.offerPrice}</p> <del className='text-red-600'> ₹{product.variants[0].price} </del> </div> : <p className="text-lg font-bold text-[#8b5cf6] mb-2">₹{product.variants[0].price}</p>}
                                             <button onClick={() => handleDeal(index)} className="w-full bg-[#8b5cf6] text-white px-3 py-1.5 rounded-full hover:bg-[#7c3aed] transition-all text-sm font-semibold">
                                                 View Deal
                                             </button>
