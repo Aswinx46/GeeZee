@@ -98,6 +98,7 @@ const StaticCategoryManagement = () => {
         // setCategories(editName.data.changeName)
       } catch (error) {
         console.log('error in editing the category', error.message)
+        toast.error(error.response.data.message)
       }
     }
 

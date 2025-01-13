@@ -195,7 +195,7 @@ const CouponCreationForm = () => {
                 <SelectValue placeholder="Select coupon type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="percentage">Percentage</SelectItem>
+                {/* <SelectItem value="percentage">Percentage</SelectItem> */}
                 <SelectItem value="fixed">Fixed Amount</SelectItem>
               </SelectContent>
             </Select>

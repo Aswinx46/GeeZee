@@ -4,8 +4,12 @@ const Brand = require('../models/brandSchema')
 const addBrand = async (req, res) => {
     const { status, newBrand, imageUrl } = req.body
     try {
-        const isExist = await Brand.findOne({ name: newBrand })
+        const allBrand=await Brand.find()
+        const isExist=allBrand.find((brand)=>brand.name.toLowerCase() == newBrand.toLowerCase())
+        // const isExist = await Brand.findOne({ name: newBrand })
         if (isExist) return res.status(400).json({ message: "the brand is already exist" })
+
+
 
         const brand = new Brand({
             name: newBrand,
@@ -25,7 +29,7 @@ const showBrand = async (req, res) => {
     try {
         const brands = await Brand.find()
         if (!brands) return res.status(400).json({ message: 'no brand available' })
-
+            
         return res.status(200).json({ messaage: "brands fetched", brands })
 
     } catch (error) {
@@ -39,8 +43,11 @@ const changeBrandName = async (req, res) => {
     const { brandId } = req.params
     const { brandName } = req.body
     try {
+        const allBrand=await Brand.find()
+        const isExist=allBrand.find((brand)=>brand.name.toLowerCase() == brandName.toLowerCase())
+        if(isExist) return res.status(400).json({message:"This brand is already exist"})
         const ChangedBrand = await Brand.findByIdAndUpdate(brandId, { name: brandName })
-        if (!changeBrandName) return res.status(400).json({ message: " no brand found" })
+        if (!ChangedBrand) return res.status(400).json({ message: " no brand found" })
         return res.status(200).json({ message: "brand name changed" })
     } catch (error) {
         console.log('error while updating brand', error)
