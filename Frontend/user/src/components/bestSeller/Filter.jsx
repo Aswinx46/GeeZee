@@ -81,7 +81,7 @@ const FilterModal = ({ isOpen, setIsOpen, setProducts,setFilteredProductChange,f
       const offerPrice =
         Number.isNaN(categoryOfferPrice) ? productOfferPrice :
           Number.isNaN(productOfferPrice) ? categoryOfferPrice :
-            Math.max(categoryOfferPrice, productOfferPrice);
+            Math.min(categoryOfferPrice, productOfferPrice);
       return { ...product, offerPrice }
     })
     setProducts(neededItems)

@@ -10,36 +10,36 @@ const ProductPage = () => {
     const [category, setCategory] = useState([])
     const [currentIndex, setCurrentIndex] = useState(0)
     const carouselRef = useRef(null);
-    const [url,setUrl]=useState()
+    const [url, setUrl] = useState()
     const navigate = useNavigate()
-    useEffect(()=>{
-       
-        const fetchdata=async () => {
-            const response=await axios.get('/showBanner/productPage')
+    useEffect(() => {
+
+        const fetchdata = async () => {
+            const response = await axios.get('/showBanner/productPage')
             setUrl(response.data.allBanners.bannerUrl)
-           
-          }
-          fetchdata()
-        
-    },[])
+
+        }
+        fetchdata()
+
+    }, [])
     useEffect(() => {
         const fetchDetails = async () => {
             try {
                 const productsResponse = await axios.get('/products')
-            //   console.log(productsResponse.data.products)
-          
+
                 const neededItems = productsResponse.data.products.map((product) => {
                     const variantPrice = product?.variants[0]?.price
                     const categoryOfferPrice = product.categoryId?.categoryOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.categoryId?.categoryOffer?.offerValue / 100 : variantPrice - product.categoryId?.categoryOffer?.offerValue
                     const productOfferPrice = product.productOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.productOffer?.offerValue / 100 : variantPrice - product.productOffer?.offerValue
                     const offerPrice =
-                      Number.isNaN(categoryOfferPrice) ? productOfferPrice :
-                        Number.isNaN(productOfferPrice) ? categoryOfferPrice :
-                          Math.min(categoryOfferPrice, productOfferPrice);
-                          console.log(categoryOfferPrice, productOfferPrice)
+                        Number.isNaN(categoryOfferPrice) ? productOfferPrice :
+                            Number.isNaN(productOfferPrice) ? categoryOfferPrice :
+                                Math.min(categoryOfferPrice, productOfferPrice);
+                    console.log(categoryOfferPrice, productOfferPrice)
                     return { ...product, offerPrice }
-                  })
-              
+                })
+
+
                 setProducts(neededItems)
                 console.log(neededItems)
                 const categoryResponse = await axios.get('/category')
@@ -53,7 +53,7 @@ const ProductPage = () => {
 
     const handleDeal = async (index) => {
         const selectedProduct = products.filter((_, i) => i == index)
-        
+
 
         localStorage.setItem("selectedProduct", JSON.stringify(selectedProduct));
         navigate('/productDetails')
@@ -108,7 +108,7 @@ const ProductPage = () => {
                         /> */}
                         <video
                             className="absolute inset-0 w-full h-full object-cover"
-                            src= {url ? url :"/keyboard video.mp4"  } // Replace with your video file path
+                            src={url ? url : "/keyboard video.mp4"} // Replace with your video file path
                             autoPlay
                             loop
                             muted
@@ -181,8 +181,8 @@ const ProductPage = () => {
                                         </div>
                                         <div className="p-3">
                                             <h3 className="text-sm font-semibold mb-2 line-clamp-2 text-white">{product.title}</h3>
-                                            
-                                        {product.offerPrice ? <> <p className="text-lg font-bold text-[#8b5cf6] mb-2">₹{product.offerPrice }</p> <del className='text-red-600'> ₹{product.variants[0].price} </del> </> :  <p className="text-lg font-bold text-[#8b5cf6] mb-2">₹{product.variants[0].price}</p>}    
+
+                                            {product.offerPrice ? <> <p className="text-lg font-bold text-[#8b5cf6] mb-2">₹{product.offerPrice}</p> <del className='text-red-600'> ₹{product.variants[0].price} </del> </> : <p className="text-lg font-bold text-[#8b5cf6] mb-2">₹{product.variants[0].price}</p>}
                                             <button onClick={() => handleDeal(index)} className="w-full bg-[#8b5cf6] text-white px-3 py-1.5 rounded-full hover:bg-[#7c3aed] transition-all text-sm font-semibold">
                                                 View Deal
                                             </button>

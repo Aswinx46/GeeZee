@@ -33,6 +33,8 @@ import BestSellers from './components/bestSeller/ProductCard';
 import OTPVerification from './components/accountDetails/ChangeEmailOtpVerification';
 import UserBlockedNotice from './extraAddonComponents/UserBlockedNotice';
 import NotFoundPage from './extraAddonComponents/NotFoundPage';
+import ForgotPassword from './components/forgetPassword/ForgetPassword';
+import ResetPassword from './components/forgetPassword/ResetPassword';
 function App() {
 
 
@@ -68,6 +70,8 @@ function App() {
         <Route path="/bestSeller" element={<BestSellers />}></Route>
         <Route path="/emailOtpVerification" element={<OTPVerification />}></Route>
         <Route path="/userBlockNotice" element={<UserBlockedNotice />}></Route>
+        <Route path="/forgetPassword" element={<ForgotPassword />}></Route>
+        <Route path="/resetPassword" element={<ResetPassword />}></Route>
         <Route path="*" element={<NotFoundPage />} />
 
 

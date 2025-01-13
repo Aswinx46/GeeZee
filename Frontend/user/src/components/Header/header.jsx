@@ -138,7 +138,8 @@ const Header = (props) => {
                 path: '#',
                 onClick: () => setShowSearch(true)
               },
-              { name: 'Cart', icon: FaShoppingCart, path: '/cart' },
+              // { name: 'Cart', icon: FaShoppingCart, path: '/cart' },
+              ...(userLoggedIn ? [{ name: 'Cart', icon: FaShoppingCart, path: '/cart' }] : []),
               ...(userLoggedIn ? [{ name: 'Account', icon: FaUser, path: '/sidebar' }] : [])
             ].map((item, index) => (
               <motion.div

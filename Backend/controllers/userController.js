@@ -277,6 +277,62 @@ const changeInformation = async (req, res) => {
     }
 }
 
+const forgetPassword=async (req,res) => {
+    try {
+        const {email}=req.body
+        console.log(email)
+        const user=await User.findOne({email})
+        if(!user)return res.status(400).json({message:"No account is matched for this email"})
+            const ogOtp= genarateOtp()
+        const emailSent = await sendVerificationMail(email, ogOtp)
+
+        otpCache.set(email, ogOtp, (err, success) => {
+            if (err) {
+                console.log('Error setting OTP in cache', err);
+            } else {
+                console.log('OTP successfully set in cache for', email);
+            }
+        });
+        
+        return res.status(200).json({message:"success"})
+    
+    } catch (error) {
+        console.log('error while forget password')
+        return res.status(500).json({message:"error while forget password"})
+    }
+}
+
+const resetPasswordOtpVerification=async (req,res) => {
+    try {
+        const {otp,email}=req.body
+        const ogOtp=otpCache.get(email);
+        if(!ogOtp || ogOtp !== otp) return res.status(400).json({message:"invalid otp"})
+            return res.status(200).json({message:"Otp verification success"})
+    } catch (error) {
+        console.log('error while verifying the resend otp in the reset password')
+        return res.status(500).json({message:"error while verifying otp in reset password ",error})
+    }
+}
+
+const forgotPasswordResetting=async(req,res)=>{
+    try {
+        const {email,password,confirmPassword}=req.body
+        const user=await User.findOne({email})
+        const existPass=await bcrypt.compare(password,user.password)
+        if(existPass)return res.status(400).json({message:"Old password cant be set again"})
+            if(password == confirmPassword)
+            {
+
+                const sPassword=await securePassword(password)
+                user.password=sPassword
+                user.save()
+                return res.status(200).json({message:'Password changed'})
+            }
+    } catch (error) {
+        console.log('error while resetting password',error)
+        return res.status(500).json({message:"error while resetting password"})
+    }
+}
 
 module.exports = {
     signup,
@@ -287,6 +343,10 @@ module.exports = {
     refreshToken,
     changePassword,
     changeInformation,
+    forgetPassword,
+    resetPasswordOtpVerification,
+    forgotPasswordResetting
+    
 
 
 }

@@ -37,7 +37,7 @@ useEffect(()=>{
     const offerPrice =
       Number.isNaN(categoryOfferPrice) ? productOfferPrice :
         Number.isNaN(productOfferPrice) ? categoryOfferPrice :
-          Math.max(categoryOfferPrice, productOfferPrice);
+          Math.min(categoryOfferPrice, productOfferPrice);
     return { ...product, offerPrice }
   })
     const count=items.length

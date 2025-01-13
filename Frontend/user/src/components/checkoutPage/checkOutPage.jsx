@@ -57,7 +57,7 @@ const CheckoutPage = () => {
         const offerPrice =
           Number.isNaN(categoryOfferPrice) ? productOfferPrice :
             Number.isNaN(productOfferPrice) ? categoryOfferPrice :
-              Math.max(categoryOfferPrice, productOfferPrice);
+              Math.min(categoryOfferPrice, productOfferPrice);
         return { ...product, offerPrice }
       })
       

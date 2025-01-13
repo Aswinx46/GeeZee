@@ -21,7 +21,10 @@ user_route.post('/login', userController.login)
 user_route.post('/refreshToken', userController.refreshToken)
 user_route.patch('/changePassword/:userId', auth.authToken, userController.changePassword)
 user_route.put('/changeUserInfo/:userId', auth.authToken, userController.changeInformation)
-
+user_route.post('/forgetPassword',userController.forgetPassword)
+user_route.post('/forgotPasswordOtpVerification',userController.resetPasswordOtpVerification)
+user_route.post('/resendOtpInResetPassword',userController.forgetPassword)
+user_route.post('/forgotPasswordResetting',userController.forgotPasswordResetting)
 
 user_route.get('/products/:pageNumber', productController.showProductListed)
 user_route.get('/products/:id', productController.showParticularProduct)
