@@ -84,6 +84,7 @@ const FilterModal = ({ isOpen, setIsOpen, setProducts,setFilteredProductChange,f
             Math.min(categoryOfferPrice, productOfferPrice);
       return { ...product, offerPrice }
     })
+    console.log('this is the needed items',neededItems)
     setProducts(neededItems)
   
     setFilteredProductChange(!filteredProductChange)

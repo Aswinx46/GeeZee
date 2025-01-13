@@ -74,14 +74,14 @@ const ProductCard = ({ product, selectedProduct, setSelectedProduct }) => {
             variants={overlayVariants}
             className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity"
           >
-            <motion.button
+            {/* <motion.button
               variants={buttonVariants}
               whileHover="hover"
               whileTap="tap"
               className="p-3 rounded-full bg-[#39FF14] text-black"
             >
               <ShoppingCart size={20} />
-            </motion.button>
+            </motion.button> */}
             <motion.button
               variants={buttonVariants}
               whileHover="hover"

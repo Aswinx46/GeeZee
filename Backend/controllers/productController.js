@@ -237,7 +237,6 @@ const editProduct = async (req, res) => {
 
         } else {
 
-
             const editedProduct = await Product.findByIdAndUpdate(id, {
 
                 title,
@@ -271,6 +270,7 @@ const editProduct = async (req, res) => {
             return res.status(200).json({ message: "product edited" })
 
         }
+
 
 
 
@@ -366,7 +366,6 @@ const showProductVariantQuantity = async (req, res) => {
 
     try {
 
-
         const selectedProduct = await product.findById(id)
 
 
@@ -445,7 +444,6 @@ const showRelatedProducts = async (req, res) => {
 
 const filterProducts = async (req, res) => {
 
-
     try {
 
         const { sortBy, brands, categories, minPrice, maxPrice } = req.query
@@ -464,11 +462,13 @@ const filterProducts = async (req, res) => {
 
 
 
+
         if (categories) {
 
             filter.categoryId = { $in: categories };
 
         }
+
 
 
 
@@ -484,15 +484,24 @@ const filterProducts = async (req, res) => {
 
 
 
-        const products = await Product.find(filter);
 
-
-
-
+        const products = await Product.find(filter)
+            .populate({
+                path: 'categoryId',
+                match: { status: 'active' },
+                populate: {
+                    path: 'categoryOffer',
+                    match: { isListed: true }
+                },
+            })
+            .populate({
+                path: 'productOffer',
+                match: { isListed: true }
+            });
 
         if (sortBy) {
 
-            const sortOptions = {};
+            let sortOptions = {};
 
             switch (sortBy) {
 
@@ -504,6 +513,7 @@ const filterProducts = async (req, res) => {
 
                 case 'price-low-high':
 
+                    // sortOptions={ 'variants[0].price': -1 };
                     sortOptions.price = 1;
 
                     break;
@@ -511,6 +521,7 @@ const filterProducts = async (req, res) => {
                 case 'price-high-low':
 
                     sortOptions.price = -1;
+                    // sortOptions={ 'variants[0].price': 1 };
 
                     break;
 
@@ -553,12 +564,25 @@ const filterProducts = async (req, res) => {
 
 
 
-
-            const sortedProducts = await Product.find(filter).populate('categoryId').populate('productOffer').sort(sortOptions)
+            const sortedProducts = await Product.find({ ...filter })
+            .populate({
+                path: 'categoryId',
+                match: { status: 'active' },
+                populate: {
+                    path: 'categoryOffer',
+                    match: { isListed: true }
+                },
+            })
+            .populate({
+                path: 'productOffer',
+                match: { isListed: true }
+            })
+            .sort(sortOptions).limit(4)
 
             return res.status(200).json(sortedProducts);
 
         }
+
 
 
 
@@ -594,7 +618,9 @@ const search = async (req, res) => {
         return res.status(500).json({ message: "error while searching " })
     }
 
-}
+    }
+
+
 
 
 module.exports = {
@@ -612,12 +638,3 @@ module.exports = {
 
 
 }
-
-
-
-
-
-
-
-
-

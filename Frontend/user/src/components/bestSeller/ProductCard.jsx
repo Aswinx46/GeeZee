@@ -31,7 +31,7 @@ const BestSeller = () => {
         const offerPrice =
           Number.isNaN(categoryOfferPrice) ? productOfferPrice :
             Number.isNaN(productOfferPrice) ? categoryOfferPrice :
-              Math.min(categoryOfferPrice, productOfferPrice);
+              Math.max(categoryOfferPrice, productOfferPrice);
         return { ...product, offerPrice }
       })
       setProducts(neededItems)
