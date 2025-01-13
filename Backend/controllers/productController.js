@@ -102,12 +102,14 @@ const showProductInHotDeals = async (req, res) => {
             match: { status: 'active' },
             populate: {
                 path: 'categoryOffer',
-                match:{isListed:true}
+                // match:{isListed:true}
+                match: { validUntil: { $gte: new Date() }, isListed: true },
             },
         })
         .populate({
             path:'productOffer',
-            match:{isListed:true}
+            // match:{isListed:true}
+            match: { validUntil: { $gte: new Date() }, isListed: true },
         })
         
         
@@ -135,12 +137,14 @@ const showParticularProduct = async (req, res) => {
           match: { status: 'active' }, // Filter only active categories
           populate: {
             path: 'categoryOffer',
-            match: { isListed: true }, // Filter listed category offers
+            match: { validUntil: { $gte: new Date() }, isListed: true },
+            // match: { isListed: true }, // Filter listed category offers
           },
         })
         .populate({
           path: 'productOffer',
-          match: { isListed: true }, // Filter listed product offers
+          match: { validUntil: { $gte: new Date() }, isListed: true }
+        //   match: { isListed: true }, // Filter listed product offers
         });
         console.log(products)
 
@@ -341,10 +345,10 @@ const showProductListed = async (req, res) => {
 
 
 
-        const activeProducts = products.filter(product => product.categoryId && product.brand?.status == 'active');
+        // const activeProducts = products.filter(product => product.categoryId && product.brand?.status == 'active');
 
 
-        return res.status(200).json({ message: 'products fetched', products: activeProducts })
+        return res.status(200).json({ message: 'products fetched', products })
 
     } catch (error) {
 
@@ -401,12 +405,14 @@ const showRelatedProducts = async (req, res) => {
             match: { status: 'active' },
             populate: {
                 path: 'categoryOffer',
-                match:{isListed:true}
+                // match:{isListed:true}
+                match: { validUntil: { $gte: new Date() }, isListed: true },
             },
         })
         .populate({
             path:'productOffer',
-            match:{isListed:true}
+            // match:{isListed:true}
+            match: { validUntil: { $gte: new Date() }, isListed: true },
         }).limit(4)
         
 
@@ -418,12 +424,14 @@ const showRelatedProducts = async (req, res) => {
             match: { status: 'active' },
             populate: {
                 path: 'categoryOffer',
-                match:{isListed:true}
+                // match:{isListed:true}
+                match: { validUntil: { $gte: new Date() }, isListed: true },
             },
         })
         .populate({
             path:'productOffer',
-            match:{isListed:true}
+            // match:{isListed:true}
+            match: { validUntil: { $gte: new Date() }, isListed: true },
         }).limit(4)
         
         if (!relatedProducts) return res.status(200).json({ message: "related products is empty so random products", notRelatedProducts })
@@ -491,12 +499,14 @@ const filterProducts = async (req, res) => {
                 match: { status: 'active' },
                 populate: {
                     path: 'categoryOffer',
-                    match: { isListed: true }
+                    // match: { isListed: true }
+                    match: { validUntil: { $gte: new Date() }, isListed: true },
                 },
             })
             .populate({
                 path: 'productOffer',
-                match: { isListed: true }
+                // match: { isListed: true }
+                match: { validUntil: { $gte: new Date() }, isListed: true },
             });
 
         if (sortBy) {
@@ -570,12 +580,14 @@ const filterProducts = async (req, res) => {
                 match: { status: 'active' },
                 populate: {
                     path: 'categoryOffer',
-                    match: { isListed: true }
+                    // match: { isListed: true }
+                    match: { validUntil: { $gte: new Date() }, isListed: true },
                 },
             })
             .populate({
                 path: 'productOffer',
-                match: { isListed: true }
+                // match: { isListed: true }
+                match: { validUntil: { $gte: new Date() }, isListed: true },
             })
             .sort(sortOptions).limit(4)
 

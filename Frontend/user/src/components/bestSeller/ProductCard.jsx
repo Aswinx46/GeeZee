@@ -16,7 +16,7 @@ const BestSeller = () => {
   const [hoveredProduct, setHoveredProduct] = useState(null);
   const [isOpen, setIsOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPage, setTotalPage] = useState(5)
+  const [totalPage, setTotalPage] = useState(1)
   const[filteredProductChange,setFilteredProductChange]=useState(false)
 
   useEffect(() => {
@@ -31,7 +31,7 @@ const BestSeller = () => {
         const offerPrice =
           Number.isNaN(categoryOfferPrice) ? productOfferPrice :
             Number.isNaN(productOfferPrice) ? categoryOfferPrice :
-              Math.max(categoryOfferPrice, productOfferPrice);
+              Math.min(categoryOfferPrice, productOfferPrice);
         return { ...product, offerPrice }
       })
       setProducts(neededItems)
