@@ -43,7 +43,7 @@ const EditProduct = () => {
     const [productId, setProductId] = useState()
     const[update,setUpdate]=useState(false)
     const [existingProductOffer, setExistingProductOffer] = useState({})
-
+    const [change,setChange]=useState(false)
     useEffect(() => {
         const fetchCategory = async () => {
             const category = await axios.get('/category');
@@ -74,7 +74,7 @@ const EditProduct = () => {
             if (sendedProduct.productImg && sendedProduct.productImg.length > 0) setImageUrl(sendedProduct.productImg)
         };
         fetchCategory();
-    }, []);
+    }, [change]);
 
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
@@ -204,6 +204,12 @@ const EditProduct = () => {
             
             const response=await axios.patch(`/changeStatusOrder/${existingProductOffer._id}`)
             toast.success(response.data.message)
+            setExistingProductOffer(prev => ({
+                ...prev,
+                isListed: !prev.isListed
+            }));
+            
+            // setChange(!change)
         } catch (error) {
             console.log('error while changing the status of offer',error)
             toast.error('error while changing the status of offer')
@@ -725,7 +731,7 @@ const EditProduct = () => {
             )}
             {isOpen && <EditVariant isOpen={isOpen} Varient={varients} index={index} setVarient={setVarients} setIsOpen={setIsOpen} />}
 
-            {OpenOffer && <OrderManagement OpenOffer={OpenOffer} update={update} setOpenOffer={setOpenOffer} productId={productId} existingProductOffer={existingProductOffer} />}
+            {OpenOffer && <OrderManagement  OpenOffer={OpenOffer} update={update} setOpenOffer={setOpenOffer} productId={productId} existingProductOffer={existingProductOffer} />}
 
             {cropModalOpen && currentImage && (
                 <motion.div

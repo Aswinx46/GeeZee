@@ -124,6 +124,7 @@ const StaticCategoryManagement = () => {
     setSelectedOffer(category.categoryOffer)
     setSelectedCategoryId(category._id)
     setOpenOffer(true)
+    setUpdate(!update)
   }
 
 
