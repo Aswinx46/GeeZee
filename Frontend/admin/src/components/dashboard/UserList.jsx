@@ -4,6 +4,7 @@ import { Loader2, AlertCircle } from 'lucide-react';
 import axios from '../../../axios/adminAxios';
 import { motion } from 'framer-motion';
 import Pagination from '../Pagination/Pagination';
+import { toast } from 'react-toastify';
 
 const UsersList = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -43,17 +44,18 @@ const UsersList = () => {
       user.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Pagination logic
+
 
 
     const handleToggleBlock =async(userId)=>{
       try {
 
         const user=users.find((u)=> u._id==userId)
-        const userStatus=user.status=='active'? 'inactive' : 'active'
         setChange(!change)
+        const userStatus=user.status=='active'? 'inactive' : 'active'
         const response=await axios.patch(`/userEdit/${userId}`,{status:userStatus})
         setUsers((prevUsers)=>prevUsers.map((u)=>u._id==userId ? {...u,status:userStatus} : u))
+        toast.success('user status changed')
       } catch (error) {
         console.log('error in editing the user status',error.message)
       }

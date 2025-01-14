@@ -2,7 +2,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { AlertTriangle, LogIn, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
+import { removeUser } from '@/redux/slices/userSlice';
+import { useDispatch } from 'react-redux';
 const UserBlockedNotice = () => {
   const containerVariants = {
     hidden: { opacity: 0, y: -50 },
@@ -19,6 +20,8 @@ const UserBlockedNotice = () => {
     },
   };
 
+  const dispatch=useDispatch()
+
   const childVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
@@ -31,6 +34,11 @@ const UserBlockedNotice = () => {
       },
     },
   };
+
+  const handleNavigateToLogin=()=>{
+   
+    dispatch(removeUser())
+  }
 
   return (
     <motion.div
@@ -54,9 +62,10 @@ const UserBlockedNotice = () => {
         <motion.div variants={childVariants}>
           <Link
             to="/login"
+            onClick={handleNavigateToLogin}
             className="block w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-200 text-center mb-4"
           >
-            <LogIn className="inline-block mr-2 h-5 w-5" />
+            <LogIn  className="inline-block mr-2 h-5 w-5" />
             Go to Login Page
           </Link>
         </motion.div>

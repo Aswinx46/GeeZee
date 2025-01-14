@@ -13,9 +13,7 @@ const AccountDetails = () => {
 
   const dispatch=useDispatch()
 
-  useEffect(()=>{
-
-  },[])
+ 
 
   const [isOpen, setIsOpen] = useState(false)
   const [formData, setFormData] = useState({
