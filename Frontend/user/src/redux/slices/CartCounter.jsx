@@ -13,9 +13,12 @@ export const cartCounterSlice=createSlice({
         },
         resetCounter:(state,action)=>{
             state.count=0
+        },
+        justIncrementCountByOne:(state,action)=>{
+            state.count=state.count+1
         }
     }
 })
 
-export const {incrementCounter,resetCounter}=cartCounterSlice.actions
+export const {incrementCounter,resetCounter,justIncrementCountByOne}=cartCounterSlice.actions
 export default cartCounterSlice.reducer

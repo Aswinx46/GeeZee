@@ -10,7 +10,7 @@ import VariantSelector from '../productDetails/ProductVariant'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import QuantitySelector from '../quantitySelector/QuantitySelector'
-import { incrementCounter } from '@/redux/slices/CartCounter'
+import { justIncrementCountByOne } from '@/redux/slices/CartCounter'
 const ProductDetails = () => {
   const [activeImage, setActiveImage] = useState(0)
   const [activeSection, setActiveSection] = useState(null)
@@ -156,9 +156,9 @@ const ProductDetails = () => {
       const selectedProductId = product._id
       const selectedVariant = product.variants.find((_, i) => i == index)
       const selectedVariantId = selectedVariant._id
-   
+      
       const uploadToCart = await axios.post('/cart', { userId: userId, productId: selectedProductId, selectedVariantId: selectedVariantId, quantity })
-     
+      dispatch(justIncrementCountByOne())
       toast.success(uploadToCart.data.message)
     
     } catch (error) {
