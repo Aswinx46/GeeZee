@@ -363,7 +363,7 @@ const showProductListed = async (req, res) => {
 
         }).countDocuments()
 
-        console.log('total', totalDocument)
+    
         const totalPages = Math.ceil(totalDocument / limit)
 
 

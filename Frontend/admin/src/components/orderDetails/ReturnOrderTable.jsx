@@ -17,7 +17,7 @@ const ReturnedOrdersTable = () => {
     const [sortColumn, setSortColumn] = useState('');
     const [sortDirection, setSortDirection] = useState('asc');
     const [selectedOrder, setSelectedOrder] = useState(null);
-
+    const[index,setIndex]=useState()
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -27,6 +27,8 @@ const ReturnedOrdersTable = () => {
                     order.orderItems.map((item) => ({
                         ...item, date: order.invoiceDate, orderId: order.orderId, address: order.address, user: order.userId,_id:order._id
                     })))
+                    console.log(response.data.orders[0])
+                    console.log(response.data.orders[1])
                 setReturnedOrders(response.data.orders)
             } catch (error) {
                 console.log('error while fetching data', error)
@@ -62,6 +64,13 @@ const ReturnedOrdersTable = () => {
         visible: { opacity: 1, y: 0 },
     };
 
+    const handleViewDetails=(order,variant,i)=>{
+        setSelectedOrder(order)
+        console.log('index',i)
+        setIndex(i)
+        console.log(order)
+        console.log(variant)
+    }
     return (
         <div className="container mx-auto p-6">
             <h1 className="text-2xl font-bold mb-6">Returned Orders</h1>
@@ -73,7 +82,7 @@ const ReturnedOrdersTable = () => {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            {['Product', 'Order ID', 'Date', 'Total', 'Status', 'Actions'].map((header) => (
+                            {['Product', 'Order ID', 'Date', 'Total', 'Discount', 'Status', 'Actions'].map((header) => (
                                 <TableHead key={header} onClick={() => handleSort(header.toLowerCase())}>
                                     <div className="flex items-center cursor-pointer">
                                         {header}
@@ -87,62 +96,67 @@ const ReturnedOrdersTable = () => {
                     </TableHeader>
                     <TableBody>
                         <AnimatePresence>
-                            {returnedOrders.map((order, i) => (
-                                <motion.tr
-                                    key={i}
-                                    variants={rowVariants}
-                                    initial="hidden"
-                                    animate="visible"
-                                    exit="hidden"
-                                    layout
-                                >
-                                 
-                                    <TableCell className="flex items-center gap-4">
-                                        <img 
-                                            className='h-16 w-16 rounded-lg object-cover shadow-md hover:scale-105 transition-transform duration-200' 
-                                            src={order.orderItems[0]?.productId.productImg[0]}
-                                            alt={order.orderItems[0].productId?.title}
-                                        />
-                                        <span>{order.orderItems[0].productId?.title}</span>
-                                    </TableCell>
+                            {returnedOrders.map((order, i) => {
+                               return order.orderItems.map((item,i)=>(
 
-                                    <TableCell>{order.orderId}</TableCell>
-                                    <TableCell>{order.invoiceDate.split('T')[0]}</TableCell>
-                                    <TableCell>₹{returnedOrders[i].finalAmount}</TableCell>
-                                    <TableCell>
-                                        <span
-                                            className={`px-2 py-1 rounded-full text-xs ${order.orderItems[0].variant.returnOrder === 'Pending'
-                                                    ? 'bg-red-200 text-red-800' // Red for Pending
-                                                    : 'bg-blue-200 text-blue-800' // Blue for Not Pending
-                                                }`}
-                                        >
-                                            {order.orderItems[0].variant.returnOrder}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => setSelectedOrder(order)}
-                                        >
-                                            <Eye className="mr-2 h-4 w-4" />
-                                            View Details
-                                        </Button>
-                                    </TableCell>
-                                </motion.tr>
-                            ))}
+                                    <motion.tr
+                                        key={item._id}
+                                        variants={rowVariants}
+                                        initial="hidden"
+                                        animate="visible"
+                                        exit="hidden"
+                                        layout
+                                    >
+                                     
+                                        <TableCell className="flex items-center gap-4">
+                                            <img 
+                                                className='h-16 w-16 rounded-lg object-cover shadow-md hover:scale-105 transition-transform duration-200' 
+                                                src={item?.productId.productImg[0]}
+                                                alt={item.productId?.title}
+                                            />
+                                            <span>{item.productId?.title}</span>
+                                        </TableCell>
+    
+                                        <TableCell>{order.orderId}</TableCell>
+                                        <TableCell>{order.invoiceDate.split('T')[0]}</TableCell>
+                                        <TableCell>₹{item.price * item.quantity}</TableCell>
+                                        <TableCell>₹{order.discount}</TableCell>
+                                        <TableCell>
+                                            <span
+                                                className={`px-2 py-1 rounded-full text-xs ${item.variant.returnOrder === 'Pending'
+                                                        ? 'bg-red-200 text-red-800' // Red for Pending
+                                                        : 'bg-blue-200 text-blue-800' // Blue for Not Pending
+                                                    }`}
+                                            >
+                                                {item.variant.returnOrder}
+                                            </span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => handleViewDetails(order,item.variant,i)}
+                                            >
+                                                <Eye className="mr-2 h-4 w-4" />
+                                                View Details
+                                            </Button>
+                                        </TableCell>
+                                    </motion.tr>
+                                ))
+                            })
+                            }
                         </AnimatePresence>
                     </TableBody>
                 </Table>
             </motion.div>
             {selectedOrder && (
-                <OrderDetailsModal order={selectedOrder} onClose={() => setSelectedOrder(null)} />
+                <OrderDetailsModal order={selectedOrder} index={index} onClose={() => setSelectedOrder(null)} />
             )}
         </div>
     );
 };
 
-const OrderDetailsModal = ({ order, onClose }) => {
+const OrderDetailsModal = ({ order, onClose,index }) => {
     const modalVariants = {
         hidden: { opacity: 0, scale: 0.8 },
         visible: {
@@ -168,11 +182,8 @@ const OrderDetailsModal = ({ order, onClose }) => {
     const handleConfirmReturn = async () => {
         try {
             console.log(order)
-            const response = await axios.patch(`/confirmReturn/${order._id}`);
-            // if (response.data.success) {
-            //     onClose();
-            //     window.location.reload();
-            // }
+            const response = await axios.patch(`/confirmReturn/${order._id}/${index}`);
+        
             toast.success(response.data.message)
             // window.location.reload();
         } catch (error) {
