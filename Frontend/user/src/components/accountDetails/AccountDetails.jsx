@@ -1,12 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import axios from '../../axios/userAxios'
 import { toast } from 'react-toastify';
+import { addUser } from '@/redux/slices/userSlice';
 import changeEmailVerification from './ChangeEmailOtpVerification'
 const AccountDetails = () => {
 
   const user = useSelector(state => state.user.user)
+  
+
+
+  const dispatch=useDispatch()
+
+  useEffect(()=>{
+
+  },[])
+
   const [isOpen, setIsOpen] = useState(false)
   const [formData, setFormData] = useState({
     firstName: user.firstName,
@@ -26,12 +36,15 @@ const AccountDetails = () => {
     e.preventDefault();
     try {
       const updateInformation = await axios.put(`/changeUserInfo/${user?._id}`, { formData })
+      dispatch(addUser(updateInformation.data.user))
       toast.success(updateInformation.data.message)
     } catch (error) {
       toast.error(error.response.data.message)
     }
-    // Handle form submission here
+  
   };
+
+  
 
   const formFields = [
     { id: 'firstName', label: 'First name', type: 'text' },

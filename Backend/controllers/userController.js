@@ -270,7 +270,7 @@ const changeInformation = async (req, res) => {
         user.firstName = formData.firstName
         user.lastName = formData.lastName
         await user.save()
-        return res.status(200).json({ message: 'User info Changed' })
+        return res.status(200).json({ message: 'User info Changed' ,user})
     } catch (error) {
         console.log('error while changin the info of the user', error)
         return res.status(500).json({ message: "error while changing the info of the user" })
