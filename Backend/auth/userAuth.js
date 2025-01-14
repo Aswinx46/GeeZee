@@ -8,10 +8,11 @@ const authToken=async(req,res,next)=>{
         try {
             const decoded=jwt.verify(token,process.env.ACCESS_TOKEN_SECRET_KEY)
             req.userId=decoded.userId;
-           
+           console.log(decoded)
             if(userId)
             {
-                const user=await User.findById(userId)
+                // const user=await User.findById(userId)
+                const user=await User.findOne({email:decoded.email})
                
                 if(!user) return res.status(400).json({message:"no user found"})
                 if(user.status == 'inactive') return res.status(423).json({message:'User is Blocked By Admin'})
