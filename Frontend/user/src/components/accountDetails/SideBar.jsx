@@ -9,19 +9,30 @@ import WalletPage from './Wallet';
 import Home from '../home/Home';
 import OrderDetails from './OrderDetails';
 import OrderTable from '../orderDetails/orderTable'
-const menuItems = [
-  { id: 1, icon: ShoppingCart, label: 'Orders', path: '/orderDetailsTable' },
-  { id: 2, icon: Heart, label: 'Wishlist', path: '/home/wishlist' },
-  { id: 3, icon: MapPin, label: 'Address', path: '/address' },
-  { id: 4, icon: Key, label: 'Password', path: '/changePassword' },
-  { id: 5, icon: User, label: 'Account Detail', path: '/accountDetails' },
-  { id: 6, icon: Wallet, label: 'Wallet', path: '/wallet' },
+import { useSelector } from 'react-redux';
 
-];
+
 
 const Sidebar = () => {
   const [activeItem, setActiveItem] = useState(5); // Setting Address as default active item
   const [hoveredItem, setHoveredItem] = useState(null);
+
+  const user=useSelector(state=>state.user.user)
+
+  const items = [
+    { id: 1, icon: ShoppingCart, label: 'Orders', path: '/orderDetailsTable' },
+    { id: 2, icon: Heart, label: 'Wishlist', path: '/home/wishlist' },
+    { id: 3, icon: MapPin, label: 'Address', path: '/address' },
+    { id: 4, icon: Key, label: 'Password', path: '/changePassword' },
+    { id: 5, icon: User, label: 'Account Detail', path: '/accountDetails' },
+    { id: 6, icon: Wallet, label: 'Wallet', path: '/wallet' },
+  
+  ];
+
+  const menuItems = items.filter(
+    (item) => !(user.GoogleVerified && item.label === "Password")
+  );
+
 
   const renderPage = () => {
 
