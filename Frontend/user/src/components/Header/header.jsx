@@ -25,7 +25,9 @@ const Header = (props) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [result, setResult] = useState([])
   const userData = useSelector(state => state.user.user);
+
   const token=useSelector(state=>state.token.token)
+  
   const CartCount = useSelector(state => state.cartCounter.count)
 
   

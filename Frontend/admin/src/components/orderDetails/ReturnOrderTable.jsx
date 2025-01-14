@@ -18,6 +18,7 @@ const ReturnedOrdersTable = () => {
     const [sortDirection, setSortDirection] = useState('asc');
     const [selectedOrder, setSelectedOrder] = useState(null);
     const[index,setIndex]=useState()
+    const[variantId,setVariantId]=useState()
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -27,8 +28,7 @@ const ReturnedOrdersTable = () => {
                     order.orderItems.map((item) => ({
                         ...item, date: order.invoiceDate, orderId: order.orderId, address: order.address, user: order.userId,_id:order._id
                     })))
-                    console.log(response.data.orders[0])
-                    console.log(response.data.orders[1])
+                   
                 setReturnedOrders(response.data.orders)
             } catch (error) {
                 console.log('error while fetching data', error)
@@ -66,10 +66,12 @@ const ReturnedOrdersTable = () => {
 
     const handleViewDetails=(order,variant,i)=>{
         setSelectedOrder(order)
-        console.log('index',i)
-        setIndex(i)
         console.log(order)
-        console.log(variant)
+        console.log(variant._id)
+        setVariantId(variant._id)
+        console.log(i)
+        setIndex(i)
+     
     }
     return (
         <div className="container mx-auto p-6">
@@ -150,13 +152,13 @@ const ReturnedOrdersTable = () => {
                 </Table>
             </motion.div>
             {selectedOrder && (
-                <OrderDetailsModal order={selectedOrder} index={index} onClose={() => setSelectedOrder(null)} />
+                <OrderDetailsModal order={selectedOrder} variantId={variantId} index={index} onClose={() => setSelectedOrder(null)} />
             )}
         </div>
     );
 };
 
-const OrderDetailsModal = ({ order, onClose,index }) => {
+const OrderDetailsModal = ({ order, onClose,index ,variantId}) => {
     const modalVariants = {
         hidden: { opacity: 0, scale: 0.8 },
         visible: {
@@ -182,7 +184,7 @@ const OrderDetailsModal = ({ order, onClose,index }) => {
     const handleConfirmReturn = async () => {
         try {
             console.log(order)
-            const response = await axios.patch(`/confirmReturn/${order._id}/${index}`);
+            const response = await axios.patch(`/confirmReturn/${order._id}/${variantId}`);
         
             toast.success(response.data.message)
             // window.location.reload();

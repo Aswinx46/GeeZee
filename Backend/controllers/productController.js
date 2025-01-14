@@ -642,10 +642,30 @@ const search = async (req, res) => {
 
     try {
         const { searchTerm } = req.query
+        // const products = await Product.find({
+        //     title: { $regex: searchTerm, $options: 'i' },
+        //     status: 'active'
+        // }).populate('categoryId').populate('productOffer').limit(5);
+
         const products = await Product.find({
             title: { $regex: searchTerm, $options: 'i' },
             status: 'active'
-        }).populate('categoryId').populate('productOffer').limit(5);
+        })
+        .populate({
+            path: 'categoryId',
+            match: { status: 'active' },
+            populate: {
+                path: 'categoryOffer',
+                // match:{isListed:true}
+                match: { validUntil: { $gte: new Date() }, isListed: true },
+            },
+        })
+        .populate({
+            path: 'productOffer',
+            // match:{isListed:true}
+            match: { validUntil: { $gte: new Date() }, isListed: true },
+        }).limit(5)
+
         return res.status(200).json({ message: 'Searched product fetched', products })
     } catch (error) {
         console.log('error while searching', error)

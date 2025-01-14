@@ -37,7 +37,7 @@ admin_route.patch('/editBrandName/:brandId', auth.adminAuth, brandController.cha
 admin_route.get('/showOrders/:pageNumber', auth.adminAuth, OrderController.showAllOrders)
 admin_route.patch('/changeOrderStatus/:orderId', auth.adminAuth, OrderController.changeOrderStatus)
 admin_route.get('/getReturnProducts', auth.adminAuth, OrderController.getReturnProducts)
-admin_route.patch('/confirmReturn/:orderId/:index', auth.adminAuth, OrderController.confirmReturnProduct)
+admin_route.patch('/confirmReturn/:orderId/:variantId', auth.adminAuth, OrderController.confirmReturnProduct)
 admin_route.get('/trending', auth.adminAuth, OrderController.trendingItems)
 
 admin_route.post('/createCoupon', auth.adminAuth, couponConrtoller.createCoupon)

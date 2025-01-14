@@ -51,17 +51,17 @@ const createOrder = async (req, res) => {
 
 
         const insufficientStock = [];
-        let originalAmount=0
-       
+        let originalAmount = 0
+
         for (const item of cartItems) {
-            
+
             const product = await Product.findById(item.id, "variants");
             const variant = product.variants.find((v) => v._id.toString() === item.variants[0]._id);
             if (!variant || variant.stock < item.quantity) {
                 insufficientStock.push(item.id);
             }
 
-            originalAmount += item.offerPrice || item.variants[0].price  * item.quantity
+            originalAmount += item.offerPrice || item.variants[0].price * item.quantity
 
         }
         if (insufficientStock.length > 0) {
@@ -91,7 +91,7 @@ const createOrder = async (req, res) => {
             })
         }
 
- 
+
 
         const orderItems = cartItems.map((item) => ({
             productId: item.id,
@@ -101,7 +101,7 @@ const createOrder = async (req, res) => {
             // variantId:changeVariant
         }))
 
-      
+
 
         const order = new Order({
             userId,
@@ -120,7 +120,7 @@ const createOrder = async (req, res) => {
 
 
         for (item of cartItems) {
-           
+
 
             const product = await Product.findById(item.id, 'variants categoryId brand salesCount')
             const changeVariant = product.variants.find(
@@ -138,7 +138,7 @@ const createOrder = async (req, res) => {
 
             await Brand.updateOne({ _id: product.brand }, { $inc: { salesCount: item.quantity } })
 
-            
+
         }
 
 
@@ -215,19 +215,19 @@ const showOrders = async (req, res) => {
 
     try {
         const { pageNumber } = req.params
-   
+
         const page = parseInt(pageNumber, 10);
         const limit = 5
         const skip = (page - 1) * limit
-        const orderDetails = await Order.find({ userId }).populate('orderItems.productId', 'productImg title').populate('address',).sort({createdOn:-1}).limit(limit).skip(skip)
+        const orderDetails = await Order.find({ userId }).populate('orderItems.productId', 'productImg title').populate('address',).sort({ createdOn: -1 }).limit(limit).skip(skip)
 
         const totalDocuments = await Order.find({ userId }).populate('orderItems.productId', 'productImg title').populate('address',).countDocuments()
 
-        const totalPages=Math.ceil(totalDocuments/limit)
+        const totalPages = Math.ceil(totalDocuments / limit)
 
         if (!orderDetails) return res.status(400).json({ message: 'no orders ' })
 
-        return res.status(200).json({ message: "order details fetched", orderDetails ,totalPages})
+        return res.status(200).json({ message: "order details fetched", orderDetails, totalPages })
 
     } catch (error) {
         console.log('error while fetching the order details', error)
@@ -293,11 +293,11 @@ const cancelOrder = async (req, res) => {
 
         if (paymentMethod == 'Razorpay') {
             const wallet = await Wallet.findOne({ userId })
-            
+
             if (!wallet) return res.status(400).json({ message: 'no wallet found' })
 
             const totalRefundAmount = details.reduce((sum, item) => sum + item.totalPrice, 0);
-    
+
 
             const transaction = {
                 type: 'Refund',
@@ -332,9 +332,9 @@ const showAllOrders = async (req, res) => {
         const skip = (page - 1) * limit
         const orders = await Order.find().populate('orderItems.productId', 'productImg title').populate('address').populate('userId', 'lastName firstName email phoneNo').limit(limit).skip(skip)
         if (!orders) return res.status(400).json({ message: 'no order found' })
-            const totalDocuments= await Order.find().countDocuments()
-            const totalPages=Math.ceil(totalDocuments/limit)
-        return res.status(200).json({ message: "order details fetched", orders,totalPages })
+        const totalDocuments = await Order.find().countDocuments()
+        const totalPages = Math.ceil(totalDocuments / limit)
+        return res.status(200).json({ message: "order details fetched", orders, totalPages })
     } catch (error) {
         console.log('error while fetching the order details', error)
         return res.status(500).json({ message: 'error while fetching the order details' })
@@ -347,27 +347,26 @@ const changeOrderStatus = async (req, res) => {
 
     try {
 
-        if(newStatus == 'Cancelled')
-        {
-            const order=await Order.findById(orderId)
-       
+        if (newStatus == 'Cancelled') {
+            const order = await Order.findById(orderId)
+
 
             for (const item of order.orderItems) {
                 await Product.findOneAndUpdate(
-                    { _id: item.productId, "variants._id": item.variant._id},
+                    { _id: item.productId, "variants._id": item.variant._id },
                     { $inc: { "variants.$.stock": item.quantity } }
                 );
                 await Product.findByIdAndUpdate(item.productId, { $inc: { salesCount: -item.quantity } });
-    
+
                 const product = await Product.findById(item.productId, 'categoryId brand');
-    
+
                 await Category.findByIdAndUpdate(product.categoryId, { $inc: { salesCount: -item.quantity } });
-    
+
                 await Brand.findByIdAndUpdate(product.brand, { $inc: { salesCount: -item.quantity } });
             }
-            order.status=newStatus
+            order.status = newStatus
             await order.save()
-            return res.status(200).json({message:'order status changed and stock incremented'})
+            return res.status(200).json({ message: 'order status changed and stock incremented' })
         }
 
         const order = await Order.findByIdAndUpdate(orderId, { status: newStatus }, { new: true })
@@ -426,21 +425,23 @@ const getReturnProducts = async (req, res) => {
 
 const confirmReturnProduct = async (req, res) => {
     try {
-        const { orderId,index } = req.params
-        console.log('this is index',index)
-        const update = await Order.findOneAndUpdate(
-            { _id: orderId, 'orderItems.variant.returnOrder': 'Pending' },
-            { $set: { 'orderItems.$.variant.returnOrder': 'Accepted' } },
-            { new: true }
-        );
-
-        console.log('this is update',update)
+        const { orderId, variantId } = req.params
+        // console.log('this is index', index)
+        // const update = await Order.findOneAndUpdate(
+        //     { _id: orderId, 'orderItems.variant.returnOrder': 'Pending' },
+        //     { $set: { 'orderItems.$.variant.returnOrder': 'Accepted' } },
+        //     { new: true }
+        // );
+        const update=await Order.findById(orderId)
+        console.log('this is update', update)
 
         if (!update) return res.status(400).json({ message: "no order found" })
-            const totalQuantity=update.orderItems.reduce((acc,item)=>acc+=item.quantity,0)
-            const deductAmountCouponEvenly=update.discount/totalQuantity
-            const shippingCharge=update.shippingCost/update.orderItems.length
-        const returnedVariant = update.orderItems.find((item,i) => i == index)
+        const totalQuantity = update.orderItems.reduce((acc, item) => acc += item.quantity, 0)
+        const deductAmountCouponEvenly = update.discount / totalQuantity
+        const shippingCharge = update.shippingCost / update.orderItems.length
+        const returnedVariant = update.orderItems.find((item) => item.variant._id == variantId)
+        returnedVariant.variant.returnOrder='Accepted'
+        update.save()
         const { productId, variant, quantity } = returnedVariant
         if (!returnedVariant) {
             return res.status(400).json({ message: "No matching item found for return" });
@@ -454,7 +455,7 @@ const confirmReturnProduct = async (req, res) => {
             ],
         }
         )
-        console.log('this is returnedVariant',returnedVariant)
+        console.log('this is returnedVariant', returnedVariant)
         // console.log('this is the selected product',selectedProduct)
         if (!selectedProduct) {
             return res.status(400).json({ message: "Failed to update variant stock" });
@@ -479,7 +480,7 @@ const confirmReturnProduct = async (req, res) => {
         const transaction = {
             type: 'Refund',
             transaction_id: uuidv4(), // Generate a unique transaction ID 
-            amount: returnedVariant.price * returnedVariant.quantity - (shippingCharge+deductAmountCouponEvenly),
+            amount: returnedVariant.price * returnedVariant.quantity - (shippingCharge + deductAmountCouponEvenly),
             description: 'Product Returned amount',
             date: new Date(), // Add a timestamp for the transaction
         };
