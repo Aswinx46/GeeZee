@@ -80,9 +80,10 @@ const showProduct = async (req, res) => {
         const limit = 5
         const skip = (page - 1) * limit
         const products = await Product.find().populate('categoryId').populate('productOffer').limit(limit).skip(skip)
-       
+        const totalDocuments=await Product.find().populate('categoryId').populate('productOffer').countDocuments()
+        const totalPages = Math.ceil(totalDocuments / limit)
 
-        return res.status(200).json({ message: 'products fetched', products })
+        return res.status(200).json({ message: 'products fetched', products ,totalPages})
     } catch (error) {
         console.log('error while fetching the products', error)
         return res.status(500).json({ message: "error while fetching the products" })
@@ -96,23 +97,23 @@ const showProductInHotDeals = async (req, res) => {
 
     try {
         // const products = await Product.find({ status: 'active' }).populate('categoryId').populate('productOffer')
-        const products = await Product.find({status:'active'})
-        .populate({
-            path: 'categoryId',
-            match: { status: 'active' },
-            populate: {
-                path: 'categoryOffer',
+        const products = await Product.find({ status: 'active' })
+            .populate({
+                path: 'categoryId',
+                match: { status: 'active' },
+                populate: {
+                    path: 'categoryOffer',
+                    // match:{isListed:true}
+                    match: { validUntil: { $gte: new Date() }, isListed: true },
+                },
+            })
+            .populate({
+                path: 'productOffer',
                 // match:{isListed:true}
                 match: { validUntil: { $gte: new Date() }, isListed: true },
-            },
-        })
-        .populate({
-            path:'productOffer',
-            // match:{isListed:true}
-            match: { validUntil: { $gte: new Date() }, isListed: true },
-        })
-        
-        
+            })
+
+
         return res.status(200).json({ message: 'products fetched', products })
     } catch (error) {
         console.log('error while fetching the products', error)
@@ -129,26 +130,26 @@ const showParticularProduct = async (req, res) => {
     try {
 
         const { id } = req.params
-       
+
         // const products = await Product.findById(id, { status: 'active' }).populate('categoryId').populate('productOffer')
         const products = await Product.findOne({ _id: id, status: 'active' }) // Ensure the product itself has 'active' status
-        .populate({
-          path: 'categoryId',
-          match: { status: 'active' }, // Filter only active categories
-          populate: {
-            path: 'categoryOffer',
-            match: { validUntil: { $gte: new Date() }, isListed: true },
-            // match: { isListed: true }, // Filter listed category offers
-          },
-        })
-        .populate({
-          path: 'productOffer',
-          match: { validUntil: { $gte: new Date() }, isListed: true }
-        //   match: { isListed: true }, // Filter listed product offers
-        });
+            .populate({
+                path: 'categoryId',
+                match: { status: 'active' }, // Filter only active categories
+                populate: {
+                    path: 'categoryOffer',
+                    match: { validUntil: { $gte: new Date() }, isListed: true },
+                    // match: { isListed: true }, // Filter listed category offers
+                },
+            })
+            .populate({
+                path: 'productOffer',
+                match: { validUntil: { $gte: new Date() }, isListed: true }
+                //   match: { isListed: true }, // Filter listed product offers
+            });
         console.log(products)
 
-        if(!products) return res.status(400).json({message:"no product found"})
+        if (!products) return res.status(400).json({ message: "no product found" })
 
         return res.status(200).json({ message: 'products fetched', products })
 
@@ -302,7 +303,7 @@ const showProductListed = async (req, res) => {
 
         const page = parseInt(pageNumber, 10);
 
-        const limit = 5
+        const limit = 2
 
         const skip = (page - 1) * limit
 
@@ -343,12 +344,33 @@ const showProductListed = async (req, res) => {
 
         }).limit(limit).skip(skip)
 
+        const totalDocument = await Product.find({ status: 'active', availableQuantity: { $gt: 0 } }).populate({
+
+            path: 'categoryId',
+
+            match: { status: 'active' },
+
+            // select: '_id categoryName status'
+
+            populate: {
+
+                path: 'categoryOffer',
+
+                match: { validUntil: { $gte: new Date() }, isListed: true },
+
+                select: 'offerType offerValue validFrom validUntil',
+            }
+
+        }).countDocuments()
+
+        console.log('total', totalDocument)
+        const totalPages = Math.ceil(totalDocument / limit)
 
 
         // const activeProducts = products.filter(product => product.categoryId && product.brand?.status == 'active');
 
 
-        return res.status(200).json({ message: 'products fetched', products })
+        return res.status(200).json({ message: 'products fetched', products, totalPages })
 
     } catch (error) {
 
@@ -393,47 +415,47 @@ const showRelatedProducts = async (req, res) => {
 
     const { id } = req.params
 
-    
+
 
 
     try {
 
         // const relatedProducts = await Product.find({ status: 'active', categoryId: id }).limit(4)
-        const relatedProducts = await Product.find({status:'active',categoryId: id})
-        .populate({
-            path: 'categoryId',
-            match: { status: 'active' },
-            populate: {
-                path: 'categoryOffer',
+        const relatedProducts = await Product.find({ status: 'active', categoryId: id })
+            .populate({
+                path: 'categoryId',
+                match: { status: 'active' },
+                populate: {
+                    path: 'categoryOffer',
+                    // match:{isListed:true}
+                    match: { validUntil: { $gte: new Date() }, isListed: true },
+                },
+            })
+            .populate({
+                path: 'productOffer',
                 // match:{isListed:true}
                 match: { validUntil: { $gte: new Date() }, isListed: true },
-            },
-        })
-        .populate({
-            path:'productOffer',
-            // match:{isListed:true}
-            match: { validUntil: { $gte: new Date() }, isListed: true },
-        }).limit(4)
-        
+            }).limit(4)
+
 
         // const notRelatedProducts = await Product.find({ status: "active" }).limit(4)
-        
-        const notRelatedProducts = await Product.find({status:'active'})
-        .populate({
-            path: 'categoryId',
-            match: { status: 'active' },
-            populate: {
-                path: 'categoryOffer',
+
+        const notRelatedProducts = await Product.find({ status: 'active' })
+            .populate({
+                path: 'categoryId',
+                match: { status: 'active' },
+                populate: {
+                    path: 'categoryOffer',
+                    // match:{isListed:true}
+                    match: { validUntil: { $gte: new Date() }, isListed: true },
+                },
+            })
+            .populate({
+                path: 'productOffer',
                 // match:{isListed:true}
                 match: { validUntil: { $gte: new Date() }, isListed: true },
-            },
-        })
-        .populate({
-            path:'productOffer',
-            // match:{isListed:true}
-            match: { validUntil: { $gte: new Date() }, isListed: true },
-        }).limit(4)
-        
+            }).limit(4)
+
         if (!relatedProducts) return res.status(200).json({ message: "related products is empty so random products", notRelatedProducts })
 
         return res.status(200).json({ message: "related products fetched", relatedProducts })
@@ -575,21 +597,21 @@ const filterProducts = async (req, res) => {
 
 
             const sortedProducts = await Product.find({ ...filter })
-            .populate({
-                path: 'categoryId',
-                match: { status: 'active' },
-                populate: {
-                    path: 'categoryOffer',
+                .populate({
+                    path: 'categoryId',
+                    match: { status: 'active' },
+                    populate: {
+                        path: 'categoryOffer',
+                        // match: { isListed: true }
+                        match: { validUntil: { $gte: new Date() }, isListed: true },
+                    },
+                })
+                .populate({
+                    path: 'productOffer',
                     // match: { isListed: true }
                     match: { validUntil: { $gte: new Date() }, isListed: true },
-                },
-            })
-            .populate({
-                path: 'productOffer',
-                // match: { isListed: true }
-                match: { validUntil: { $gte: new Date() }, isListed: true },
-            })
-            .sort(sortOptions).limit(4)
+                })
+                .sort(sortOptions).limit(4)
 
             return res.status(200).json(sortedProducts);
 
@@ -630,7 +652,7 @@ const search = async (req, res) => {
         return res.status(500).json({ message: "error while searching " })
     }
 
-    }
+}
 
 
 

@@ -12,7 +12,7 @@ const UsersList = () => {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const[change,setChange]=useState(false)
-  const[totalPage,setTotalPage]=useState(5)
+  const[totalPage,setTotalPage]=useState(1)
   const[changePage,setChangePage]=useState(false)
   const usersPerPage = 10;
   
@@ -25,6 +25,7 @@ const UsersList = () => {
         setError(null);
         const response = await axios.get(`/usersList/${currentPage}`);
         setUsers(response.data.users);
+        setTotalPage(response.data.totalPages)
       } catch (error) {
         setError('Failed to fetch users. Please try again later.');
         console.error('Error fetching users:', error.message);

@@ -10,7 +10,7 @@ import { addProductSlice } from '@/redux/slices/editProductSlice';
 import Pagination from '../Pagination/Pagination';
 const ProductList = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPage, setTotalPage] = useState(5)
+  const [totalPage, setTotalPage] = useState(1)
   const[changePage,setChangePage]=useState(false)
   const [products, setProducts] = useState([])
   const [search, setSearch] = useState('')
@@ -22,6 +22,7 @@ const ProductList = () => {
 
       const products = await axios.get(`/products/${currentPage}`)
       setProducts(products.data.products)
+      setTotalPage(products.data.totalPages)
 
     }
     fetchProducts()

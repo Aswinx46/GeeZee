@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PlusCircle, SendHorizontal, ScanLine, ChevronRight } from 'lucide-react';
 import axios from '../../axios/userAxios'
 import { useSelector } from 'react-redux';
+
 const Wallet = () => {
 
   const user = useSelector(state => state.user.user)
@@ -15,6 +16,8 @@ const Wallet = () => {
   const [wallet, setWallet] = useState({})
   const [isLoading, setIsLoading] = useState(false);
   const [totalAmount, setTotalAmount] = useState(0)
+  const [showAllTransactions, setShowAllTransactions] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
       const walletDetails = await axios.get(`/getWalletDetails/${user?._id}`)
@@ -101,34 +104,41 @@ const Wallet = () => {
         >
           <h3 className="text-lg font-semibold mb-4">Recent Transactions</h3>
           <AnimatePresence>
-            {wallet?.transactions?.length == 0 ? <motion.h3
-              className="text-center text-lg font-bold text-gray-700 mt-5"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-            >
-              No Transaction
-            </motion.h3> :
-
-              wallet?.transactions?.map((transaction, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="flex justify-between items-center border-b border-gray-200 py-3"
-                >
-                  <div>
-                    <p className="font-medium">{transaction.description}</p>
-                    <p className="text-sm text-gray-500">{transaction.date}</p>
-                  </div>
-                  <p className={`font-semibold ${transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    ${Math.abs(transaction.amount).toFixed(2)}
-                  </p>
-                </motion.div>
-              ))
-            }
+            {wallet?.transactions?.length === 0 ? (
+              <motion.h3
+                className="text-center text-lg font-bold text-gray-700 mt-5"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+              >
+                No Transaction
+              </motion.h3>
+            ) : (
+              <>
+                {(showAllTransactions ? wallet.transactions : wallet.transactions?.slice(0, 1))?.map((transaction, index) => (
+                  <motion.div
+                    key={transaction._id || index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{
+                      duration: 0.3,
+                      delay: showAllTransactions ? index * 0.1 : 0,
+                      ease: "easeOut"
+                    }}
+                    className="flex justify-between items-center border-b border-gray-200 py-3"
+                  >
+                    <div>
+                      <p className="font-medium">{transaction.description}</p>
+                      <p className="text-sm text-gray-500">{transaction.date}</p>
+                    </div>
+                    <p className={`font-semibold ${transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      ₹{Math.abs(transaction.amount).toFixed(2)}
+                    </p>
+                  </motion.div>
+                ))}
+              </>
+            )}
           </AnimatePresence>
         </motion.div>
 
@@ -138,10 +148,11 @@ const Wallet = () => {
           transition={{ delay: 0.8 }}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
+          onClick={() => setShowAllTransactions(!showAllTransactions)}
           className="w-full mt-6 bg-black text-white py-3 rounded-lg flex items-center justify-center"
         >
-          View All Transactions
-          <ChevronRight className="ml-2" size={18} />
+          {showAllTransactions ? 'Show Less' : 'View All Transactions'}
+          <ChevronRight className={`ml-2 transform transition-transform duration-300 ${showAllTransactions ? 'rotate-90' : ''}`} size={18} />
         </motion.button>
       </motion.div>
     </div>
@@ -149,4 +160,3 @@ const Wallet = () => {
 };
 
 export default Wallet;
-

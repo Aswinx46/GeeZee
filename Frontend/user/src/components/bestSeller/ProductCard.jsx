@@ -22,7 +22,8 @@ const BestSeller = () => {
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get(`/products/${currentPage}`)
-
+      setTotalPage(response.data.totalPages)
+      console.log(response.data.totalPages)
       const neededItems = response.data.products.map((product) => {
         const variantPrice = product?.variants[0]?.price
         const categoryOfferPrice = product.categoryId?.categoryOffer?.offerType == 'percentage' ? variantPrice - variantPrice * product.categoryId?.categoryOffer?.offerValue / 100 : variantPrice - product.categoryId?.categoryOffer?.offerValue

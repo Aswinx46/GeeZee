@@ -34,8 +34,10 @@ const fetchUser = async (req, res) => {
         const limit = 5
         const skip = (page - 1) * limit
         const users = await User.find().limit(limit).skip(skip)
+        const totalDocuments=await User.find().countDocuments()
+        const totalPages=Math.ceil(totalDocuments/limit)
 
-        res.status(200).json({ message: 'users fetched', users })
+        res.status(200).json({ message: 'users fetched', users ,totalPages})
     } catch (error) {
         return res.status(400).json({ message: 'failed to fetch the users list' })
     }

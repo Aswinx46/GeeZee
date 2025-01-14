@@ -20,7 +20,7 @@ const OrderDetails = () => {
   const [orderDetails, setOrderDetails] = useState([])
   const [expandedOrders, setExpandedOrders] = useState({})
   const [particularOrderDetails, setParticularOrderDetails] = useState({})
-  const[totalPage,setTotalPage]=useState(5)
+  const[totalPage,setTotalPage]=useState(1)
   const[changePage,setChangePage]=useState(false)
   const [currentPage, setCurrentPage] = useState(1);
   const user = useSelector((state) => state.user.user)
@@ -30,6 +30,7 @@ const OrderDetails = () => {
     const fetchData = async () => {
       const orderDetails = await axios.get(`/orderDetails/${userId}/${currentPage}`)
       setOrderDetails(orderDetails.data.orderDetails)
+      setTotalPage(orderDetails.data.totalPages)
       // if (orderDetails.data.orderDetails.length > 0) {
       //   setParticularOrderDetails(orderDetails.data.orderDetails[0].orderItems[0])
       // }

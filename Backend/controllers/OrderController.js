@@ -61,7 +61,7 @@ const createOrder = async (req, res) => {
                 insufficientStock.push(item.id);
             }
 
-            originalAmount += item.offerPrice * item.quantity
+            originalAmount += item.offerPrice || item.variants[0].price  * item.quantity
 
         }
         if (insufficientStock.length > 0) {
@@ -91,15 +91,17 @@ const createOrder = async (req, res) => {
             })
         }
 
-
+        console.log('cart items',cartItems)
 
         const orderItems = cartItems.map((item) => ({
             productId: item.id,
             quantity: item.quantity,
-            price: item.offerPrice,
+            price: item.offerPrice || item.variants[0].price,
             variant: item.variants[0]
             // variantId:changeVariant
         }))
+
+        console.log(orderItems)
 
         const order = new Order({
             userId,
@@ -217,12 +219,16 @@ const showOrders = async (req, res) => {
         const page = parseInt(pageNumber, 10);
         const limit = 5
         const skip = (page - 1) * limit
-        const orderDetails = await Order.find({ userId }).populate('orderItems.productId', 'productImg title').populate('address',).limit(limit).skip(skip)
+        const orderDetails = await Order.find({ userId }).populate('orderItems.productId', 'productImg title').populate('address',).sort({createdOn:-1}).limit(limit).skip(skip)
+
+        const totalDocuments = await Order.find({ userId }).populate('orderItems.productId', 'productImg title').populate('address',).countDocuments()
+
+        const totalPages=Math.ceil(totalDocuments/limit)
 
         if (!orderDetails) return res.status(400).json({ message: 'no orders ' })
-        
+        console.log('this is total',totalDocuments)
 
-        return res.status(200).json({ message: "order details fetched", orderDetails })
+        return res.status(200).json({ message: "order details fetched", orderDetails ,totalPages})
 
     } catch (error) {
         console.log('error while fetching the order details', error)
@@ -327,7 +333,9 @@ const showAllOrders = async (req, res) => {
         const skip = (page - 1) * limit
         const orders = await Order.find().populate('orderItems.productId', 'productImg title').populate('address').populate('userId', 'lastName firstName email phoneNo').limit(limit).skip(skip)
         if (!orders) return res.status(400).json({ message: 'no order found' })
-        return res.status(200).json({ message: "order details fetched", orders })
+            const totalDocuments= await Order.find().countDocuments()
+            const totalPages=Math.ceil(totalDocuments/limit)
+        return res.status(200).json({ message: "order details fetched", orders,totalPages })
     } catch (error) {
         console.log('error while fetching the order details', error)
         return res.status(500).json({ message: 'error while fetching the order details' })

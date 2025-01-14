@@ -35,7 +35,7 @@ const OrderTable = () => {
   const [orderID, setOrderId] = useState()
   const [orderDetails, setOrderDetails] = useState({})
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPage, setTotalPage] = useState(5)
+  const [totalPage, setTotalPage] = useState(1)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,6 +43,7 @@ const OrderTable = () => {
         console.log("this is the current page")
         const response = await axios.get(`/showOrders/${currentPage}`)
         setAllOrderItems(response.data.orders)
+        setTotalPage(response.data.totalPages)
         const neededDetails = response.data.orders.map((order) => {
           return {
             name: order.orderItems[0]?.productId?.title || 'N/A',
