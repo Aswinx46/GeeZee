@@ -2,6 +2,7 @@ const User = require('../models/userSchema')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
+const StatusCodes = require('../enums/httpStatusCode')
 require('dotenv').config()
 const login = async (req, res) => {
     const { email, password } = req.body
@@ -21,10 +22,11 @@ const login = async (req, res) => {
                 maxAge: 7 * 24 * 60 * 60 * 1000
             })
 
-            return res.status(200).json({ message: 'admin logged', token, user })
+            return res.status(StatusCodes.OK).json({ message: 'admin logged', token, user })
         }
     } catch (error) {
         console.log('admin login failed', error)
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR)
     }
 }
 const fetchUser = async (req, res) => {
@@ -34,12 +36,12 @@ const fetchUser = async (req, res) => {
         const limit = 5
         const skip = (page - 1) * limit
         const users = await User.find().limit(limit).skip(skip)
-        const totalDocuments=await User.find().countDocuments()
-        const totalPages=Math.ceil(totalDocuments/limit)
+        const totalDocuments = await User.find().countDocuments()
+        const totalPages = Math.ceil(totalDocuments / limit)
 
-        res.status(200).json({ message: 'users fetched', users ,totalPages})
+        res.status(StatusCodes.OK).json({ message: 'users fetched', users, totalPages })
     } catch (error) {
-        return res.status(400).json({ message: 'failed to fetch the users list' })
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'failed to fetch the users list' })
     }
 }
 
@@ -54,10 +56,10 @@ const editUser = async (req, res) => {
             { new: true }
         );
         if (!updatedUser) return res.status(400).json({ message: "the user is not edited" })
-        return res.status(200).json({ message: "the user is edited" })
+        return res.status(StatusCodes.OK).json({ message: "the user is edited" })
 
     } catch (error) {
-
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json('error while editing user')
     }
 }
 
@@ -71,10 +73,10 @@ const refreshToken = async (req, res) => {
         if (!user) return res.status(400).json({ message: "user not found" })
         const newAccessToken = jwt.sign({ email: user.email }, process.env.ADMIN_ACCESS_TOKEN_KEY)
 
-        return res.status(200).json({ message: 'new token created', newAccessToken })
+        return res.status(StatusCodes.OK).json({ message: 'new token created', newAccessToken })
     } catch (error) {
         console.log(error)
-        return res.status(403).json({ message: "error in creating new access token" })
+        return res.status(StatusCodes.FORBIDDEN).json({ message: "error in creating new access token" })
     }
 }
 

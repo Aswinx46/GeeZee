@@ -1,4 +1,5 @@
 
+const StatusCodes = require('../enums/httpStatusCode');
 const Order = require('../models/OrderSchema');
 const salesReport = async (req, res) => {
   try {
@@ -70,10 +71,10 @@ const salesReport = async (req, res) => {
       { $sort: { year: 1, month: 1 } },
     ]);
 
-    return res.status(200).json({ message: 'Sales report fetched', salesReport });
+    return res.status(StatusCodes.OK).json({ message: 'Sales report fetched', salesReport });
   } catch (error) {
     console.error('Error while fetching sales report', error);
-    return res.status(500).json({ message: 'Error while fetching sales report' });
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error while fetching sales report' });
   }
 };
 

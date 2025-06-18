@@ -1,19 +1,20 @@
 const User = require('../models/userSchema')
 const Product = require('../models/productSchema')
 const Cart = require('../models/CartSchema')
+const StatusCodes = require('../enums/httpStatusCode')
 const addToCart = async (req, res) => {
     const { userId, productId, selectedVariantId, quantity } = req.body
 
     try {
         const user = await User.findById(userId)
-        if (!user) return res.status(400).json({ message: "no user found" })
+        if (!user) return res.status(StatusCodes.BAD_REQUEST).json({ message: "no user found" })
         const product = await Product.findById(productId)
-        if (!product) return res.status(400).json({ message: 'no product found' })
+        if (!product) return res.status(StatusCodes.BAD_REQUEST).json({ message: 'no product found' })
         const Varient = product.variants.find((item) => item._id.toString() === selectedVariantId)
         const price = Varient.price
         const cart = await Cart.findOne({ userId })
         const totalPrice = quantity * price
-        if (quantity > Varient.stock) return res.status(400).json({ message: "your quantity is greater than the stock" })
+        if (quantity > Varient.stock) return res.status(StatusCodes.BAD_REQUEST).json({ message: "your quantity is greater than the stock" })
         if (!cart) {
             const newCart = new Cart({
                 userId,
@@ -25,7 +26,7 @@ const addToCart = async (req, res) => {
                 }]
             })
             await newCart.save()
-            return res.status(201).json({ message: "item added to cart", newCart })
+            return res.status(StatusCodes.CREATED).json({ message: "item added to cart", newCart })
         } else {
             const existingItemIndex = cart.items.findIndex((item) => item.productId.toString() === productId.toString() && item.varientId == selectedVariantId)
             const existingVariantItem = cart.items.find((item) => item.varientId == selectedVariantId)
@@ -36,7 +37,7 @@ const addToCart = async (req, res) => {
                 cart.items[existingItemIndex].quantity = quantity
                 cart.items[existingItemIndex].totalPrice = totalPrice
                 await cart.save()
-                return res.status(200).json({ message: "Cart updated successfully", cart });
+                return res.status(StatusCodes.OK).json({ message: "Cart updated successfully", cart });
             } else {
                 cart.items.push({
                     productId,
@@ -45,13 +46,13 @@ const addToCart = async (req, res) => {
                     varientId: selectedVariantId
                 })
                 await cart.save();
-                return res.status(200).json({ message: "item added to cart", cart });
+                return res.status(StatusCodes.OK).json({ message: "item added to cart", cart });
             }
 
         }
     } catch (error) {
         console.log('error while creating the cart', error)
-        return res.status(500).json({ message: "error while creating cart" })
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "error while creating cart" })
     }
 }
 
@@ -92,7 +93,7 @@ const showCartItems = async (req, res) => {
             });
 
         if (!cartItems) {
-            return res.status(404).json({ message: 'No items found in the cart' });
+            return res.status(StatusCodes.NOT_FOUND).json({ message: 'No items found in the cart' });
         }
         // Transforming the data
         const result = cartItems.items.map((item) => {
@@ -122,10 +123,10 @@ const showCartItems = async (req, res) => {
         });
 
 
-        return res.status(200).json({ message: "cart items fetched", result })
+        return res.status(StatusCodes.OK).json({ message: "cart items fetched", result })
     } catch (error) {
         console.log('error while fetching the cart items', error)
-        return res.status(500).json({ message: "error in fetching the cart details" })
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "error in fetching the cart details" })
     }
 }
 
@@ -145,12 +146,12 @@ const changeQuantity = async (req, res) => {
         if (newQuantity >= 1 && newQuantity <= 5 && newQuantity <= varientToBeEdited.stock) {
             varienInCart.quantity += count
             await cart.save();
-            return res.status(200).json({ message: "count updated", cart })
+            return res.status(StatusCodes.OK).json({ message: "count updated", cart })
         }
-        return res.status(400).json({ message: 'no stock available' })
+        return res.status(StatusCodes.BAD_REQUEST).json({ message: 'no stock available' })
     } catch (error) {
         console.log('error while updating the quantity', error)
-        return res.status(500).json({ message: "error while updating the quantity" })
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "error while updating the quantity" })
     }
 }
 
@@ -164,7 +165,7 @@ const deleteItem = async (req, res) => {
 
     } catch (error) {
         console.log('error while deleting item from the cart', error)
-        return res.status(500).json({ message: "error while deleting item from cart" })
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "error while deleting item from cart" })
     }
 }
 

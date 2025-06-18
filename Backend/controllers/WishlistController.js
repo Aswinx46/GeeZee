@@ -1,5 +1,6 @@
 const Wishlist=require('../models/wishlistSchema')
 const Product=require('../models/productSchema')
+const StatusCodes = require('../enums/httpStatusCode')
 
 
 const addProductWishlist=async (req,res) => {
@@ -28,10 +29,10 @@ const addProductWishlist=async (req,res) => {
             existingWishlist.product.push(newProduct)
             await existingWishlist.save()
         }
-        return res.status(200).json({message:'Product added to wishlist'})
+        return res.status(StatusCodes.OK).json({message:'Product added to wishlist'})
     } catch (error) {
         console.log('error while adding product in wishlist',error)
-        return res.status(500).json({message:'error while adding product in wishlist',error})
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message:'error while adding product in wishlist',error})
     }
 }
 
@@ -40,13 +41,13 @@ const addProductWishlist=async (req,res) => {
             const {userId}=req.params
             const wishilst=await Wishlist.findOne({userId}).populate('product.productId')
 
-            if(!wishilst) return res.status(400).json({message:"no wishlist found"})
+            if(!wishilst) return res.status(StatusCodes.BAD_REQUEST).json({message:"no wishlist found"})
         
     
-            return res.status(200).json({message:'wishlist fetched',wishilst})
+            return res.status(StatusCodes.OK).json({message:'wishlist fetched',wishilst})
         } catch (error) {
             console.log('error while fetching the wishlist details',error)
-            return res.status(500).json({message:"error while fetching wishlist data"})
+            return res.status(StatusCodes.BAD_REQUEST).json({message:"error while fetching wishlist data"})
         }
     }
 
@@ -57,16 +58,16 @@ const addProductWishlist=async (req,res) => {
             const{item}=req.body
       
             const wishilst=await Wishlist.findOne({userId})
-            if(!wishilst) return res.status(400).json({message:"no wishlist found"})
+            if(!wishilst) return res.status(StatusCodes.BAD_REQUEST).json({message:"no wishlist found"})
                 const updatedWishlist=wishilst.product.filter((prod)=>prod.productId.toString() !== item.productId._id.toString())
     
 
                 wishilst.product=updatedWishlist
                 await wishilst.save()
-                return res.status(200).json({message:'item removed from wishlist'})
+                return res.status(StatusCodes.OK).json({message:'item removed from wishlist'})
         } catch (error) {
             console.log('error while removing item from wishlist',error);
-            return res.status(500).json({message:"error while removing item from wishlist",error})
+            return res.status(StatusCodes.BAD_REQUEST).json({message:"error while removing item from wishlist",error})
             
         }
 
