@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from 'react-toastify';
 import axios from '../../../axios/adminAxios'
-const OfferModal = ({ OpenOffer, setOpenOffer, onClose, onSubmit,productId, update,setUpdate, type,existingProductOffer,categoryId }) => {
+const OfferModal = ({ OpenOffer, setOpenOffer, onClose, onSubmit, productId, update, setUpdate, type, existingProductOffer, categoryId, productPrice }) => {
   const [offerType, setOfferType] = useState('percentage');
   const [offerValue, setOfferValue] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -19,7 +19,7 @@ const OfferModal = ({ OpenOffer, setOpenOffer, onClose, onSubmit,productId, upda
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     // Validate offer value
     if (!offerValue) {
       newErrors.offerValue = 'Offer value is required';
@@ -36,7 +36,7 @@ const OfferModal = ({ OpenOffer, setOpenOffer, onClose, onSubmit,productId, upda
       }
     }
 
-    
+
     if (!startDate) {
       newErrors.startDate = 'Start date is required';
     }
@@ -61,30 +61,28 @@ const OfferModal = ({ OpenOffer, setOpenOffer, onClose, onSubmit,productId, upda
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
       try {
-        if(productId)
-        {
-        
-          const response=await axios.post(`/addOffer/${productId}`,{offerType, offerValue, startDate, endDate})
+        if (productId) {
+
+          const response = await axios.post(`/addOffer/${productId}`, { offerType, offerValue, startDate, endDate })
           console.log(response.data)
           toast.success(response.data.message);
           setOpenOffer(false);
 
-        }else if(categoryId)
-        {
-          const response=await axios.post(`/addOfferCategory/${categoryId}`,{offerType, offerValue, startDate, endDate})
+        } else if (categoryId) {
+          const response = await axios.post(`/addOfferCategory/${categoryId}`, { offerType, offerValue, startDate, endDate })
           toast.success(response.data.message);
           setOpenOffer(false);
           setUpdate(!update)
         }
       } catch (error) {
-        console.log('error while updating offer in the backend',error)
+        console.log('error while updating offer in the backend', error)
         toast.error('error while updating offer in the backend')
       }
-   
+
     } else {
       toast.error('Please fix the errors in the form');
     }
@@ -92,17 +90,17 @@ const OfferModal = ({ OpenOffer, setOpenOffer, onClose, onSubmit,productId, upda
 
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.8 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       scale: 1,
-      transition: { 
+      transition: {
         type: "spring",
         damping: 25,
         stiffness: 500
       }
     },
-    exit: { 
-      opacity: 0, 
+    exit: {
+      opacity: 0,
       scale: 0.8,
       transition: {
         type: "spring",
@@ -116,6 +114,15 @@ const OfferModal = ({ OpenOffer, setOpenOffer, onClose, onSubmit,productId, upda
     hidden: { opacity: 0 },
     visible: { opacity: 1 },
   };
+
+  const handleOfferChange = (e) => {
+    let value = e.target.value
+    if (value >= productPrice) {
+      toast('Offer Amount is greater than product price')
+      return
+    }
+    setOfferValue(value)
+  }
 
   return (
     <AnimatePresence>
@@ -136,7 +143,7 @@ const OfferModal = ({ OpenOffer, setOpenOffer, onClose, onSubmit,productId, upda
           >
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">Add Offer to {type}</h2>
-              <Button variant="ghost" size="icon" onClick={()=>setOpenOffer(false)}>
+              <Button variant="ghost" size="icon" onClick={() => setOpenOffer(false)}>
                 <X className="h-4 w-4" />
               </Button>
             </div>
@@ -168,7 +175,7 @@ const OfferModal = ({ OpenOffer, setOpenOffer, onClose, onSubmit,productId, upda
                     id="offerValue"
                     type="number"
                     value={offerValue || existingProductOffer?.offerValue}
-                    onChange={(e) => setOfferValue(e.target.value)}
+                    onChange={(e) => handleOfferChange(e)}
                     placeholder={offerType === 'percentage' ? 'Enter percentage' : 'Enter amount'}
                     className={`pl-8 ${errors.offerValue ? 'border-red-500' : ''}`}
                   />

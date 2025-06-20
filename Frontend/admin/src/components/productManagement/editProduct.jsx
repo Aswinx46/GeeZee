@@ -24,7 +24,7 @@ const EditProduct = () => {
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
     const [isVariantModalOpen, setIsVariantModalOpen] = useState(false);
     const [OpenOffer, setOpenOffer] = useState(false)
-    const[selectedOffer,setSelectedOffer]=useState({})
+    const [selectedOffer, setSelectedOffer] = useState({})
 
 
     const [product, setProduct] = useState(store.getState().product.product)
@@ -41,9 +41,9 @@ const EditProduct = () => {
     const navigate = useNavigate()
     const [index, setIndex] = useState()
     const [productId, setProductId] = useState()
-    const[update,setUpdate]=useState(false)
+    const [update, setUpdate] = useState(false)
     const [existingProductOffer, setExistingProductOffer] = useState({})
-    const [change,setChange]=useState(false)
+    const [change, setChange] = useState(false)
     useEffect(() => {
         const fetchCategory = async () => {
             const category = await axios.get('/category');
@@ -56,20 +56,20 @@ const EditProduct = () => {
             setProductId(product?._id)
 
             const brand = response.data.brands.filter((bran) => bran.name !== selectedBrand.name)
-        
+
 
             setBrands(brand);
 
-       
+
             const cat = category.data.category.filter((cat) => cat.categoryName != sendedProduct.categoryId.categoryName)
-            
+
 
 
 
             setOldUrl(sendedProduct.productImg)
             setCategories(cat);
             setSuccess(false)
-        
+
             setExistingProductOffer(sendedProduct.productOffer)
             if (sendedProduct.productImg && sendedProduct.productImg.length > 0) setImageUrl(sendedProduct.productImg)
         };
@@ -87,7 +87,7 @@ const EditProduct = () => {
             };
             reader.readAsDataURL(files[0]);
             setImage([...image, files[0]]);
-            
+
         }
     };
 
@@ -187,38 +187,38 @@ const EditProduct = () => {
     }
 
     const handleEditVariant = (index) => {
-        
+
         setIndex(index)
-        
+
         setIsOpen(true)
     }
 
-
+    console.log(product)
 
     const handleAddOffer = () => {
         setOpenOffer(true)
-        
+
     }
-    const handleListOffer=async()=>{
+    const handleListOffer = async () => {
         try {
-            
-            const response=await axios.patch(`/changeStatusOrder/${existingProductOffer._id}`)
+
+            const response = await axios.patch(`/changeStatusOrder/${existingProductOffer._id}`)
             toast.success(response.data.message)
             setExistingProductOffer(prev => ({
                 ...prev,
                 isListed: !prev.isListed
             }));
-            
+
             // setChange(!change)
         } catch (error) {
-            console.log('error while changing the status of offer',error)
+            console.log('error while changing the status of offer', error)
             toast.error('error while changing the status of offer')
         }
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-       
+
         const newErrors = {};
         if (!product.title?.trim()) {
             newErrors.title = 'Title is required';
@@ -278,7 +278,7 @@ const EditProduct = () => {
 
             if (urls.length > 0) {
                 const response = await axios.put(`/editProduct/${product._id}`, { product, urls: [...oldUrl, ...urls], variants: varients })
-              
+
                 setSuccess(true)
                 navigate('/showProduct')
             } else {
@@ -296,7 +296,7 @@ const EditProduct = () => {
 
     // const handleDeleteOffer=async()=>{
     //     try {
-            
+
     //     } catch (error) {
     //         console.log('error while deleting the error',error)
     //         toast.error('error while deleting the error')
@@ -582,18 +582,18 @@ const EditProduct = () => {
                         >
 
                         </motion.div>
-                       {!existingProductOffer && 
-                        <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        type="button"
-                        onClick={handleAddOffer}
-                        className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-all duration-200 ease-in-out"
-                        >
-                            <FaSave className="mr-2" />
-                            Add Offer
-                        </motion.button>
-                        } 
+                        {!existingProductOffer &&
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                type="button"
+                                onClick={handleAddOffer}
+                                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-all duration-200 ease-in-out"
+                            >
+                                <FaSave className="mr-2" />
+                                Add Offer
+                            </motion.button>
+                        }
 
                         <motion.button
                             whileHover={{ scale: 1.05 }}
@@ -646,7 +646,7 @@ const EditProduct = () => {
                                     onClick={handleListOffer}
                                     className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                                 >
-                                  {existingProductOffer.isListed ? 'Block' : 'Unblock'}
+                                    {existingProductOffer.isListed ? 'Block' : 'Unblock'}
                                 </motion.button>
                             </div>
                         </div>
@@ -716,12 +716,12 @@ const EditProduct = () => {
                                         >
                                             Edit
                                         </button>
-                                        <button
+                                        {/* <button
                                             onClick={() => handleDeleteVariant(idx)}
                                             className="text-red-600 hover:text-red-800 font-medium ml-2"
                                         >
                                             Delete
-                                        </button>
+                                        </button> */}
                                     </td>
                                 </tr>
                             ))}
@@ -731,7 +731,7 @@ const EditProduct = () => {
             )}
             {isOpen && <EditVariant isOpen={isOpen} Varient={varients} index={index} setVarient={setVarients} setIsOpen={setIsOpen} />}
 
-            {OpenOffer && <OrderManagement  OpenOffer={OpenOffer} update={update} setOpenOffer={setOpenOffer} productId={productId} existingProductOffer={existingProductOffer} />}
+            {OpenOffer && <OrderManagement OpenOffer={OpenOffer} update={update} setOpenOffer={setOpenOffer} productId={productId} existingProductOffer={existingProductOffer} productPrice={product.price} />}
 
             {cropModalOpen && currentImage && (
                 <motion.div

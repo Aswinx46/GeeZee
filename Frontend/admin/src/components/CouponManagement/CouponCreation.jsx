@@ -39,15 +39,24 @@ const CouponCreationForm = () => {
       isValid = false;
     }
 
+    const discount = parseFloat(formData.discountValue);
+    const minPrice = parseFloat(formData.minimumPrice);
+
     // Discount value validation
     if (formData.couponType === 'percentage') {
-      if (parseFloat(formData.discountValue) <= 0 || parseFloat(formData.discountValue) > 100) {
+      if (isNaN(discount) || discount <= 0 || discount > 100) {
         tempErrors.discountValue = 'Percentage must be between 0 and 100';
         isValid = false;
       }
     } else if (formData.couponType === 'fixed') {
-      if (parseFloat(formData.discountValue) <= 0) {
+      if (isNaN(discount) || discount <= 0) {
         tempErrors.discountValue = 'Amount must be greater than 0';
+        isValid = false;
+      } else if (discount > 10000) {
+        tempErrors.discountValue = 'Offer amount cannot exceed ₹10,000';
+        isValid = false;
+      } else if (minPrice && discount >= minPrice) {
+        tempErrors.discountValue = 'Offer amount cannot be more than or equal to minimum purchase price';
         isValid = false;
       }
     }
@@ -62,8 +71,11 @@ const CouponCreationForm = () => {
     if (!formData.minimumPrice) {
       tempErrors.minimumPrice = 'Minimum price is required';
       isValid = false;
-    } else if (parseFloat(formData.minimumPrice) <= 0) {
+    } else if (isNaN(minPrice) || minPrice <= 0) {
       tempErrors.minimumPrice = 'Minimum price must be greater than 0';
+      isValid = false;
+    } else if (minPrice > 1000000) {
+      tempErrors.minimumPrice = 'Minimum price cannot exceed ₹100,000';
       isValid = false;
     }
 
@@ -78,6 +90,7 @@ const CouponCreationForm = () => {
     setErrors(tempErrors);
     return isValid;
   };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -106,6 +119,10 @@ const CouponCreationForm = () => {
 
     if (validateForm()) {
       try {
+        console.log(formData)
+        if (!formData.couponType) {
+          toast.error('Choose The Type')
+        }
         const response = await axios.post('/createCoupon', { formData })
         toast.success(`Coupon ${response.data.newCoupon.couponCode} has been created successfully.`);
         // Reset form after submission
@@ -120,8 +137,8 @@ const CouponCreationForm = () => {
         });
         setErrors({});
       } catch (error) {
-        console.log('error while creating the coupon',error)
-     
+        console.log('error while creating the coupon', error)
+
         toast.error(error.response.data.message)
       }
 

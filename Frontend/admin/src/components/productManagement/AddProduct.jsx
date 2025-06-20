@@ -47,6 +47,8 @@ const ProductManagement = () => {
   useEffect(() => {
     const getCategory = async () => {
       const category = await axios.get('/category')
+      // category.data.category.unshift({categoryName:"select"})
+      console.log(category.data.category)
       setCategories(category.data.category)
 
       const response = await axios.get('/brands');
@@ -147,7 +149,7 @@ const ProductManagement = () => {
 
       const spec = data.get('spec')
       const specArray = spec.split('>').map((item) => item.trim()).filter((item) => item.length > 0)
-      
+
 
       const subHeading = data.get('SubHeadings')
       const subHeadArray = subHeading.split('>').map((item) => item.trim()).filter((item) => item.length > 0)
@@ -155,7 +157,7 @@ const ProductManagement = () => {
       const subHeadingdescription = data.get('subHeadingdescription')
       const subHeadingDescriptionArray = subHeadingdescription.split('>').map((item) => item.trim()).filter((item) => item.length > 0)
 
-      
+
 
 
       const productDetails = {
@@ -348,7 +350,8 @@ const ProductManagement = () => {
                   Category
                 </label>
 
-                <select name='category' className="w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black">
+                <select name='category' defaultValue="" className="w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black">
+                  <option value="" disabled>Select a category</option>
                   {categories.map((category, i) => (
                     <option key={i}>{category.categoryName}</option>
                   ))}
@@ -366,7 +369,8 @@ const ProductManagement = () => {
                   Brands
                 </label>
 
-                <select name='brand' className="w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black">
+                <select name='brand'  defaultValue="" className="w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black">
+                  <option value="" disabled>Select a Brand</option>
                   {brands.map((brand, i) => (
                     <option key={i}>{brand.name}</option>
                   ))}

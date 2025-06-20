@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import axios from '../../../axios/adminAxios';
@@ -16,13 +16,6 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-const dummyOrders = [
-  { product: 'sample', id: 'ORD001', date: '2023-06-20', total: 329.98, status: 'Processing' },
-  { product: 'sample', id: 'ORD002', date: '2023-06-21', total: 159.99, status: 'Shipped' },
-  { product: 'sample', id: 'ORD003', date: '2023-06-22', total: 499.99, status: 'Delivered' },
-  { product: 'sample', id: 'ORD004', date: '2023-06-23', total: 79.99, status: 'Pending' },
-  { product: 'sample', id: 'ORD005', date: '2023-06-24', total: 249.99, status: 'Cancelled' },
-];
 
 
 

@@ -6,7 +6,7 @@ const mongoose = require('mongoose')
 const session = require('express-session')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
-mongoose.connect(process.env.MONGO_ATLAS_CONNECTION_STRING).then(() => console.log("DB connected succesfully "))
+mongoose.connect(process.env.MONGO_DB_KEY).then(() => console.log("DB connected succesfully "))
 const admin_route = require('./routes/adminRoute')
 const user_route = require('./routes/userRoute')
 
