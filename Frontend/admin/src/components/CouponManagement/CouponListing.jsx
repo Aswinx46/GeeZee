@@ -14,16 +14,20 @@ import {
 } from "@/components/ui/table"
 import { useNavigate } from 'react-router-dom';
 import axios from '../../../axios/adminAxios';
+import Pagination from '../Pagination/Pagination';
 const CouponList = () => {
   const [coupons, setCoupons] = useState([]);
   const [update, setUpdate] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
   useEffect(() => {
     const fetchData = async () => {
-      const response = await axios.get('/getCoupon')
+      const response = await axios.get(`/getCoupon/${currentPage}`)
       setCoupons(response.data.allCoupon)
+      setTotalPages(response.data.totalPages)
     }
     fetchData()
-  }, [update])
+  }, [update, currentPage])
 
   const navigate = useNavigate()
 
@@ -50,6 +54,10 @@ const CouponList = () => {
 
   const handleCreateCoupon = () => {
     navigate('/addCoupon')
+  }
+
+  const handleOnChangePage = (page) => {
+    setCurrentPage(page)
   }
 
   const itemVariants = {
@@ -142,6 +150,7 @@ const CouponList = () => {
           </AnimatePresence>
         </TableBody>
       </Table>
+      <Pagination currentPage={currentPage} onPageChange={handleOnChangePage} totalPages={totalPages} />
     </motion.div>
   );
 };

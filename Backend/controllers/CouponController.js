@@ -28,9 +28,15 @@ const createCoupon = async (req, res) => {
 
 const showCoupon = async (req, res) => {
     try {
-        const allCoupon = await Coupon.find()
+        const { pageNo } = req.params
+        const page = parseInt(pageNo, 10);
+        const limit = 2
+        const skip = (page - 1) * limit
+        const allCoupon = await Coupon.find().limit(limit).skip(skip)
+        const totalDocuments = await Coupon.find().countDocuments()
+        const totalPages = Math.ceil(totalDocuments / limit)
         if (!allCoupon) return res.status(200).json({ message: 'no coupon available' })
-        return res.status(StatusCodes.OK).json({ message: "coupons fetched", allCoupon })
+        return res.status(StatusCodes.OK).json({ message: "coupons fetched", allCoupon, totalPages })
     } catch (error) {
         console.log('error while fetching coupon details', error)
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "error while fetching coupon details", error })

@@ -41,7 +41,7 @@ admin_route.patch('/confirmReturn/:orderId/:variantId', auth.adminAuth, OrderCon
 admin_route.get('/trending', auth.adminAuth, OrderController.trendingItems)
 
 admin_route.post('/createCoupon', auth.adminAuth, couponConrtoller.createCoupon)
-admin_route.get('/getCoupon', auth.adminAuth, couponConrtoller.showCoupon)
+admin_route.get('/getCoupon/:pageNo', auth.adminAuth, couponConrtoller.showCoupon)
 admin_route.patch('/changeStatusOfCoupon/:couponId', auth.adminAuth, couponConrtoller.changeStatusOfCoupon)
 
 admin_route.get('/salesReport', auth.adminAuth, salesReportController.salesReport)
