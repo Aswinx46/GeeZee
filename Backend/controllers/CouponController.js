@@ -30,7 +30,7 @@ const showCoupon = async (req, res) => {
     try {
         const { pageNo } = req.params
         const page = parseInt(pageNo, 10);
-        const limit = 2
+        const limit = 5
         const skip = (page - 1) * limit
         const allCoupon = await Coupon.find().limit(limit).skip(skip)
         const totalDocuments = await Coupon.find().countDocuments()

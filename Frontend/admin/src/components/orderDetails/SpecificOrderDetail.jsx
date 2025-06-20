@@ -39,7 +39,7 @@ const dummyOrder = {
   status: 'Processing',
 };
 
-const statusOptions = ['Pending','Processing','Shipped','Delivered','Cancelled','Return Request','Returned']
+const statusOptions = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Return Request', 'Returned']
 
 const statusColors = {
   Pending: 'bg-yellow-500',
@@ -51,40 +51,40 @@ const statusColors = {
   Returned: 'bg-gray-500',
 };
 
-const SpecificOrderDetail = ({ isOpen, onClose, setIsOpen, order: initialOrder,orderDetails, }) => {
+const SpecificOrderDetail = ({ isOpen, onClose, setIsOpen, order: initialOrder, orderDetails, }) => {
   const [order, setOrder] = useState(initialOrder || dummyOrder);
-  const[orderItems,setOrderItems]=useState(orderDetails.orderItems)
-  const[newStatus,setNewStatus]=useState()
+  const [orderItems, setOrderItems] = useState(orderDetails.orderItems)
+  const [newStatus, setNewStatus] = useState()
   const handleStatusChange = (newStatus) => {
     setNewStatus(newStatus)
   };
 
-  const currentOrderStatus=orderDetails.status
+  const currentOrderStatus = orderDetails.status
 
-  const orderStatus=[currentOrderStatus,...statusOptions.filter((status)=>status !== currentOrderStatus)]
+  const orderStatus = [currentOrderStatus, ...statusOptions.filter((status) => status !== currentOrderStatus)]
 
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
+    visible: {
       opacity: 1,
-      transition: { 
+      transition: {
         when: "beforeChildren",
         staggerChildren: 0.1,
       },
     },
   };
 
-  const handleSave=async () => {
-    
-    const orderId=orderDetails._id
+  const handleSave = async () => {
+
+    const orderId = orderDetails._id
     try {
-      
-      const response=await axios.patch(`/changeOrderStatus/${orderId}`,{newStatus})
+
+      const response = await axios.patch(`/changeOrderStatus/${orderId}`, { newStatus })
       toast.success(response.data.message)
       setIsOpen(false)
     } catch (error) {
-      console.log('error while changing the status of the order',error)
+      console.log('error while changing the status of the order', error)
       toast.error('error while changing the status of the order')
     }
   }
@@ -100,12 +100,12 @@ const SpecificOrderDetail = ({ isOpen, onClose, setIsOpen, order: initialOrder,o
         <DialogHeader>
           <div className="flex justify-between items-center">
             <DialogTitle className="text-3xl font-bold">Order Details</DialogTitle>
-            <Button variant="ghost" size="icon" onClick={()=>setIsOpen(false)}>
+            <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
               <X className="h-4 w-4" />
             </Button>
           </div>
         </DialogHeader>
-        
+
         <motion.div
           className="space-y-8"
           variants={containerVariants}
@@ -113,7 +113,7 @@ const SpecificOrderDetail = ({ isOpen, onClose, setIsOpen, order: initialOrder,o
           animate="visible"
         >
           <motion.div variants={itemVariants} className="flex justify-between items-center">
-           
+
             <Badge variant="outline" className={`${statusColors[orderDetails.status]} text-white px-3 py-1 rounded-full`}>
               {orderDetails.status}
             </Badge>
@@ -133,7 +133,7 @@ const SpecificOrderDetail = ({ isOpen, onClose, setIsOpen, order: initialOrder,o
                   <Calendar className="mr-2 text-gray-500" />
                   <span>Date: {orderDetails.invoiceDate.split('T')[0]}</span>
                 </div>
-                  <span>Cancellation reason: {orderDetails.CancellationReason}</span>
+                <span>Cancellation reason: {orderDetails.CancellationReason}</span>
               </CardContent>
             </Card>
           </motion.div>
@@ -167,16 +167,26 @@ const SpecificOrderDetail = ({ isOpen, onClose, setIsOpen, order: initialOrder,o
               </CardHeader>
               <CardContent>
                 {orderItems.map((item) => (
-                  <div key={item._id} className="flex justify-between items-center py-2">
-                    <span>{item.productId.title} (x{item.quantity})</span>
-                    <span><img className='w-20 h-20' src={item.productId.productImg[0]}></img></span>
-                    <span>₹{(item.price * item.quantity).toFixed(2)}</span>
+                  // <div key={item._id} className="flex justify-between items-center py-2">
+                  //   <span>{item.productId.title} (x{item.quantity})</span>
+                  //   <span><img className='w-20 h-20' src={item.productId.productImg[0]}></img></span>
+                  //   <span>₹{(item.price * item.quantity).toFixed(2)}</span>
+                  // </div>
+                  <div key={item._id} className="flex items-center justify-between py-4 border-b">
+                    <div className="flex items-center space-x-4">
+                      <img src={item.productId.productImg[0]} alt={item.productId.title} className="w-20 h-20 object-cover rounded" />
+                      <div>
+                        <p className="font-medium">{item.productId.title}</p>
+                        <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                      </div>
+                    </div>
+                    <p className="font-semibold">₹{(item.price * item.quantity).toFixed(2)}</p>
                   </div>
                 ))}
                 <Separator className="my-4" />
                 <div className="flex justify-between items-center font-semibold">
                   <span>Total</span>
-                  <span>${orderDetails.totalPrice.toFixed(2)}</span>
+                  <span>₹{orderDetails.totalPrice.toFixed(2)}</span>
                 </div>
               </CardContent>
             </Card>
@@ -194,7 +204,7 @@ const SpecificOrderDetail = ({ isOpen, onClose, setIsOpen, order: initialOrder,o
                 </div>
                 <div className="flex items-center">
                   <MapPin className="mr-2 text-gray-500" />
-                  <span>{orderDetails.address.street} {orderDetails.address.city} <br/>Pincode: {orderDetails.address.pinCode} <br/> {orderDetails.address.state} {orderDetails.address.country}</span>
+                  <span>{orderDetails.address.street} {orderDetails.address.city} <br />Pincode: {orderDetails.address.pinCode} <br /> {orderDetails.address.state} {orderDetails.address.country}</span>
                 </div>
               </CardContent>
             </Card>
@@ -208,9 +218,9 @@ const SpecificOrderDetail = ({ isOpen, onClose, setIsOpen, order: initialOrder,o
               <CardContent className="space-y-2">
                 <div className="flex items-center">
                   <CreditCard className="mr-2 text-gray-500" />
-                  <span>{orderDetails.paymentMethod}</span> 
+                  <span>{orderDetails.paymentMethod}</span>
                 </div>
-                  <span> shipping Charge : {orderDetails.shippingCost}</span>
+                <span> shipping Charge : {orderDetails.shippingCost}</span>
               </CardContent>
             </Card>
           </motion.div>
